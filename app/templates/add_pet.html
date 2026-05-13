@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Pet</title>
+</head>
+<body>
+
+<h1>Add Pet</h1>
+
+<a href="/dashboard">
+    Dashboard
+</a>
+
+<form method="POST">
+
+    <input
+        type="text"
+        name="pet_name"
+        placeholder="Pet Name"
+        required
+    >
+
+    <select name="animal_type">
+
+        <option value="dog">
+            Dog
+        </option>
+
+        <option value="cat">
+            Cat
+        </option>
+
+    </select>
+
+    <input
+        type="text"
+        name="breed"
+        placeholder="Breed"
+    >
+
+    <input
+        type="number"
+        name="age"
+        placeholder="Age"
+    >
+
+    <input
+        type="text"
+        name="gender"
+        placeholder="Gender"
+    >
+
+    <input
+        type="text"
+        name="color"
+        placeholder="Color"
+    >
+
+    <textarea
+        name="description"
+        placeholder="Description"
+    ></textarea>
+
+    <button type="submit">
+        Add Pet
+    </button>
+
+</form>
+
+</body>
+</html>

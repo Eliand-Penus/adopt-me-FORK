@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard</title>
+</head>
+<body>
+
+<a href="/admin/logout">
+    <button>
+        Logout
+    </button>
+</a>
+
+<h1>Pending Pets</h1>
+
+{% for pet in pending_pets %}
+
+    <div>
+
+        <h3>{{ pet.pet_name }}</h3>
+
+        <p>Breed: {{ pet.breed }}</p>
+
+        <p>Owner: {{ pet.owner.username }}</p>
+
+        <p>Status: {{ pet.adoption_status }}</p>
+
+        <a href="/admin/approve-pet/{{ pet.pet_id }}">
+            Approve
+        </a>
+
+        <a href="/admin/reject-pet/{{ pet.pet_id }}">
+            Reject
+        </a>
+
+        <hr>
+
+    </div>
+
+{% endfor %}
+
+<h1>Accepted Pets</h1>
+
+{% for pet in accepted_pets %}
+
+    <div>
+
+        <h3>{{ pet.pet_name }}</h3>
+
+        <p>Status: {{ pet.adoption_status }}</p>
+
+        <hr>
+
+    </div>
+
+{% endfor %}
+
+<h1>Rejected Pets</h1>
+
+{% for pet in rejected_pets %}
+
+    <div>
+
+        <h3>{{ pet.pet_name }}</h3>
+
+        <p>Status: {{ pet.adoption_status }}</p>
+
+        <hr>
+
+    </div>
+
+{% endfor %}
+
+</body>
+</html>

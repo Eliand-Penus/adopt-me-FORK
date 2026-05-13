@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Available Pets</title>
+</head>
+<body>
+
+<h1>Available Pets</h1>
+
+<a href="/dashboard">
+    <button>
+        Dashboard
+    </button>
+</a>
+
+<a href="/my-pets">
+    <button>
+        My Pets
+    </button>
+</a>
+
+<a href="/logout">
+    <button>
+        Logout
+    </button>
+</a>
+
+<br><br>
+
+{% if pets %}
+
+    {% for pet in pets %}
+
+        <div>
+
+            <h2>
+                <a href="/pet/{{ pet.pet_id }}">
+                    {{ pet.pet_name }}
+                </a>
+            </h2>
+
+            <p>
+                Type:
+                {{ pet.animal_type }}
+            </p>
+
+            <p>
+                Breed:
+                {{ pet.breed }}
+            </p>
+
+            <p>
+                Age:
+                {{ pet.age }}
+            </p>
+
+            <p>
+                Gender:
+                {{ pet.gender }}
+            </p>
+
+            <p>
+                Color:
+                {{ pet.color }}
+            </p>
+
+            <p>
+                Description:
+                {{ pet.description }}
+            </p>
+
+            <p>
+                Status:
+                {{ pet.adoption_status }}
+            </p>
+
+            <hr>
+
+        </div>
+
+    {% endfor %}
+
+{% else %}
+
+    <h3>
+        No pets available right now.
+    </h3>
+
+{% endif %}
+
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Pets</title>
+</head>
+<body>
+
+<h1>My Pets</h1>
+
+<a href="/dashboard">
+    Dashboard
+</a>
+
+<br><br>
+
+{% for pet in pets %}
+
+    <div>
+
+        <h2>{{ pet.pet_name }}</h2>
+
+        <p>Breed: {{ pet.breed }}</p>
+
+        <p>Status: {{ pet.adoption_status }}</p>
+
+        <a href="/edit-pet/{{ pet.pet_id }}">
+            Edit
+        </a>
+
+        <a href="/delete-pet/{{ pet.pet_id }}">
+            Delete
+        </a>
+
+        <hr>
+
+    </div>
+
+{% endfor %}
+
+</body>
+</html>

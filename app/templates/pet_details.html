@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ pet.pet_name }}</title>
+</head>
+<body>
+
+<h1>{{ pet.pet_name }}</h1>
+
+<p>Type: {{ pet.animal_type }}</p>
+
+<p>Breed: {{ pet.breed }}</p>
+
+<p>Age: {{ pet.age }}</p>
+
+<p>Description: {{ pet.description }}</p>
+
+<p>Owner: {{ pet.owner.username }}</p>
+
+<a href="/adopt/{{ pet.pet_id }}">
+    Adopt Me
+</a>
+
+</body>
+</html>
