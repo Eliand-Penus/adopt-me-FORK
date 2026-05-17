@@ -1,71 +1,133 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Add Pet</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Pet - Adopt Me</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
+<body class="bg-gray-50 min-h-screen text-gray-800 font-sans">
 
-<h1>Add Pet</h1>
+    <!-- Navigation -->
+    <nav class="bg-white shadow px-6 py-4 mb-8">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-indigo-600">Adopt Me</h1>
+            <a href="/dashboard" class="text-gray-600 hover:text-indigo-600 font-medium">Dashboard</a>
+        </div>
+    </nav>
 
-<a href="/dashboard">
-    Dashboard
-</a>
+    <main class="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow-md mb-12">
+        <h2 class="text-3xl font-extrabold text-gray-900 mb-6 text-center">Add a Pet for Adoption</h2>
+        <p class="text-gray-500 text-center mb-8">Please fill in the details and upload the necessary files. All submissions are subject to admin approval.</p>
 
-<form method="POST">
+        <form method="POST" action="/add-pet" enctype="multipart/form-data" class="space-y-6">
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Pet Name -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Pet Name *</label>
+                    <input type="text" name="pet_name" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-gray-50">
+                </div>
 
-    <input
-        type="text"
-        name="pet_name"
-        placeholder="Pet Name"
-        required
-    >
+                <!-- Animal Type -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Animal Type *</label>
+                    <select name="animal_type" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-gray-50">
+                        <option value="dog">Dog</option>
+                        <option value="cat">Cat</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
 
-    <select name="animal_type">
+                <!-- Breed -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Breed</label>
+                    <input type="text" name="breed" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-gray-50">
+                </div>
 
-        <option value="dog">
-            Dog
-        </option>
+                <!-- Age -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Age</label>
+                    <input type="number" name="age" min="0" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-gray-50">
+                </div>
 
-        <option value="cat">
-            Cat
-        </option>
+                <!-- Gender -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Gender</label>
+                    <input type="text" name="gender" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-gray-50">
+                </div>
 
-    </select>
+                <!-- Color -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Color</label>
+                    <input type="text" name="color" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-gray-50">
+                </div>
+            </div>
 
-    <input
-        type="text"
-        name="breed"
-        placeholder="Breed"
-    >
+            <!-- Description -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <textarea name="description" rows="4" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-gray-50"></textarea>
+            </div>
 
-    <input
-        type="number"
-        name="age"
-        placeholder="Age"
-    >
+            <hr class="my-6">
 
-    <input
-        type="text"
-        name="gender"
-        placeholder="Gender"
-    >
+            <h3 class="text-xl font-bold text-gray-800 mb-4">Required Documents</h3>
 
-    <input
-        type="text"
-        name="color"
-        placeholder="Color"
-    >
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Pet Image Upload -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Pet Image * (PNG, JPG)</label>
+                    <div class="border-2 border-dashed border-gray-300 p-4 rounded-lg text-center hover:bg-gray-50 transition">
+                        <input type="file" name="pet_image" id="pet_image" accept="image/png, image/jpeg" required class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+                    </div>
+                    <div class="mt-4 hidden" id="preview-container">
+                        <p class="text-xs text-gray-500 mb-1">Preview:</p>
+                        <img id="image-preview" class="h-32 object-cover rounded-lg shadow-sm" src="" alt="Preview">
+                    </div>
+                </div>
 
-    <textarea
-        name="description"
-        placeholder="Description"
-    ></textarea>
+                <!-- Valid ID and Medical Record -->
+                <div class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Your Valid ID * (PNG, JPG)</label>
+                        <input type="file" name="valid_id" accept="image/png, image/jpeg" required class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+                    </div>
 
-    <button type="submit">
-        Add Pet
-    </button>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Past Medical Record (PDF, DOCX)</label>
+                        <input type="file" name="medical_record" accept=".pdf, .doc, .docx, image/png, image/jpeg" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+                    </div>
+                </div>
+            </div>
 
-</form>
+            <div class="pt-6">
+                <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-300 transition-colors shadow-lg">
+                    Submit Pet for Adoption
+                </button>
+            </div>
+        </form>
+    </main>
 
+    <script>
+        const imageInput = document.getElementById('pet_image');
+        const previewContainer = document.getElementById('preview-container');
+        const imagePreview = document.getElementById('image-preview');
+
+        imageInput.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.addEventListener('load', function() {
+                    imagePreview.src = this.result;
+                    previewContainer.classList.remove('hidden');
+                });
+                reader.readAsDataURL(file);
+            } else {
+                previewContainer.classList.add('hidden');
+                imagePreview.src = '';
+            }
+        });
+    </script>
 </body>
 </html>

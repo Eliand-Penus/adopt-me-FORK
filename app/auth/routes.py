@@ -16,6 +16,8 @@ def register():
         username = request.form.get("username")
         email = request.form.get("email")
         password = request.form.get("password")
+        phone_number = request.form.get("phone_number")
+        address = request.form.get("address")
 
         hashed_password = bcrypt.generate_password_hash(
             password
@@ -26,7 +28,9 @@ def register():
             last_name=last_name,
             username=username,
             email=email,
-            password_hash=hashed_password
+            password_hash=hashed_password,
+            phone_number=phone_number,
+            address=address
         )
 
         db.session.add(new_user)

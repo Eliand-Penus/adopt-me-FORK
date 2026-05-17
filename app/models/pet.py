@@ -32,7 +32,13 @@ class Pet(db.Model):
 
     description = db.Column(db.Text)
 
-    adoption_status = db.Column(
+    pet_image = db.Column(db.String(255))
+
+    owner_valid_id = db.Column(db.String(255))
+
+    medical_record_file = db.Column(db.String(255))
+
+    status = db.Column(
         db.String(50),
         default="pending"
     )

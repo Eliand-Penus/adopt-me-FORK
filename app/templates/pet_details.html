@@ -1,25 +1,74 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>{{ pet.pet_name }}</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ pet.pet_name }} - Adopt Me</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
+<body class="bg-gray-50 min-h-screen text-gray-800 font-sans">
 
-<h1>{{ pet.pet_name }}</h1>
+    <!-- Navigation -->
+    <nav class="bg-white shadow px-6 py-4 mb-8">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-indigo-600">Adopt Me</h1>
+            <a href="/pets" class="text-gray-600 hover:text-indigo-600 font-medium">Back to Pets</a>
+        </div>
+    </nav>
 
-<p>Type: {{ pet.animal_type }}</p>
-
-<p>Breed: {{ pet.breed }}</p>
-
-<p>Age: {{ pet.age }}</p>
-
-<p>Description: {{ pet.description }}</p>
-
-<p>Owner: {{ pet.owner.username }}</p>
-
-<a href="/adopt/{{ pet.pet_id }}">
-    Adopt Me
-</a>
+    <main class="max-w-4xl mx-auto px-6 mb-12">
+        <div class="bg-white rounded-xl shadow-md overflow-hidden flex flex-col md:flex-row">
+            <!-- Image -->
+            <div class="md:w-1/2 h-64 md:h-auto bg-gray-200">
+                {% if pet.pet_image %}
+                    <img src="{{ url_for('static', filename=pet.pet_image) }}" alt="{{ pet.pet_name }}" class="w-full h-full object-cover">
+                {% else %}
+                    <div class="w-full h-full flex items-center justify-center text-gray-400">No Image Available</div>
+                {% endif %}
+            </div>
+            
+            <!-- Details -->
+            <div class="md:w-1/2 p-8 flex flex-col justify-center">
+                <div class="flex justify-between items-start mb-4">
+                    <h2 class="text-3xl font-extrabold text-gray-900">{{ pet.pet_name }}</h2>
+                    {% if pet.status == 'approved' %}
+                        <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full uppercase font-bold">Available</span>
+                    {% else %}
+                        <span class="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded-full uppercase font-bold">{{ pet.status }}</span>
+                    {% endif %}
+                </div>
+                
+                <ul class="text-gray-700 space-y-2 mb-6">
+                    <li><strong class="font-semibold w-24 inline-block">Type:</strong> <span class="capitalize">{{ pet.animal_type }}</span></li>
+                    <li><strong class="font-semibold w-24 inline-block">Breed:</strong> {{ pet.breed or 'Unknown' }}</li>
+                    <li><strong class="font-semibold w-24 inline-block">Age:</strong> {{ pet.age or '?' }} yrs</li>
+                    <li><strong class="font-semibold w-24 inline-block">Gender:</strong> {{ pet.gender or 'N/A' }}</li>
+                    <li><strong class="font-semibold w-24 inline-block">Color:</strong> {{ pet.color or 'N/A' }}</li>
+                </ul>
+                
+                <div class="mb-8">
+                    <h3 class="text-lg font-bold text-gray-900 mb-2">About {{ pet.pet_name }}</h3>
+                    <p class="text-gray-600 leading-relaxed">{{ pet.description or 'No description provided.' }}</p>
+                </div>
+                
+                {% if current_user.is_authenticated %}
+                    {% if pet.owner_id != current_user.user_id and pet.status == 'approved' %}
+                        <a href="/adopt/{{ pet.pet_id }}" class="block w-full text-center bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 transition">
+                            Apply to Adopt
+                        </a>
+                    {% elif pet.owner_id == current_user.user_id %}
+                        <div class="bg-indigo-50 text-indigo-700 p-4 rounded text-center">
+                            This is your pet.
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <a href="/login" class="block w-full text-center bg-gray-200 text-gray-800 font-bold py-3 px-4 rounded-lg hover:bg-gray-300 transition">
+                        Login to Adopt
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </main>
 
 </body>
 </html>

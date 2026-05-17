@@ -1,92 +1,78 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Available Pets</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Available Pets - Adopt Me</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
+<body class="bg-gray-50 min-h-screen text-gray-800 font-sans">
 
-<h1>Available Pets</h1>
-
-<a href="/dashboard">
-    <button>
-        Dashboard
-    </button>
-</a>
-
-<a href="/my-pets">
-    <button>
-        My Pets
-    </button>
-</a>
-
-<a href="/logout">
-    <button>
-        Logout
-    </button>
-</a>
-
-<br><br>
-
-{% if pets %}
-
-    {% for pet in pets %}
-
-        <div>
-
-            <h2>
-                <a href="/pet/{{ pet.pet_id }}">
-                    {{ pet.pet_name }}
-                </a>
-            </h2>
-
-            <p>
-                Type:
-                {{ pet.animal_type }}
-            </p>
-
-            <p>
-                Breed:
-                {{ pet.breed }}
-            </p>
-
-            <p>
-                Age:
-                {{ pet.age }}
-            </p>
-
-            <p>
-                Gender:
-                {{ pet.gender }}
-            </p>
-
-            <p>
-                Color:
-                {{ pet.color }}
-            </p>
-
-            <p>
-                Description:
-                {{ pet.description }}
-            </p>
-
-            <p>
-                Status:
-                {{ pet.adoption_status }}
-            </p>
-
-            <hr>
-
+    <!-- Navigation -->
+    <nav class="bg-white shadow px-6 py-4 mb-8">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-indigo-600">Adopt Me</h1>
+            <div class="space-x-4">
+                {% if current_user.is_authenticated %}
+                    <a href="/dashboard" class="text-gray-600 hover:text-indigo-600 font-medium">Dashboard</a>
+                    <a href="/my-pets" class="text-gray-600 hover:text-indigo-600 font-medium">My Pets</a>
+                    <a href="/logout" class="text-red-600 hover:text-red-800 font-medium">Logout</a>
+                {% else %}
+                    <a href="/login" class="text-gray-600 hover:text-indigo-600 font-medium">Login</a>
+                    <a href="/register" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition">Register</a>
+                {% endif %}
+            </div>
         </div>
+    </nav>
 
-    {% endfor %}
-
-{% else %}
-
-    <h3>
-        No pets available right now.
-    </h3>
-
-{% endif %}
+    <main class="max-w-6xl mx-auto px-6 mb-12">
+        <h2 class="text-3xl font-extrabold text-gray-900 mb-8">Pets Available for Adoption</h2>
+        
+        {% if pets %}
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {% for pet in pets %}
+                    <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition flex flex-col">
+                        {% if pet.pet_image %}
+                            <img src="{{ url_for('static', filename=pet.pet_image) }}" alt="{{ pet.pet_name }}" class="w-full h-48 object-cover">
+                        {% else %}
+                            <div class="w-full h-48 bg-gray-200 flex items-center justify-center text-gray-400">
+                                No Image Available
+                            </div>
+                        {% endif %}
+                        
+                        <div class="p-5 flex flex-col flex-grow">
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="text-xl font-bold text-gray-900">
+                                    <a href="/pet/{{ pet.pet_id }}" class="hover:text-indigo-600">{{ pet.pet_name }}</a>
+                                </h3>
+                                <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full uppercase font-bold">Approved</span>
+                            </div>
+                            
+                            <p class="text-sm text-gray-600 mb-4 capitalize">
+                                {{ pet.animal_type }} • {{ pet.breed or 'Unknown Breed' }} • {{ pet.age or '?' }} yrs
+                            </p>
+                            
+                            <p class="text-gray-500 text-sm mb-6 flex-grow line-clamp-3">
+                                {{ pet.description or 'No description provided.' }}
+                            </p>
+                            
+                            <a href="/pet/{{ pet.pet_id }}" class="block w-full text-center bg-indigo-50 text-indigo-700 font-semibold py-2 rounded hover:bg-indigo-100 transition mt-auto">
+                                View Details
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="bg-white p-12 text-center rounded-xl shadow-md">
+                <svg class="mx-auto h-16 w-16 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <h3 class="text-xl font-bold text-gray-900 mb-2">No pets available right now</h3>
+                <p class="text-gray-500">Check back later for more adorable friends!</p>
+            </div>
+        {% endif %}
+    </main>
 
 </body>
 </html>

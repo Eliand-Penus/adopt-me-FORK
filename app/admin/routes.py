@@ -47,15 +47,15 @@ def admin_home():
 def admin_dashboard():
 
     pending_pets = Pet.query.filter_by(
-        adoption_status="pending"
+        status="pending"
     ).all()
 
     accepted_pets = Pet.query.filter_by(
-        adoption_status="available"
+        status="approved"
     ).all()
 
     rejected_pets = Pet.query.filter_by(
-        adoption_status="rejected"
+        status="rejected"
     ).all()
 
     return render_template(
@@ -118,7 +118,7 @@ def approve_pet(pet_id):
 
     pet = Pet.query.get_or_404(pet_id)
 
-    pet.adoption_status = "available"
+    pet.status = "approved"
 
     db.session.commit()
 
@@ -135,7 +135,7 @@ def reject_pet(pet_id):
 
     pet = Pet.query.get_or_404(pet_id)
 
-    pet.adoption_status = "rejected"
+    pet.status = "rejected"
 
     db.session.commit()
 

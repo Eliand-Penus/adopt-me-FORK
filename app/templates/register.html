@@ -1,54 +1,89 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Register</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account - Adopt Me</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
+<body class="bg-gray-50 min-h-screen text-gray-800 font-sans flex flex-col justify-center py-12 sm:px-6 lg:px-8">
 
-<h1>Create Account</h1>
+    <div class="sm:mx-auto sm:w-full sm:max-w-xl">
+        <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+            Join <span class="text-indigo-600">Adopt Me</span>
+        </h2>
+        <p class="mt-2 text-center text-sm text-gray-600">
+            Create an account to start adopting or listing pets today.
+        </p>
+    </div>
 
-<form method="POST">
+    <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-xl">
+        <div class="bg-white py-8 px-4 shadow-lg sm:rounded-xl sm:px-10 border border-gray-100">
+            <form method="POST" action="/register" class="space-y-5">
+                
+                <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                    <!-- First Name -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">First Name</label>
+                        <input type="text" name="first_name" required class="mt-1 appearance-none block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-gray-50">
+                    </div>
 
-    <input
-        type="text"
-        name="first_name"
-        placeholder="First Name"
-        required
-    >
+                    <!-- Last Name -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Last Name</label>
+                        <input type="text" name="last_name" required class="mt-1 appearance-none block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-gray-50">
+                    </div>
+                </div>
 
-    <input
-        type="text"
-        name="last_name"
-        placeholder="Last Name"
-        required
-    >
+                <!-- Username -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Username</label>
+                    <input type="text" name="username" required class="mt-1 appearance-none block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-gray-50">
+                </div>
 
-    <input
-        type="text"
-        name="username"
-        placeholder="Username"
-        required
-    >
+                <!-- Email -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Email Address</label>
+                    <input type="email" name="email" required class="mt-1 appearance-none block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-gray-50">
+                </div>
 
-    <input
-        type="email"
-        name="email"
-        placeholder="Email"
-        required
-    >
+                <!-- Password -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Password</label>
+                    <input type="password" name="password" required class="mt-1 appearance-none block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-gray-50">
+                </div>
 
-    <input
-        type="password"
-        name="password"
-        placeholder="Password"
-        required
-    >
+                <!-- Phone -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Phone Number</label>
+                    <input type="text" name="phone_number" required class="mt-1 appearance-none block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-gray-50">
+                </div>
 
-    <button type="submit">
-        Register
-    </button>
+                <!-- Address -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Physical Address</label>
+                    <input type="text" name="address" required class="mt-1 appearance-none block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-gray-50">
+                </div>
 
-</form>
+                <div class="pt-2">
+                    <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition">
+                        Create Account
+                    </button>
+                </div>
+            </form>
+            
+            <div class="mt-6 text-center">
+                <p class="text-sm text-gray-600">
+                    Already have an account? <a href="/login" class="font-medium text-indigo-600 hover:text-indigo-500">Log in instead</a>
+                </p>
+            </div>
+            
+        </div>
+        
+        <p class="mt-6 text-center text-sm text-gray-500">
+            <a href="/" class="hover:text-indigo-600 hover:underline">← Back to home</a>
+        </p>
+    </div>
 
 </body>
 </html>

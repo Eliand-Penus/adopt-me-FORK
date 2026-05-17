@@ -1,75 +1,117 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Admin Dashboard</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Adopt Me</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
+<body class="bg-gray-100 min-h-screen text-gray-800 font-sans">
 
-<a href="/admin/logout">
-    <button>
-        Logout
-    </button>
-</a>
+    <!-- Admin Navigation -->
+    <nav class="bg-slate-800 shadow px-6 py-4 mb-8">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-white">Admin Dashboard</h1>
+            <a href="/admin/logout" class="text-slate-300 hover:text-white font-medium">Logout</a>
+        </div>
+    </nav>
 
-<h1>Pending Pets</h1>
+    <main class="max-w-7xl mx-auto px-6 mb-12">
+        <h2 class="text-3xl font-extrabold text-gray-900 mb-8">Pet Management</h2>
 
-{% for pet in pending_pets %}
+        <!-- Pending Pets -->
+        <section class="mb-12">
+            <h3 class="text-xl font-bold text-gray-800 border-b pb-2 mb-6">Pending Submissions</h3>
+            
+            {% if pending_pets %}
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {% for pet in pending_pets %}
+                        <div class="bg-white rounded-lg shadow border border-gray-200 overflow-hidden flex flex-col">
+                            {% if pet.pet_image %}
+                                <img src="{{ url_for('static', filename=pet.pet_image) }}" alt="{{ pet.pet_name }}" class="w-full h-40 object-cover">
+                            {% else %}
+                                <div class="w-full h-40 bg-gray-200 flex items-center justify-center text-gray-400">No Image</div>
+                            {% endif %}
+                            
+                            <div class="p-5 flex-grow">
+                                <h4 class="text-lg font-bold text-gray-900 mb-1">{{ pet.pet_name }}</h4>
+                                <p class="text-sm text-gray-600 capitalize mb-4">{{ pet.animal_type }} • {{ pet.breed or 'Unknown' }} • {{ pet.age or '?' }} yrs</p>
+                                
+                                <h5 class="text-sm font-semibold text-gray-700 mb-2">Submitted Documents:</h5>
+                                <ul class="text-sm space-y-1 mb-6">
+                                    <li>
+                                        {% if pet.owner_valid_id %}
+                                            <a href="{{ url_for('static', filename=pet.owner_valid_id) }}" target="_blank" class="text-indigo-600 hover:underline flex items-center gap-1">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                                View Valid ID
+                                            </a>
+                                        {% else %}
+                                            <span class="text-red-500">No Valid ID</span>
+                                        {% endif %}
+                                    </li>
+                                    <li>
+                                        {% if pet.medical_record_file %}
+                                            <a href="{{ url_for('static', filename=pet.medical_record_file) }}" target="_blank" class="text-indigo-600 hover:underline flex items-center gap-1">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                                View Medical Record
+                                            </a>
+                                        {% else %}
+                                            <span class="text-gray-400">No Medical Record</span>
+                                        {% endif %}
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <div class="bg-gray-50 p-4 border-t flex justify-between gap-3">
+                                <a href="/admin/approve-pet/{{ pet.pet_id }}" class="flex-1 bg-green-600 text-white text-center font-bold py-2 px-4 rounded hover:bg-green-700 transition">Approve</a>
+                                <a href="/admin/reject-pet/{{ pet.pet_id }}" class="flex-1 bg-red-600 text-white text-center font-bold py-2 px-4 rounded hover:bg-red-700 transition">Reject</a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-gray-500 italic bg-white p-6 rounded shadow-sm">No pending pet submissions.</p>
+            {% endif %}
+        </section>
 
-    <div>
+        <!-- Approved / Rejected lists can go here if needed -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <section>
+                <h3 class="text-xl font-bold text-gray-800 border-b pb-2 mb-4">Approved Pets</h3>
+                <ul class="bg-white rounded shadow-sm divide-y">
+                    {% for pet in accepted_pets %}
+                        <li class="p-4 flex justify-between items-center hover:bg-gray-50">
+                            <div>
+                                <span class="font-semibold text-gray-900">{{ pet.pet_name }}</span>
+                                <span class="text-sm text-gray-500 ml-2">({{ pet.animal_type }})</span>
+                            </div>
+                            <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">Approved</span>
+                        </li>
+                    {% else %}
+                        <li class="p-4 text-gray-500 italic">No approved pets.</li>
+                    {% endfor %}
+                </ul>
+            </section>
+            
+            <section>
+                <h3 class="text-xl font-bold text-gray-800 border-b pb-2 mb-4">Rejected Pets</h3>
+                <ul class="bg-white rounded shadow-sm divide-y">
+                    {% for pet in rejected_pets %}
+                        <li class="p-4 flex justify-between items-center hover:bg-gray-50">
+                            <div>
+                                <span class="font-semibold text-gray-900">{{ pet.pet_name }}</span>
+                                <span class="text-sm text-gray-500 ml-2">({{ pet.animal_type }})</span>
+                            </div>
+                            <span class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full">Rejected</span>
+                        </li>
+                    {% else %}
+                        <li class="p-4 text-gray-500 italic">No rejected pets.</li>
+                    {% endfor %}
+                </ul>
+            </section>
+        </div>
 
-        <h3>{{ pet.pet_name }}</h3>
-
-        <p>Breed: {{ pet.breed }}</p>
-
-        <p>Owner: {{ pet.owner.username }}</p>
-
-        <p>Status: {{ pet.adoption_status }}</p>
-
-        <a href="/admin/approve-pet/{{ pet.pet_id }}">
-            Approve
-        </a>
-
-        <a href="/admin/reject-pet/{{ pet.pet_id }}">
-            Reject
-        </a>
-
-        <hr>
-
-    </div>
-
-{% endfor %}
-
-<h1>Accepted Pets</h1>
-
-{% for pet in accepted_pets %}
-
-    <div>
-
-        <h3>{{ pet.pet_name }}</h3>
-
-        <p>Status: {{ pet.adoption_status }}</p>
-
-        <hr>
-
-    </div>
-
-{% endfor %}
-
-<h1>Rejected Pets</h1>
-
-{% for pet in rejected_pets %}
-
-    <div>
-
-        <h3>{{ pet.pet_name }}</h3>
-
-        <p>Status: {{ pet.adoption_status }}</p>
-
-        <hr>
-
-    </div>
-
-{% endfor %}
+    </main>
 
 </body>
 </html>

@@ -1,7 +1,9 @@
 from datetime import datetime
+
 from app import db
 
 class AdoptionRequest(db.Model):
+
     __tablename__ = "adoption_requests"
 
     request_id = db.Column(

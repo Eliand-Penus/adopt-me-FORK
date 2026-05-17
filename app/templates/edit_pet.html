@@ -1,53 +1,110 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Edit Pet</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Pet - Adopt Me</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
+<body class="bg-gray-50 min-h-screen text-gray-800 font-sans">
 
-<h1>Edit Pet</h1>
+    <!-- Navigation -->
+    <nav class="bg-white shadow px-6 py-4 mb-8">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-indigo-600">Adopt Me</h1>
+            <a href="/my-pets" class="text-gray-600 hover:text-indigo-600 font-medium">Back to My Pets</a>
+        </div>
+    </nav>
 
-<form method="POST">
+    <main class="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow-md mb-12">
+        <h2 class="text-3xl font-extrabold text-gray-900 mb-6 text-center">Edit Pet: {{ pet.pet_name }}</h2>
 
-    <input
-        type="text"
-        name="pet_name"
-        value="{{ pet.pet_name }}"
-    >
+        <form method="POST" action="/edit-pet/{{ pet.pet_id }}" enctype="multipart/form-data" class="space-y-6">
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Pet Name -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Pet Name *</label>
+                    <input type="text" name="pet_name" value="{{ pet.pet_name }}" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-gray-50">
+                </div>
 
-    <input
-        type="text"
-        name="breed"
-        value="{{ pet.breed }}"
-    >
+                <!-- Status -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                    <select name="status" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-gray-50">
+                        <option value="pending" {% if pet.status == 'pending' %}selected{% endif %}>Pending Review</option>
+                        <option value="approved" {% if pet.status == 'approved' %}selected{% endif %}>Approved (Available)</option>
+                        <option value="adopted" {% if pet.status == 'adopted' %}selected{% endif %}>Adopted</option>
+                        <option value="rejected" {% if pet.status == 'rejected' %}selected{% endif %}>Rejected</option>
+                    </select>
+                </div>
 
-    <input
-        type="number"
-        name="age"
-        value="{{ pet.age }}"
-    >
+                <!-- Breed -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Breed</label>
+                    <input type="text" name="breed" value="{{ pet.breed }}" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-gray-50">
+                </div>
 
-    <input
-        type="text"
-        name="gender"
-        value="{{ pet.gender }}"
-    >
+                <!-- Age -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Age</label>
+                    <input type="number" name="age" min="0" value="{{ pet.age }}" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-gray-50">
+                </div>
 
-    <input
-        type="text"
-        name="color"
-        value="{{ pet.color }}"
-    >
+                <!-- Gender -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Gender</label>
+                    <input type="text" name="gender" value="{{ pet.gender }}" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-gray-50">
+                </div>
 
-    <textarea
-        name="description"
-    >{{ pet.description }}</textarea>
+                <!-- Color -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Color</label>
+                    <input type="text" name="color" value="{{ pet.color }}" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-gray-50">
+                </div>
+            </div>
 
-    <button type="submit">
-        Save Changes
-    </button>
+            <!-- Description -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <textarea name="description" rows="4" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-gray-50">{{ pet.description }}</textarea>
+            </div>
 
-</form>
+            <hr class="my-6">
+
+            <h3 class="text-xl font-bold text-gray-800 mb-4">Update Documents (Optional)</h3>
+            <p class="text-sm text-gray-500 mb-4">Leave these fields blank if you do not wish to change the existing files.</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Pet Image Upload -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Update Pet Image (PNG, JPG)</label>
+                    <input type="file" name="pet_image" accept="image/png, image/jpeg" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+                    {% if pet.pet_image %}
+                        <div class="mt-3 text-sm text-gray-500">Current: <a href="{{ url_for('static', filename=pet.pet_image) }}" target="_blank" class="text-indigo-600 hover:underline">View Image</a></div>
+                    {% endif %}
+                </div>
+
+                <!-- Medical Record Upload -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Update Medical Record (PDF, DOCX)</label>
+                    <input type="file" name="medical_record" accept=".pdf, .doc, .docx, image/png, image/jpeg" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+                    {% if pet.medical_record_file %}
+                        <div class="mt-3 text-sm text-gray-500">Current: <a href="{{ url_for('static', filename=pet.medical_record_file) }}" target="_blank" class="text-indigo-600 hover:underline">View Document</a></div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="pt-6 flex gap-4">
+                <button type="submit" class="flex-grow bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-300 transition-colors shadow-lg">
+                    Save Changes
+                </button>
+                <a href="/my-pets" class="flex-grow text-center bg-gray-200 text-gray-800 font-bold py-3 px-4 rounded-lg hover:bg-gray-300 transition-colors">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </main>
 
 </body>
 </html>
