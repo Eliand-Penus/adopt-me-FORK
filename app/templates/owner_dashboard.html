@@ -20,34 +20,32 @@
     </nav>
 
     <main class="flex-grow max-w-6xl mx-auto px-6 py-12 w-full">
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="mb-6 space-y-4">
+                    {% for category, message in messages %}
+                        <div class="px-4 py-3 rounded border {% if category == 'success' %}bg-green-50 border-green-200 text-green-800{% else %}bg-indigo-50 border-indigo-200 text-indigo-800{% endif %}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        
         <div class="mb-10">
             <h2 class="text-3xl font-extrabold text-gray-900">Pet Owner Dashboard</h2>
             <p class="text-gray-500 mt-2">Manage your listed pets and review incoming adoption requests.</p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            
-            <!-- Put Up Adoption -->
-            <a href="/add-pet" class="block group">
-                <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200 hover:shadow-md hover:border-indigo-200 transition h-full flex flex-col items-center text-center">
-                    <div class="bg-indigo-50 text-indigo-600 p-4 rounded-full mb-4 group-hover:bg-indigo-600 group-hover:text-white transition">
-                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                    </div>
-                    <h3 class="text-lg font-bold text-gray-900 mb-2">Put Up for Adoption</h3>
-                    <p class="text-gray-500 text-sm">Create a new listing to help a pet find their forever home.</p>
-                </div>
-            </a>
+        {% if pending_count > 0 %}
+        <div class="mb-8 bg-yellow-50 border border-yellow-200 rounded-lg p-4 flex items-center shadow-sm">
+            <svg class="w-6 h-6 text-yellow-600 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <p class="text-yellow-800 font-medium">You have {{ pending_count }} pet(s) currently under review by the admin.</p>
+        </div>
+        {% endif %}
 
-            <!-- My Pets -->
-            <a href="/my-pets" class="block group">
-                <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200 hover:shadow-md hover:teal-200 transition h-full flex flex-col items-center text-center">
-                    <div class="bg-teal-50 text-teal-600 p-4 rounded-full mb-4 group-hover:bg-teal-600 group-hover:text-white transition">
-                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-                    </div>
-                    <h3 class="text-lg font-bold text-gray-900 mb-2">My Uploaded Pets</h3>
-                    <p class="text-gray-500 text-sm">View, edit, or remove the pets you have currently listed.</p>
-                </div>
-            </a>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
 
             <!-- Notifications -->
             <a href="/notifications" class="block group">
@@ -60,6 +58,56 @@
                 </div>
             </a>
 
+        </div>
+
+        <!-- Listed Pets Section -->
+        <div>
+            <h3 class="text-2xl font-bold text-gray-900 mb-6">Your Listed Pets</h3>
+            
+            {% if pets %}
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {% for pet in pets %}
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex flex-col hover:shadow-md transition">
+                            <div class="h-48 w-full bg-gray-200">
+                                {% if pet.pet_image %}
+                                    {% set img_url = pet.pet_image if pet.pet_image.startswith('http') else url_for('static', filename=pet.pet_image) %}
+                                    <img src="{{ img_url }}" alt="{{ pet.pet_name }}" class="w-full h-full object-cover">
+                                {% else %}
+                                    <div class="w-full h-full flex items-center justify-center text-gray-400 text-xs">No Image</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="p-5 flex-grow flex flex-col">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h4 class="text-xl font-bold text-gray-900">{{ pet.pet_name }}</h4>
+                                    {% if pet.status == 'approved' %}
+                                        <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full uppercase font-bold">Approved</span>
+                                    {% elif pet.status == 'adopted' %}
+                                        <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full uppercase font-bold">Adopted</span>
+                                    {% endif %}
+                                </div>
+                                <p class="text-sm text-gray-600 capitalize mb-3">{{ pet.animal_type }} • {{ pet.breed or 'Unknown' }} • {{ pet.age or '?' }} yrs</p>
+                                <p class="text-sm text-gray-500 mb-6 flex-grow line-clamp-2">{{ pet.description or 'No description provided.' }}</p>
+                                
+                                <div class="grid grid-cols-2 gap-3 mt-auto">
+                                    <a href="/edit-pet/{{ pet.pet_id }}" class="text-center bg-gray-100 text-gray-700 hover:bg-gray-200 font-semibold py-2 rounded transition text-sm">
+                                        Edit Pet
+                                    </a>
+                                    <a href="/delete-pet/{{ pet.pet_id }}" class="text-center bg-white border border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 font-semibold py-2 rounded transition text-sm" onclick="return confirm('Are you sure you want to remove this pet from adoption listings?');">
+                                        Cancel Adoption
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="bg-white p-12 text-center rounded-xl shadow-sm border border-gray-200">
+                    <h3 class="text-lg font-bold text-gray-900 mb-2">No Active Listings</h3>
+                    <p class="text-gray-500 mb-4">You do not have any approved or adopted pets right now.</p>
+                    <a href="/add-pet" class="text-indigo-600 hover:text-indigo-800 font-medium text-sm">Put a pet up for adoption &rarr;</a>
+                </div>
+            {% endif %}
         </div>
     </main>
 

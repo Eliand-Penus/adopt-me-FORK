@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - Adopt Me</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="bg-gray-100 min-h-screen text-gray-800 font-sans">
 
@@ -19,6 +20,41 @@
     <main class="max-w-7xl mx-auto px-6 mb-12">
         <h2 class="text-3xl font-extrabold text-gray-900 mb-8">Pet Management</h2>
 
+        <!-- Analytics Section -->
+        <section class="mb-12">
+            <h3 class="text-xl font-bold text-gray-800 border-b pb-2 mb-6">Platform Analytics</h3>
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 flex flex-col md:flex-row items-center gap-8">
+                <!-- Statistic Cards -->
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4 w-full md:w-2/3">
+                    <div class="bg-indigo-50 p-4 rounded-lg border border-indigo-100 text-center">
+                        <p class="text-sm font-semibold text-indigo-600 uppercase">Pending</p>
+                        <p class="text-3xl font-bold text-gray-900">{{ stats.pending }}</p>
+                    </div>
+                    <div class="bg-green-50 p-4 rounded-lg border border-green-100 text-center">
+                        <p class="text-sm font-semibold text-green-600 uppercase">Approved</p>
+                        <p class="text-3xl font-bold text-gray-900">{{ stats.approved }}</p>
+                    </div>
+                    <div class="bg-red-50 p-4 rounded-lg border border-red-100 text-center">
+                        <p class="text-sm font-semibold text-red-600 uppercase">Rejected</p>
+                        <p class="text-3xl font-bold text-gray-900">{{ stats.rejected }}</p>
+                    </div>
+                    <div class="bg-teal-50 p-4 rounded-lg border border-teal-100 text-center">
+                        <p class="text-sm font-semibold text-teal-600 uppercase">Adopted</p>
+                        <p class="text-3xl font-bold text-gray-900">{{ stats.adopted }}</p>
+                    </div>
+                    <div class="bg-gray-100 p-4 rounded-lg border border-gray-200 text-center">
+                        <p class="text-sm font-semibold text-gray-600 uppercase">Cancelled</p>
+                        <p class="text-3xl font-bold text-gray-900">{{ stats.cancelled }}</p>
+                    </div>
+                </div>
+                
+                <!-- Chart -->
+                <div class="w-full md:w-1/3 h-64 flex justify-center">
+                    <canvas id="petStatusChart"></canvas>
+                </div>
+            </div>
+        </section>
+
         <!-- Pending Pets -->
         <section class="mb-12">
             <h3 class="text-xl font-bold text-gray-800 border-b pb-2 mb-6">Pending Submissions</h3>
@@ -27,8 +63,18 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {% for pet in pending_pets %}
                         <div class="bg-white rounded-lg shadow border border-gray-200 overflow-hidden flex flex-col">
-                            {% if pet.pet_image %}
-                                <img src="{{ url_for('static', filename=pet.pet_image) }}" alt="{{ pet.pet_name }}" class="w-full h-40 object-cover">
+                            {% if pet.images %}
+                                {% set first_img = pet.images[0].image_path %}
+                                {% set main_url = first_img if first_img.startswith('http') else url_for('static', filename=first_img) %}
+                                <img src="{{ main_url }}" alt="{{ pet.pet_name }}" class="w-full h-40 object-cover">
+                                {% if pet.images|length > 1 %}
+                                    <div class="bg-gray-100 text-xs text-center py-1 text-gray-500 font-medium">
+                                        +{{ pet.images|length - 1 }} more image(s)
+                                    </div>
+                                {% endif %}
+                            {% elif pet.pet_image %}
+                                {% set main_url = pet.pet_image if pet.pet_image.startswith('http') else url_for('static', filename=pet.pet_image) %}
+                                <img src="{{ main_url }}" alt="{{ pet.pet_name }}" class="w-full h-40 object-cover">
                             {% else %}
                                 <div class="w-full h-40 bg-gray-200 flex items-center justify-center text-gray-400">No Image</div>
                             {% endif %}
@@ -37,35 +83,99 @@
                                 <h4 class="text-lg font-bold text-gray-900 mb-1">{{ pet.pet_name }}</h4>
                                 <p class="text-sm text-gray-600 capitalize mb-4">{{ pet.animal_type }} • {{ pet.breed or 'Unknown' }} • {{ pet.age or '?' }} yrs</p>
                                 
-                                <h5 class="text-sm font-semibold text-gray-700 mb-2">Submitted Documents:</h5>
-                                <ul class="text-sm space-y-1 mb-6">
-                                    <li>
-                                        {% if pet.owner_valid_id %}
-                                            <a href="{{ url_for('static', filename=pet.owner_valid_id) }}" target="_blank" class="text-indigo-600 hover:underline flex items-center gap-1">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                                                View Valid ID
-                                            </a>
-                                        {% else %}
-                                            <span class="text-red-500">No Valid ID</span>
-                                        {% endif %}
-                                    </li>
-                                    <li>
-                                        {% if pet.medical_record_file %}
-                                            <a href="{{ url_for('static', filename=pet.medical_record_file) }}" target="_blank" class="text-indigo-600 hover:underline flex items-center gap-1">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                                                View Medical Record
-                                            </a>
-                                        {% else %}
-                                            <span class="text-gray-400">No Medical Record</span>
-                                        {% endif %}
-                                    </li>
-                                </ul>
+                                <button onclick="openPetModal('{{ pet.pet_id }}')" class="w-full bg-indigo-50 text-indigo-700 font-bold py-2 px-4 rounded hover:bg-indigo-100 transition mb-4">
+                                    Review Details & Documents
+                                </button>
                             </div>
                             
-                            <div class="bg-gray-50 p-4 border-t flex justify-between gap-3">
-                                <a href="/admin/approve-pet/{{ pet.pet_id }}" class="flex-1 bg-green-600 text-white text-center font-bold py-2 px-4 rounded hover:bg-green-700 transition">Approve</a>
-                                <a href="/admin/reject-pet/{{ pet.pet_id }}" class="flex-1 bg-red-600 text-white text-center font-bold py-2 px-4 rounded hover:bg-red-700 transition">Reject</a>
+                            <div class="bg-gray-50 p-4 border-t flex flex-col gap-2">
+                                <div class="flex justify-between gap-3">
+                                    <a href="/admin/approve-pet/{{ pet.pet_id }}" class="flex-1 bg-green-600 text-white text-center font-bold py-2 px-4 rounded hover:bg-green-700 transition">Approve</a>
+                                    <a href="/admin/reject-pet/{{ pet.pet_id }}" class="flex-1 bg-red-600 text-white text-center font-bold py-2 px-4 rounded hover:bg-red-700 transition">Reject</a>
+                                </div>
+                                <div class="flex justify-between gap-3 mt-1">
+                                    <a href="/edit-pet/{{ pet.pet_id }}" class="flex-1 text-gray-600 bg-white border border-gray-300 text-center text-sm font-bold py-1 px-2 rounded hover:bg-gray-50 transition">Edit</a>
+                                    <a href="/admin/delete-pet/{{ pet.pet_id }}" onclick="return confirm('Are you sure you want to delete this pet entirely?')" class="flex-1 text-red-600 bg-white border border-red-300 text-center text-sm font-bold py-1 px-2 rounded hover:bg-red-50 transition">Delete</a>
+                                </div>
                             </div>
+                        </div>
+
+                        <!-- Pet Modal -->
+                        <div id="pet-modal-{{ pet.pet_id }}" class="fixed inset-0 z-50 hidden flex items-center justify-center">
+                            <!-- Backdrop -->
+                            <div class="absolute inset-0 bg-black bg-opacity-40 backdrop-blur-sm" onclick="closePetModal('{{ pet.pet_id }}')"></div>
+                            
+                            <!-- Modal Content -->
+                            <div class="bg-white rounded-xl shadow-2xl w-11/12 max-w-2xl mx-auto z-10 overflow-hidden flex flex-col max-h-[90vh]">
+                                <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
+                                    <h3 class="text-xl font-extrabold text-gray-900">Review: {{ pet.pet_name }}</h3>
+                                    <button onclick="closePetModal('{{ pet.pet_id }}')" class="text-gray-400 hover:text-gray-600 focus:outline-none transition">
+                                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                    </button>
+                                </div>
+                                
+                                <div class="p-6 overflow-y-auto">
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                        <div>
+                                            <h4 class="text-sm font-bold text-gray-500 uppercase mb-2">Pet Details</h4>
+                                            <ul class="text-sm space-y-1">
+                                                <li><strong>Type:</strong> <span class="capitalize">{{ pet.animal_type }}</span></li>
+                                                <li><strong>Breed:</strong> {{ pet.breed or 'Unknown' }}</li>
+                                                <li><strong>Age:</strong> {{ pet.age or '?' }}</li>
+                                                <li><strong>Gender:</strong> {{ pet.gender or 'N/A' }}</li>
+                                                <li><strong>Color:</strong> {{ pet.color or 'N/A' }}</li>
+                                            </ul>
+                                        </div>
+                                        
+                                        {% if pet.reason_for_rehoming %}
+                                        <div>
+                                            <h4 class="text-sm font-bold text-gray-500 uppercase mb-2">Reason for Rehoming</h4>
+                                            <p class="text-sm text-gray-800 bg-orange-50 p-3 rounded border border-orange-100">"{{ pet.reason_for_rehoming }}"</p>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <h4 class="text-sm font-bold text-gray-500 uppercase mb-3 border-b pb-2">Submitted Documents</h4>
+                                    <ul class="text-sm space-y-3">
+                                        <li class="bg-gray-50 p-3 rounded border border-gray-200">
+                                            <p class="font-bold text-gray-800 mb-2 flex items-center gap-2">
+                                                <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2"></path></svg>
+                                                Valid ID(s)
+                                            </p>
+                                            {% if pet.valid_ids %}
+                                                <div class="flex flex-wrap gap-2">
+                                                    {% for vid in pet.valid_ids %}
+                                                        {% set vid_url = vid.image_path if vid.image_path.startswith('http') else url_for('static', filename=vid.image_path) %}
+                                                        <a href="{{ vid_url }}" target="_blank" class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded hover:bg-indigo-200 transition">View ID {{ loop.index }}</a>
+                                                    {% endfor %}
+                                                </div>
+                                            {% elif pet.owner_valid_id %}
+                                                {% set owner_vid_url = pet.owner_valid_id if pet.owner_valid_id.startswith('http') else url_for('static', filename=pet.owner_valid_id) %}
+                                                <a href="{{ owner_vid_url }}" target="_blank" class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded hover:bg-indigo-200 transition">View ID</a>
+                                            {% else %}
+                                                <span class="text-red-500 font-medium">No Valid ID provided.</span>
+                                            {% endif %}
+                                        </li>
+                                        <li class="bg-gray-50 p-3 rounded border border-gray-200">
+                                            <p class="font-bold text-gray-800 mb-2 flex items-center gap-2">
+                                                <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                                Medical Record
+                                            </p>
+                                            {% if pet.medical_record_file %}
+                                                {% set medical_url = pet.medical_record_file if pet.medical_record_file.startswith('http') else url_for('static', filename=pet.medical_record_file) %}
+                                                <a href="{{ medical_url }}" target="_blank" class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded hover:bg-indigo-200 transition">View Medical Record</a>
+                                            {% else %}
+                                                <span class="text-gray-500 font-medium">No Medical Record provided.</span>
+                                            {% endif %}
+                                        </li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="px-6 py-4 border-t border-gray-200 bg-gray-50 flex justify-end gap-3">
+                                    <button onclick="closePetModal('{{ pet.pet_id }}')" class="bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded hover:bg-gray-300 transition">Close</button>
+                                </div>
+                            </div>
+                        </div>
                         </div>
                     {% endfor %}
                 </div>
@@ -74,8 +184,8 @@
             {% endif %}
         </section>
 
-        <!-- Approved / Rejected lists can go here if needed -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- Approved / Rejected / Cancelled lists -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
             <section>
                 <h3 class="text-xl font-bold text-gray-800 border-b pb-2 mb-4">Approved Pets</h3>
                 <ul class="bg-white rounded shadow-sm divide-y">
@@ -85,7 +195,15 @@
                                 <span class="font-semibold text-gray-900">{{ pet.pet_name }}</span>
                                 <span class="text-sm text-gray-500 ml-2">({{ pet.animal_type }})</span>
                             </div>
-                            <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">Approved</span>
+                            <div class="flex items-center gap-3">
+                                <a href="/edit-pet/{{ pet.pet_id }}" class="text-indigo-600 hover:text-indigo-800" title="Edit">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                </a>
+                                <a href="/admin/delete-pet/{{ pet.pet_id }}" onclick="return confirm('Delete this pet?')" class="text-red-600 hover:text-red-800" title="Delete">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                </a>
+                                <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full ml-1">Approved</span>
+                            </div>
                         </li>
                     {% else %}
                         <li class="p-4 text-gray-500 italic">No approved pets.</li>
@@ -102,10 +220,43 @@
                                 <span class="font-semibold text-gray-900">{{ pet.pet_name }}</span>
                                 <span class="text-sm text-gray-500 ml-2">({{ pet.animal_type }})</span>
                             </div>
-                            <span class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full">Rejected</span>
+                            <div class="flex items-center gap-3">
+                                <a href="/edit-pet/{{ pet.pet_id }}" class="text-indigo-600 hover:text-indigo-800" title="Edit">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                </a>
+                                <a href="/admin/delete-pet/{{ pet.pet_id }}" onclick="return confirm('Delete this pet?')" class="text-red-600 hover:text-red-800" title="Delete">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                </a>
+                                <span class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full ml-1">Rejected</span>
+                            </div>
                         </li>
                     {% else %}
                         <li class="p-4 text-gray-500 italic">No rejected pets.</li>
+                    {% endfor %}
+                </ul>
+            </section>
+            
+            <section>
+                <h3 class="text-xl font-bold text-gray-800 border-b pb-2 mb-4">Cancelled Pets</h3>
+                <ul class="bg-white rounded shadow-sm divide-y">
+                    {% for pet in cancelled_pets %}
+                        <li class="p-4 flex justify-between items-center hover:bg-gray-50">
+                            <div>
+                                <span class="font-semibold text-gray-900">{{ pet.pet_name }}</span>
+                                <span class="text-sm text-gray-500 ml-2">({{ pet.animal_type }})</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <a href="/edit-pet/{{ pet.pet_id }}" class="text-indigo-600 hover:text-indigo-800" title="Edit">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                </a>
+                                <a href="/admin/delete-pet/{{ pet.pet_id }}" onclick="return confirm('Delete this pet?')" class="text-red-600 hover:text-red-800" title="Delete">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                </a>
+                                <span class="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded-full ml-1">Cancelled</span>
+                            </div>
+                        </li>
+                    {% else %}
+                        <li class="p-4 text-gray-500 italic">No cancelled pets.</li>
                     {% endfor %}
                 </ul>
             </section>
@@ -113,5 +264,64 @@
 
     </main>
 
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Chart.js initialization
+            const ctx = document.getElementById('petStatusChart').getContext('2d');
+            const data = {
+                labels: ['Pending', 'Approved', 'Rejected', 'Adopted', 'Cancelled'],
+                datasets: [{
+                    data: [
+                        {{ stats.pending|default(0) }},
+                        {{ stats.approved|default(0) }},
+                        {{ stats.rejected|default(0) }},
+                        {{ stats.adopted|default(0) }},
+                        {{ stats.cancelled|default(0) }}
+                    ],
+                    backgroundColor: [
+                        '#6366f1', // indigo-500
+                        '#22c55e', // green-500
+                        '#ef4444', // red-500
+                        '#14b8a6', // teal-500
+                        '#9ca3af'  // gray-400
+                    ],
+                    borderWidth: 0
+                }]
+            };
+            
+            const config = {
+                type: 'doughnut',
+                data: data,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                boxWidth: 12,
+                                font: {
+                                    size: 11
+                                }
+                            }
+                        }
+                    },
+                    cutout: '65%'
+                }
+            };
+            
+            new Chart(ctx, config);
+        });
+
+        function openPetModal(petId) {
+            const modal = document.getElementById(`pet-modal-${petId}`);
+            if (modal) modal.classList.remove('hidden');
+        }
+
+        function closePetModal(petId) {
+            const modal = document.getElementById(`pet-modal-${petId}`);
+            if (modal) modal.classList.add('hidden');
+        }
+    </script>
 </body>
 </html>

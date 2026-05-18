@@ -32,16 +32,18 @@ class Pet(db.Model):
 
     description = db.Column(db.Text)
 
-    pet_image = db.Column(db.String(255))
+    pet_image = db.Column(db.Text)
 
-    owner_valid_id = db.Column(db.String(255))
+    owner_valid_id = db.Column(db.Text)
 
-    medical_record_file = db.Column(db.String(255))
+    medical_record_file = db.Column(db.Text)
 
     status = db.Column(
         db.String(50),
         default="pending"
     )
+
+    reason_for_rehoming = db.Column(db.Text)
 
     created_at = db.Column(
         db.DateTime,
@@ -52,4 +54,25 @@ class Pet(db.Model):
         "AdoptionRequest",
         backref="pet",
         lazy=True
+    )
+
+    images = db.relationship(
+        "PetImage",
+        backref="pet",
+        lazy=True,
+        cascade="all, delete-orphan"
+    )
+
+    valid_ids = db.relationship(
+        "PetValidId",
+        backref="pet",
+        lazy=True,
+        cascade="all, delete-orphan"
+    )
+
+    favorited_by = db.relationship(
+        "Favorite",
+        backref="pet_item",
+        lazy=True,
+        cascade="all, delete-orphan"
     )

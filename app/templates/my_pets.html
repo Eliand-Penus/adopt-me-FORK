@@ -30,7 +30,8 @@
                             <!-- Image -->
                             <div class="flex-shrink-0 w-32 h-32 rounded-lg overflow-hidden bg-gray-200">
                                 {% if pet.pet_image %}
-                                    <img src="{{ url_for('static', filename=pet.pet_image) }}" alt="{{ pet.pet_name }}" class="w-full h-full object-cover">
+                                    {% set img_url = pet.pet_image if pet.pet_image.startswith('http') else url_for('static', filename=pet.pet_image) %}
+                                    <img src="{{ img_url }}" alt="{{ pet.pet_name }}" class="w-full h-full object-cover">
                                 {% else %}
                                     <div class="w-full h-full flex items-center justify-center text-gray-400 text-xs">No Image</div>
                                 {% endif %}

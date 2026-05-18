@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - Adopt Me</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen text-gray-800 font-sans flex flex-col">
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow px-6 py-4 mb-8">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-indigo-600">Adopt Me</h1>
+            <div class="space-x-4">
+                <a href="/" class="text-gray-600 hover:text-indigo-600 font-medium">Home</a>
+                <a href="/pets" class="text-gray-600 hover:text-indigo-600 font-medium">Browse</a>
+                <a href="/about" class="text-indigo-600 font-bold">About</a>
+                {% if current_user.is_authenticated %}
+                    <a href="/dashboard" class="text-gray-600 hover:text-indigo-600 font-medium">Dashboard</a>
+                {% else %}
+                    <a href="/login" class="text-gray-600 hover:text-indigo-600 font-medium">Login</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-4xl mx-auto px-6 mb-12 flex-grow w-full">
+        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            <div class="px-8 py-10 bg-indigo-600 text-white text-center">
+                <h2 class="text-4xl font-extrabold mb-4">About Adopt Me</h2>
+                <p class="text-indigo-100 max-w-2xl mx-auto text-lg">Connecting loving families with pets in need of a forever home.</p>
+            </div>
+            
+            <div class="p-8 space-y-8">
+                <section>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-3 border-b pb-2">Our Mission</h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        We believe every pet deserves a loving and safe environment. Adopt Me was created to streamline the adoption process, making it easier for shelters and individuals to find responsible adopters for dogs and cats. By centralizing listings and verifying users, we aim to reduce the number of homeless animals and build a community of caring pet owners.
+                    </p>
+                </section>
+                
+                <section>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-3 border-b pb-2">How It Works</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+                        <div class="bg-gray-50 p-5 rounded-lg border border-gray-100 text-center">
+                            <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                            </div>
+                            <h4 class="font-bold text-gray-900 mb-2">1. Browse Pets</h4>
+                            <p class="text-sm text-gray-600">Search through our database of available dogs and cats using advanced filters to find your perfect match.</p>
+                        </div>
+                        <div class="bg-gray-50 p-5 rounded-lg border border-gray-100 text-center">
+                            <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                            </div>
+                            <h4 class="font-bold text-gray-900 mb-2">2. Apply to Adopt</h4>
+                            <p class="text-sm text-gray-600">Submit an application. Pet owners and shelters will review your profile and request to ensure a safe home.</p>
+                        </div>
+                        <div class="bg-gray-50 p-5 rounded-lg border border-gray-100 text-center">
+                            <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            </div>
+                            <h4 class="font-bold text-gray-900 mb-2">3. Meet Your Match</h4>
+                            <p class="text-sm text-gray-600">Once approved, arrange a meet-up and welcome your new furry family member to their forever home!</p>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t py-8 text-center text-gray-500 mt-auto">
+        <p>&copy; 2026 Adopt Me Platform. All rights reserved.</p>
+    </footer>
+
+</body>
+</html>

@@ -18,14 +18,19 @@ class User(db.Model, UserMixin):
     phone_number = db.Column(db.String(20))
     address = db.Column(db.Text)
 
-    profile_picture = db.Column(db.String(255))
+    profile_picture = db.Column(db.Text)
 
     valid_id_type = db.Column(db.String(100))
-    valid_id_image_url = db.Column(db.String(255))
+    valid_id_image_url = db.Column(db.Text)
 
     verification_status = db.Column(
         db.String(50),
         default="pending"
+    )
+
+    is_active = db.Column(
+        db.Boolean,
+        default=True
     )
 
     created_at = db.Column(
@@ -46,4 +51,11 @@ class User(db.Model, UserMixin):
         "AdoptionRequest",
         backref="requester",
         lazy=True
+    )
+
+    favorites = db.relationship(
+        "Favorite",
+        backref="user",
+        lazy=True,
+        cascade="all, delete-orphan"
     )
