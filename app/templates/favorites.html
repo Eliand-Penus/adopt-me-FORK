@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Favorites - Adopt Me</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        async function toggleFavorite(petId, btn) {
+            try {
+                const response = await fetch(`/toggle-favorite/${petId}`, { method: 'POST' });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    if (result.action === 'removed') {
+                        // Remove card if we are on favorites page
+                        const card = document.getElementById(`pet-card-${petId}`);
+                        if (card) {
+                            card.remove();
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error("Error toggling favorite", error);
+            }
+        }
+    </script>
+</head>
+
+<body class="bg-gray-50 min-h-screen text-gray-800 font-sans flex flex-col">
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow px-6 py-4 mb-8">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-indigo-600">Adopt Me</h1>
+            <div class="space-x-4">
+                <a href="/" class="text-gray-600 hover:text-indigo-600 font-medium">Home</a>
+                <a href="/pets" class="text-gray-600 hover:text-indigo-600 font-medium">Browse Pets</a>
+                <a href="/dashboard" class="text-gray-600 hover:text-indigo-600 font-medium">Dashboard</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-6xl mx-auto px-6 mb-12 flex-grow w-full">
+        <h2 class="text-3xl font-extrabold text-gray-900 mb-8">My Favorited Pets</h2>
+
+        {% if pets %}
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {% for pet in pets %}
+            <div id="pet-card-{{ pet.pet_id }}"
+                class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition flex flex-col relative">
+
+                <!-- Favorite Icon (Filled because it's in favorites) -->
+                <button onclick="toggleFavorite({{ pet.pet_id }}, this)"
+                    class="absolute top-3 right-3 bg-white p-2 rounded-full shadow hover:bg-gray-100 z-10 transition">
+                    <svg class="w-5 h-5 text-cyan-700 fill-current" viewBox="0 0 24 24">
+                        <path
+                            d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                    </svg>
+                </button>
+
+                {% if pet.pet_image %}
+                {% set img_url = pet.pet_image if pet.pet_image.startswith('http') else url_for('static',
+                filename=pet.pet_image) %}
+                <img src="{{ img_url }}" alt="{{ pet.pet_name }}" class="w-full h-48 object-cover">
+                {% else %}
+                <div class="w-full h-48 bg-gray-200 flex items-center justify-center text-gray-400">
+                    No Image
+                </div>
+                {% endif %}
+
+                <div class="p-5 flex flex-col flex-grow">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="text-xl font-bold text-gray-900">
+                            <a href="/pet/{{ pet.pet_id }}" class="hover:text-indigo-600">{{ pet.pet_name }}</a>
+                        </h3>
+                        <span
+                            class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full uppercase font-bold">Available</span>
+                    </div>
+
+                    <p class="text-sm text-gray-600 mb-4 capitalize">
+                        {{ pet.animal_type }} • {{ pet.breed or 'Unknown Breed' }} • {{ pet.age or '?' }} yrs
+                    </p>
+
+                    <a href="/pet/{{ pet.pet_id }}"
+                        class="block w-full text-center bg-indigo-50 text-indigo-700 font-semibold py-2 rounded hover:bg-indigo-100 transition mt-auto">
+                        View Details
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="bg-white p-12 text-center rounded-xl shadow-md border border-gray-100">
+            <svg class="mx-auto h-16 w-16 text-red-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z">
+                </path>
+            </svg>
+            <h3 class="text-xl font-bold text-gray-900 mb-2">No favorites yet</h3>
+            <p class="text-gray-500 mb-6">You haven't added any pets to your favorites list.</p>
+            <a href="/pets"
+                class="bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-indigo-700 transition">Browse
+                Pets</a>
+        </div>
+        {% endif %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t py-8 text-center text-gray-500 mt-auto">
+        <p>&copy; 2026 Adopt Me Platform. All rights reserved.</p>
+    </footer>
+
+</body>
+
+</html>

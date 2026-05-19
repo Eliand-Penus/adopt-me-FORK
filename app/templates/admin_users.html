@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Users - Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen text-gray-800 font-sans flex flex-col">
+
+    <!-- Admin Navigation -->
+    <nav class="bg-gray-900 shadow px-6 py-4 mb-8 text-white">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+            <h1 class="text-2xl font-bold">Adopt Me <span class="text-indigo-400">Admin</span></h1>
+            <div class="space-x-2 sm:space-x-4 flex flex-wrap justify-center">
+                <a href="/admin" class="hover:text-indigo-400 font-medium transition">Dashboard</a>
+                <a href="/admin/users" class="text-indigo-400 font-bold transition">Manage Users</a>
+                <a href="/admin/export/xml" class="hover:text-indigo-400 font-medium transition">Export XML</a>
+                <a href="/" class="hover:text-indigo-400 font-medium transition">Home</a>
+                <a href="/admin/logout" class="text-red-400 hover:text-red-300 font-medium transition">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-grow max-w-7xl mx-auto px-6 w-full mb-12">
+        <div class="flex justify-between items-end mb-8 border-b pb-4">
+            <div>
+                <h2 class="text-3xl font-extrabold text-gray-900">User Management</h2>
+                <p class="text-gray-500 mt-2">Search, view, and manage registered users.</p>
+            </div>
+            <form action="/admin/users" method="GET" class="flex gap-2">
+                <input type="text" name="search" value="{{ search }}" placeholder="Search email or username..." class="px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <button type="submit" class="relative z-10 cursor-pointer block bg-indigo-600 text-white px-4 py-2 rounded shadow hover:bg-indigo-700 font-bold transition">Search</button>
+                {% if search %}
+                    <a href="/admin/users" class="relative z-10 cursor-pointer block text-center bg-gray-200 text-gray-700 px-4 py-2 rounded shadow hover:bg-gray-300 font-bold transition">Clear</a>
+                {% endif %}
+            </form>
+        </div>
+
+        <div class="bg-white rounded shadow overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-gray-100 border-b text-gray-600 text-sm">
+                        <th class="p-4 font-bold">ID</th>
+                        <th class="p-4 font-bold">User</th>
+                        <th class="p-4 font-bold">Contact</th>
+                        <th class="p-4 font-bold">Status</th>
+                        <th class="p-4 font-bold text-center">Action</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    {% for user in users %}
+                        <tr class="hover:bg-gray-50">
+                            <td class="p-4 text-gray-500 text-sm">#{{ user.user_id }}</td>
+                            <td class="p-4">
+                                <div class="flex items-center gap-3">
+                                    <div class="h-10 w-10 bg-indigo-100 text-indigo-700 rounded-full flex items-center justify-center font-bold">
+                                        {{ user.first_name[0] }}{{ user.last_name[0] }}
+                                    </div>
+                                    <div>
+                                        <p class="font-bold text-gray-900">{{ user.first_name }} {{ user.last_name }}</p>
+                                        <p class="text-xs text-gray-500">@{{ user.username }}</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="p-4">
+                                <p class="text-sm text-gray-800">{{ user.email }}</p>
+                                <p class="text-xs text-gray-500">{{ user.phone_number or 'No phone' }}</p>
+                            </td>
+                            <td class="p-4">
+                                {% if user.is_active %}
+                                    <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full uppercase font-bold">Active</span>
+                                {% else %}
+                                    <span class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full uppercase font-bold">Deactivated</span>
+                                {% endif %}
+                            </td>
+                            <td class="p-4 text-center">
+                                <a href="/admin/toggle-user-status/{{ user.user_id }}" class="relative z-10 cursor-pointer block text-sm font-medium px-3 py-2 rounded shadow-sm transition-colors {% if user.is_active %}text-red-700 bg-red-100 hover:bg-red-200{% else %}text-green-700 bg-green-100 hover:bg-green-200{% endif %}">
+                                    {% if user.is_active %}Deactivate{% else %}Reactivate{% endif %}
+                                </a>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="5" class="p-8 text-center text-gray-500 italic">No users found.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+</body>
+</html>

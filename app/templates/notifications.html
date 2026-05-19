@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adoption Requests - Adopt Me</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen text-gray-800 font-sans flex flex-col">
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow px-6 py-4">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-indigo-600">Adopt Me</h1>
+            <a href="/owner-dashboard" class="text-gray-600 hover:text-indigo-600 font-medium">Back to Owner Dashboard</a>
+        </div>
+    </nav>
+
+    <main class="flex-grow max-w-4xl mx-auto px-6 py-12 w-full">
+        <div class="flex items-center justify-between mb-8">
+            <h2 class="text-3xl font-extrabold text-gray-900">Adoption Requests</h2>
+        </div>
+
+        {% if requests %}
+            <div class="space-y-6">
+                {% for request in requests %}
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition">
+                        <div class="border-b bg-gray-50 px-6 py-4 flex justify-between items-center">
+                            <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+                                <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                                Request for {{ request.pet.pet_name }}
+                            </h3>
+                            <span class="bg-gray-100 text-gray-600 text-sm px-3 py-1 rounded-full font-medium flex items-center gap-1.5 border border-gray-200">
+                                <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                {{ request.created_at|ph_time }}
+                            </span>
+                        </div>
+                        
+                        <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <p class="text-sm text-gray-500 mb-1">Requester Name</p>
+                                <p class="font-medium text-gray-900">{{ request.requester.first_name }} {{ request.requester.last_name }} ({{ request.requester.username }})</p>
+                            </div>
+                            
+                            <div>
+                                <p class="text-sm text-gray-500 mb-1">Email Address</p>
+                                <a href="mailto:{{ request.requester.email }}" class="font-medium text-indigo-600 hover:underline">{{ request.requester.email }}</a>
+                            </div>
+
+                            <div>
+                                <p class="text-sm text-gray-500 mb-1">Phone Number</p>
+                                <p class="font-medium text-gray-900">{{ request.requester.phone_number }}</p>
+                            </div>
+
+                            <div>
+                                <p class="text-sm text-gray-500 mb-1">Physical Address</p>
+                                <p class="font-medium text-gray-900">{{ request.requester.address }}</p>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="bg-white p-12 text-center rounded-xl shadow-sm border border-gray-100">
+                <svg class="mx-auto h-12 w-12 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                <h3 class="text-xl font-bold text-gray-900 mb-2">No Requests Yet</h3>
+                <p class="text-gray-500">You haven't received any adoption requests for your pets.</p>
+            </div>
+        {% endif %}
+    </main>
+
+</body>
+</html>

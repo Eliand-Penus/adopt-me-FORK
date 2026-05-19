@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Choose Pet Category - Adopt Me</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-50 min-h-screen text-gray-800 font-sans flex flex-col">
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow px-6 py-4">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-indigo-600">Adopt Me</h1>
+            <div class="space-x-4">
+                <a href="/" class="text-gray-600 hover:text-indigo-600 font-medium">Home</a>
+                <a href="/about" class="text-gray-600 hover:text-indigo-600 font-medium">About</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-grow flex items-center justify-center p-6">
+        <div class="max-w-4xl w-full text-center">
+            <h2 class="text-4xl font-extrabold text-gray-900 mb-4">What kind of friend are you looking for?</h2>
+            <p class="text-lg text-gray-500 mb-12">Select a category below to view all available pets.</p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 max-w-2xl mx-auto">
+
+                <!-- Dog Card -->
+                <a href="/pets?type=dog" class="block group">
+                    <div
+                        class="bg-white rounded-3xl p-10 shadow-lg border-2 border-transparent hover:border-indigo-400 hover:shadow-2xl transition transform hover:-translate-y-2 cursor-pointer flex flex-col items-center">
+                        <div
+                            class="w-32 h-32 bg-indigo-50 rounded-full flex items-center justify-center mb-6 group-hover:bg-indigo-100 transition">
+                            <span class="text-6xl">🐶</span>
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-900 group-hover:text-indigo-600 transition">Dogs</h3>
+                    </div>
+                </a>
+
+                <!-- Cat Card -->
+                <a href="/pets?type=cat" class="block group">
+                    <div
+                        class="bg-white rounded-3xl p-10 shadow-lg border-2 border-transparent hover:border-indigo-400 hover:shadow-2xl transition transform hover:-translate-y-2 cursor-pointer flex flex-col items-center">
+                        <div
+                            class="w-32 h-32 bg-indigo-50 rounded-full flex items-center justify-center mb-6 group-hover:bg-indigo-100 transition">
+                            <span class="text-6xl">🐱</span>
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-900 group-hover:text-indigo-600 transition">Cats</h3>
+                    </div>
+                </a>
+
+            </div>
+
+            <div class="mt-12">
+                <a href="/pets" class="text-indigo-600 font-medium hover:underline">Or view all pets &rarr;</a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t py-8 text-center text-gray-500 mt-auto">
+        <p>&copy; 2026 Adopt Me Platform. All rights reserved.</p>
+    </footer>
+
+</body>
+
+</html>

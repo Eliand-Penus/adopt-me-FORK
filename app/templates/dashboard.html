@@ -1,37 +1,87 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Dashboard</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Adopt Me</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
+<body class="bg-gray-50 min-h-screen text-gray-800 font-sans flex flex-col">
 
-<h1>
-    Welcome {{ current_user.username }}
-</h1>
+    <!-- Navigation -->
+    <nav class="bg-white shadow px-6 py-4">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-indigo-600">Adopt Me</h1>
+            <div class="space-x-4">
+                <a href="/" class="text-gray-600 hover:text-indigo-600 font-medium">Home</a>
+                <a href="/logout" class="text-red-600 hover:text-red-800 font-medium">Logout</a>
+            </div>
+        </div>
+    </nav>
 
-<a href="/my-pets">
-    My Pets
-</a>
+    <!-- Dashboard Content -->
+    <main class="flex-grow max-w-6xl mx-auto px-6 py-12 w-full">
+        
+        <div class="bg-gradient-to-r from-indigo-500 to-teal-500 rounded-2xl shadow-lg p-8 mb-10 text-white">
+            <h2 class="text-4xl font-extrabold mb-2">Welcome, {{ current_user.username }}! 👋</h2>
+            <p class="text-indigo-100 text-lg">Ready to make a difference in a pet's life today?</p>
+        </div>
 
-<br><br>
+        <h3 class="text-2xl font-bold text-gray-900 mb-6">Quick Actions</h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Browse Pets Card -->
+            <div class="bg-white rounded-xl shadow-md p-8 hover:shadow-xl transition transform hover:-translate-y-1 border border-gray-100 flex flex-col items-start">
+                <div class="bg-indigo-100 text-indigo-600 p-4 rounded-full mb-6">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </div>
+                <h4 class="text-xl font-bold text-gray-900 mb-2">Browse Pets</h4>
+                <p class="text-gray-500 mb-6 flex-grow">Look through our list of adorable pets currently looking for a loving home.</p>
+                <a href="/pets" class="w-full text-center bg-indigo-600 text-white font-bold py-3 rounded-lg hover:bg-indigo-700 transition">
+                    View Available Pets
+                </a>
+            </div>
 
-<br>
+            <!-- Owner Dashboard Card -->
+            <div class="bg-white rounded-xl shadow-md p-8 hover:shadow-xl transition transform hover:-translate-y-1 border border-gray-100 flex flex-col items-start">
+                <div class="bg-teal-100 text-teal-600 p-4 rounded-full mb-6">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                </div>
+                <h4 class="text-xl font-bold text-gray-900 mb-2">Pet Owner Area</h4>
+                <p class="text-gray-500 mb-6 flex-grow">Manage your uploaded pets, review adoption requests, or list a new pet.</p>
+                <a href="/owner-dashboard" class="w-full text-center bg-teal-600 text-white font-bold py-3 rounded-lg hover:bg-teal-700 transition">
+                    Go to Owner Dashboard
+                </a>
+            </div>
+        </div>
 
-<a href="/add-pet">
-    Put Up Adoption
-</a>
+        <h3 class="text-2xl font-bold text-gray-900 mt-12 mb-6">Recent Notifications</h3>
+        
+        {% if notifications %}
+            <div class="space-y-4">
+                {% for notification in notifications %}
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex items-start gap-4">
+                    <div class="bg-indigo-100 text-indigo-500 rounded-full p-2 shrink-0">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
+                    <div>
+                        <p class="text-gray-800 font-medium">{{ notification.message }}</p>
+                        <p class="text-xs text-gray-500 mt-1 font-semibold uppercase tracking-wider">{{ notification.created_at|ph_time }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-8 text-center text-gray-500">
+                You have no new notifications.
+            </div>
+        {% endif %}
+    </main>
 
-<br><br>
-
-<a href="/pets">
-    View Pets
-</a>
-
-<br><br>
-
-<a href="/logout">
-    Logout
-</a>
+    <!-- Footer -->
+    <footer class="bg-white border-t py-8 text-center text-gray-500 mt-auto">
+        <p>&copy; 2026 Adopt Me Platform. All rights reserved.</p>
+    </footer>
 
 </body>
 </html>

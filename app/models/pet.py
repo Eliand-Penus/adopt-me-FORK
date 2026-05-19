@@ -30,12 +30,20 @@ class Pet(db.Model):
 
     color = db.Column(db.String(50))
 
-    description = db.Column(db.Text)
+    traits = db.Column(db.Text)
 
-    adoption_status = db.Column(
+    pet_image = db.Column(db.Text)
+
+    owner_valid_id = db.Column(db.Text)
+
+    medical_record_file = db.Column(db.Text)
+
+    status = db.Column(
         db.String(50),
         default="pending"
     )
+
+    reason_for_rehoming = db.Column(db.Text)
 
     created_at = db.Column(
         db.DateTime,
@@ -47,3 +55,34 @@ class Pet(db.Model):
         backref="pet",
         lazy=True
     )
+
+    images = db.relationship(
+        "PetImage",
+        backref="pet",
+        lazy=True,
+        cascade="all, delete-orphan"
+    )
+
+    valid_ids = db.relationship(
+        "PetValidId",
+        backref="pet",
+        lazy=True,
+        cascade="all, delete-orphan"
+    )
+
+    favorited_by = db.relationship(
+        "Favorite",
+        backref="pet_item",
+        lazy=True,
+        cascade="all, delete-orphan"
+    )
+
+    @property
+    def traits_list(self):
+        if self.traits:
+            import json
+            try:
+                return json.loads(self.traits)
+            except:
+                return []
+        return []

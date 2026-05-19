@@ -1,33 +1,53 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Admin Login</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - Adopt Me</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
+<body class="bg-slate-900 min-h-screen text-gray-200 font-sans flex flex-col justify-center py-12 sm:px-6 lg:px-8">
 
-<h1>Admin Login</h1>
+    <div class="sm:mx-auto sm:w-full sm:max-w-md">
+        <h2 class="mt-6 text-center text-3xl font-extrabold text-white">
+            System Administration
+        </h2>
+        <p class="mt-2 text-center text-sm text-slate-400">
+            Secure portal for Adopt Me administrators.
+        </p>
+    </div>
 
-<form method="POST">
+    <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+        <div class="bg-slate-800 py-8 px-4 shadow-2xl sm:rounded-xl sm:px-10 border border-slate-700">
+            <form method="POST" action="/admin/login" class="space-y-6">
+                
+                <div>
+                    <label for="email" class="block text-sm font-medium text-slate-300">Admin Email</label>
+                    <div class="mt-1">
+                        <input id="email" name="email" type="email" autocomplete="email" required class="appearance-none block w-full px-3 py-2 border border-slate-600 rounded-lg shadow-sm placeholder-slate-500 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-slate-700 text-white">
+                    </div>
+                </div>
 
-    <input
-        type="email"
-        name="email"
-        placeholder="Admin Email"
-        required
-    >
+                <div>
+                    <label for="password" class="block text-sm font-medium text-slate-300">Password</label>
+                    <div class="mt-1">
+                        <input id="password" name="password" type="password" required class="appearance-none block w-full px-3 py-2 border border-slate-600 rounded-lg shadow-sm placeholder-slate-500 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-slate-700 text-white">
+                    </div>
+                </div>
 
-    <input
-        type="password"
-        name="password"
-        placeholder="Password"
-        required
-    >
-
-    <button type="submit">
-        Login
-    </button>
-
-</form>
+                <div>
+                    <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 focus:ring-indigo-500 transition">
+                        Access Dashboard
+                    </button>
+                </div>
+            </form>
+            
+        </div>
+        
+        <p class="mt-6 text-center text-sm text-slate-500">
+            <a href="/" class="hover:text-indigo-400 hover:underline">← Back to public site</a>
+        </p>
+    </div>
 
 </body>
 </html>
