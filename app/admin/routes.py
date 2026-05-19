@@ -16,11 +16,16 @@ from flask_login import (
 )
 
 import json
+import os
+from uuid import uuid4
+from werkzeug.utils import secure_filename
 
 from app.admin.utils import admin_required
 
 from app.models.pet import Pet
 from app.models.admin import Admin
+from app.models.pet_image import PetImage
+from app.models.pet_valid_id import PetValidId
 
 from app import db, bcrypt
 
@@ -29,6 +34,8 @@ admin = Blueprint(
     __name__,
     url_prefix="/admin"
 )
+
+from app.utils import upload_to_cloudinary, ALLOWED_EXTENSIONS, ALLOWED_IMAGE_EXTENSIONS
 
 # =========================
 # ADMIN ENTRYPOINT
@@ -188,24 +195,24 @@ def edit_pet(pet_id):
 
         if pet_image_files and pet_image_files[0].filename:
             for img in pet_image_files:
-                if img and allowed_file(img.filename, ALLOWED_IMAGE_EXTENSIONS):
-                    path = save_file(img, "pets")
-                    if path:
-                        pet.images.append(PetImage(image_path=path))
-                        if not pet.pet_image:
-                            pet.pet_image = path
+                path = upload_to_cloudinary(img, "pets", ALLOWED_IMAGE_EXTENSIONS)
+                if path:
+                    pet.images.append(PetImage(image_path=path))
+                    if not pet.pet_image:
+                        pet.pet_image = path
                         
         if valid_id_files and valid_id_files[0].filename:
             for vid in valid_id_files:
-                if vid and allowed_file(vid.filename, ALLOWED_IMAGE_EXTENSIONS):
-                    path = save_file(vid, "valid_ids")
-                    if path:
-                        pet.valid_ids.append(PetValidId(image_path=path))
-                        if not pet.owner_valid_id:
-                            pet.owner_valid_id = path
+                path = upload_to_cloudinary(vid, "valid_ids", ALLOWED_IMAGE_EXTENSIONS)
+                if path:
+                    pet.valid_ids.append(PetValidId(image_path=path))
+                    if not pet.owner_valid_id:
+                        pet.owner_valid_id = path
             
-        if medical_record_file_req and allowed_file(medical_record_file_req.filename, ALLOWED_EXTENSIONS):
-            pet.medical_record_file = save_file(medical_record_file_req, "medical_records")
+        if medical_record_file_req:
+            path = upload_to_cloudinary(medical_record_file_req, "medical_records", ALLOWED_EXTENSIONS)
+            if path:
+                pet.medical_record_file = path
 
         db.session.commit()
         

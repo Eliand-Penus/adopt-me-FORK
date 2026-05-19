@@ -21,7 +21,7 @@ from app.models.pet_valid_id import PetValidId
 from app.models.favorite import Favorite
 from app.models.notification import Notification
 
-from app.utils import save_file, allowed_file, ALLOWED_IMAGE_EXTENSIONS, ALLOWED_EXTENSIONS
+from app.utils import upload_to_cloudinary, ALLOWED_IMAGE_EXTENSIONS, ALLOWED_EXTENSIONS
 import json
 
 main = Blueprint("main", __name__)
@@ -92,8 +92,10 @@ def profile():
             # Profile Picture Upload
             profile_picture = request.files.get("profile_picture")
             if profile_picture and profile_picture.filename != "":
-                from app.utils import save_file
-                current_user.profile_picture = save_file(profile_picture, "profile_pictures")
+                from app.utils import upload_to_cloudinary
+                url = upload_to_cloudinary(profile_picture, "profile_pictures", ALLOWED_IMAGE_EXTENSIONS)
+                if url:
+                    current_user.profile_picture = url
                 
             db.session.commit()
             flash("Profile updated successfully.", "success")
@@ -161,21 +163,13 @@ def add_pet():
 
         # Keeping the first one for backward compatibility if we still use pet.pet_image
         # But we added PetImage and PetValidId tables. We will populate them.
+        # The main columns will be populated using the first successful uploads in the loop
         pet_image_path = None
         owner_valid_id_path = None
         medical_record_path = None
-        
-        # We will populate the main column with the first image for convenience
-        if pet_image_files and pet_image_files[0].filename:
-            if allowed_file(pet_image_files[0].filename, ALLOWED_IMAGE_EXTENSIONS):
-                pet_image_path = save_file(pet_image_files[0], "pets")
-                
-        if valid_id_files and valid_id_files[0].filename:
-            if allowed_file(valid_id_files[0].filename, ALLOWED_IMAGE_EXTENSIONS):
-                owner_valid_id_path = save_file(valid_id_files[0], "valid_ids")
             
-        if medical_record_file_req and allowed_file(medical_record_file_req.filename, ALLOWED_EXTENSIONS):
-            medical_record_path = save_file(medical_record_file_req, "medical_records")
+        if medical_record_file_req:
+            medical_record_path = upload_to_cloudinary(medical_record_file_req, "medical_records", ALLOWED_EXTENSIONS)
 
         new_pet = Pet(
             owner_id=current_user.user_id,
@@ -197,16 +191,20 @@ def add_pet():
         )
         
         for img in pet_image_files:
-            if img and img.filename and allowed_file(img.filename, ALLOWED_IMAGE_EXTENSIONS):
-                path = save_file(img, "pets")
+            if img and img.filename:
+                path = upload_to_cloudinary(img, "pets", ALLOWED_IMAGE_EXTENSIONS)
                 if path:
                     new_pet.images.append(PetImage(image_path=path))
+                    if not new_pet.pet_image:
+                        new_pet.pet_image = path
                 
         for vid in valid_id_files:
-            if vid and vid.filename and allowed_file(vid.filename, ALLOWED_IMAGE_EXTENSIONS):
-                path = save_file(vid, "valid_ids")
+            if vid and vid.filename:
+                path = upload_to_cloudinary(vid, "valid_ids", ALLOWED_IMAGE_EXTENSIONS)
                 if path:
                     new_pet.valid_ids.append(PetValidId(image_path=path))
+                    if not new_pet.owner_valid_id:
+                        new_pet.owner_valid_id = path
 
         db.session.add(new_pet)
 
@@ -461,25 +459,25 @@ def edit_pet(pet_id):
 
         if pet_image_files and pet_image_files[0].filename:
             for img in pet_image_files:
-                if img and allowed_file(img.filename, ALLOWED_IMAGE_EXTENSIONS):
-                    path = save_file(img, "pets")
-                    if path:
-                        pet.images.append(PetImage(image_path=path))
-                        # update main image if empty
-                        if not pet.pet_image:
-                            pet.pet_image = path
+                path = upload_to_cloudinary(img, "pets", ALLOWED_IMAGE_EXTENSIONS)
+                if path:
+                    pet.images.append(PetImage(image_path=path))
+                    # update main image if empty
+                    if not pet.pet_image:
+                        pet.pet_image = path
                         
         if valid_id_files and valid_id_files[0].filename:
             for vid in valid_id_files:
-                if vid and allowed_file(vid.filename, ALLOWED_IMAGE_EXTENSIONS):
-                    path = save_file(vid, "valid_ids")
-                    if path:
-                        pet.valid_ids.append(PetValidId(image_path=path))
-                        if not pet.owner_valid_id:
-                            pet.owner_valid_id = path
+                path = upload_to_cloudinary(vid, "valid_ids", ALLOWED_IMAGE_EXTENSIONS)
+                if path:
+                    pet.valid_ids.append(PetValidId(image_path=path))
+                    if not pet.owner_valid_id:
+                        pet.owner_valid_id = path
             
-        if medical_record_file_req and allowed_file(medical_record_file_req.filename, ALLOWED_EXTENSIONS):
-            pet.medical_record_file = save_file(medical_record_file_req, "medical_records")
+        if medical_record_file_req:
+            path = upload_to_cloudinary(medical_record_file_req, "medical_records", ALLOWED_EXTENSIONS)
+            if path:
+                pet.medical_record_file = path
 
         db.session.commit()
         

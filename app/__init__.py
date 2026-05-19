@@ -29,6 +29,15 @@ def create_app():
     # LOAD CONFIG
     app.config.from_object("config.Config")
 
+    # CLOUDINARY CONFIG
+    import cloudinary
+    cloudinary.config(
+        cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"),
+        api_key=os.getenv("CLOUDINARY_API_KEY"),
+        api_secret=os.getenv("CLOUDINARY_API_SECRET"),
+        secure=True
+    )
+
     # INIT EXTENSIONS
     db.init_app(app)
     migrate.init_app(app, db)
