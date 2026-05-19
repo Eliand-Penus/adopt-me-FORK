@@ -20,10 +20,13 @@ def save_file(file, folder_name):
         # We upload to Cloudinary.
         # Cloudinary automatically generates unique filenames if we don't specify public_id.
         # We can specify the folder to keep things organized.
+        is_doc = file.filename.rsplit('.', 1)[1].lower() in ALLOWED_DOC_EXTENSIONS
+        r_type = "raw" if is_doc else "image"
+        
         upload_result = cloudinary.uploader.upload(
             file,
             folder=folder_name,
-            resource_type="auto" # Handles both images and raw files like PDFs
+            resource_type=r_type
         )
         
         # Return the secure HTTPS URL provided by Cloudinary

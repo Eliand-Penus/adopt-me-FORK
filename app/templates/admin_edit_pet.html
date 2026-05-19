@@ -9,10 +9,16 @@
 <body class="bg-gray-50 min-h-screen text-gray-800 font-sans">
 
     <!-- Navigation -->
-    <nav class="bg-white shadow px-6 py-4 mb-8">
-        <div class="max-w-4xl mx-auto flex justify-between items-center">
-            <h1 class="text-2xl font-bold text-indigo-600">Adopt Me</h1>
-            <a href="/my-pets" class="text-gray-600 hover:text-indigo-600 font-medium">Back to My Pets</a>
+    <nav class="bg-gray-900 shadow px-6 py-4 mb-8 text-white">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+            <h1 class="text-2xl font-bold">Adopt Me <span class="text-indigo-400">Admin</span></h1>
+            <div class="space-x-2 sm:space-x-4 flex flex-wrap justify-center">
+                <a href="/admin" class="text-indigo-400 font-bold transition">Dashboard</a>
+                <a href="/admin/users" class="hover:text-indigo-400 font-medium transition">Manage Users</a>
+                <a href="/admin/export/xml" class="hover:text-indigo-400 font-medium transition">Export XML</a>
+                <a href="/" class="hover:text-indigo-400 font-medium transition">Home</a>
+                <a href="/admin/logout" class="text-red-400 hover:text-red-300 font-medium transition">Logout</a>
+            </div>
         </div>
     </nav>
 
@@ -32,7 +38,7 @@
         <div class="bg-white rounded-xl shadow-md overflow-hidden p-8">
         <h2 class="text-3xl font-extrabold text-gray-900 mb-6 text-center">Edit Pet: {{ pet.pet_name }}</h2>
 
-        <form method="POST" action="/edit-pet/{{ pet.pet_id }}" enctype="multipart/form-data" class="space-y-6">
+        <form method="POST" action="/admin/edit-pet/{{ pet.pet_id }}" enctype="multipart/form-data" class="space-y-6">
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Pet Name -->
@@ -168,7 +174,7 @@
                 <button type="submit" class="flex-grow bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-300 transition-colors shadow-lg">
                     Save Changes
                 </button>
-                <a href="/my-pets" class="flex-grow text-center bg-gray-200 text-gray-800 font-bold py-3 px-4 rounded-lg hover:bg-gray-300 transition-colors">
+                <a href="/admin" class="flex-grow text-center bg-gray-200 text-gray-800 font-bold py-3 px-4 rounded-lg hover:bg-gray-300 transition-colors">
                     Cancel
                 </a>
             </div>

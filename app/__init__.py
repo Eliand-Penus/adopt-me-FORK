@@ -1,5 +1,6 @@
 import os
 from dotenv import load_dotenv
+from zoneinfo import ZoneInfo
 
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
@@ -62,5 +63,15 @@ def create_app():
     app.register_blueprint(auth)
     app.register_blueprint(main)
     app.register_blueprint(admin)
+
+    # CUSTOM JINJA FILTERS
+    @app.template_filter('ph_time')
+    def format_ph_time(dt_utc):
+        if not dt_utc:
+            return ""
+        if dt_utc.tzinfo is None:
+            dt_utc = dt_utc.replace(tzinfo=ZoneInfo("UTC"))
+        dt_ph = dt_utc.astimezone(ZoneInfo("Asia/Manila"))
+        return dt_ph.strftime('%m/%d/%Y - %I:%M %p')
 
     return app

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,35 +8,44 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         async function toggleFavorite(petId, btn) {
-            const isAuthenticated = {{ 'true' if current_user.is_authenticated else 'false' }};
-            if (!isAuthenticated) {
-                window.location.href = '/login';
-                return;
+
+            const isAuthenticated = {{ current_user.is_authenticated | tojson
+        }};
+
+        if (!isAuthenticated) {
+            window.location.href = '/login';
+            return;
+        }
+
+        try {
+            const response = await fetch(`/toggle-favorite/${petId}`, {
+                method: 'POST'
+            });
+
+            const result = await response.json();
+
+            if (result.status === 'success') {
+                const icon = btn.querySelector('svg');
+                const text = btn.querySelector('span');
+
+                if (result.action === 'added') {
+                    icon.classList.add('text-cyan-700', 'fill-current');
+                    icon.classList.remove('text-gray-400');
+                    text.innerText = 'Favorited';
+                } else {
+                    icon.classList.remove('text-cyan-700', 'fill-current');
+                    icon.classList.add('text-gray-400');
+                    text.innerText = 'Add to Favorites';
+                }
             }
 
-            try {
-                const response = await fetch(`/toggle-favorite/${petId}`, { method: 'POST' });
-                const result = await response.json();
-                
-                if (result.status === 'success') {
-                    const icon = btn.querySelector('svg');
-                    const text = btn.querySelector('span');
-                    if (result.action === 'added') {
-                        icon.classList.add('text-red-500', 'fill-current');
-                        icon.classList.remove('text-gray-400');
-                        text.innerText = 'Favorited';
-                    } else {
-                        icon.classList.remove('text-red-500', 'fill-current');
-                        icon.classList.add('text-gray-400');
-                        text.innerText = 'Add to Favorites';
-                    }
-                }
-            } catch (error) {
-                console.error("Error toggling favorite", error);
-            }
+        } catch (error) {
+            console.error("Error toggling favorite", error);
         }
+    }
     </script>
 </head>
+
 <body class="bg-gray-50 min-h-screen text-gray-800 font-sans">
 
     <!-- Navigation -->
@@ -50,64 +60,102 @@
         <div class="bg-white rounded-xl shadow-md overflow-hidden flex flex-col md:flex-row">
             <!-- Image Gallery -->
             <div class="md:w-1/2 bg-gray-200 flex flex-col">
-                <div class="h-64 md:h-96 w-full">
+                <div class="h-64 md:h-96 w-full relative group">
                     {% if pet.images %}
-                        {% set first_img = pet.images[0].image_path %}
-                        {% set main_url = first_img if first_img.startswith('http') else url_for('static', filename=first_img) %}
-                        <img id="main-image" src="{{ main_url }}" alt="{{ pet.pet_name }}" class="w-full h-full object-cover transition-opacity duration-300">
+                    {% set first_img = pet.images[0].image_path %}
+                    {% set main_url = first_img if first_img.startswith('http') else url_for('static',
+                    filename=first_img) %}
+                    <img id="main-image" src="{{ main_url }}" alt="{{ pet.pet_name }}"
+                        class="w-full h-full object-cover transition-opacity duration-300">
+                        
+                    {% if pet.images|length > 1 %}
+                    <button onclick="prevImage()" class="absolute left-2 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition opacity-0 group-hover:opacity-100">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                    </button>
+                    <button onclick="nextImage()" class="absolute right-2 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition opacity-0 group-hover:opacity-100">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </button>
+                    {% endif %}
+                    
                     {% elif pet.pet_image %}
-                        {% set main_url = pet.pet_image if pet.pet_image.startswith('http') else url_for('static', filename=pet.pet_image) %}
-                        <img id="main-image" src="{{ main_url }}" alt="{{ pet.pet_name }}" class="w-full h-full object-cover transition-opacity duration-300">
+                    {% set main_url = pet.pet_image if pet.pet_image.startswith('http') else url_for('static',
+                    filename=pet.pet_image) %}
+                    <img id="main-image" src="{{ main_url }}" alt="{{ pet.pet_name }}"
+                        class="w-full h-full object-cover transition-opacity duration-300">
                     {% else %}
-                        <div class="w-full h-full flex items-center justify-center text-gray-400">No Image Available</div>
+                    <div class="w-full h-full flex items-center justify-center text-gray-400">No Image Available</div>
                     {% endif %}
                 </div>
-                
+
                 {% if pet.images and pet.images|length > 1 %}
                 <div class="flex gap-2 p-4 overflow-x-auto bg-gray-100">
                     {% for img in pet.images %}
-                        {% set img_url = img.image_path if img.image_path.startswith('http') else url_for('static', filename=img.image_path) %}
-                        <img src="{{ img_url }}" onclick="changeMainImage(this.src)" class="h-16 w-16 object-cover rounded cursor-pointer opacity-70 hover:opacity-100 transition-opacity border-2 border-transparent hover:border-indigo-500">
+                    {% set img_url = img.image_path if img.image_path.startswith('http') else url_for('static',
+                    filename=img.image_path) %}
+                    <img src="{{ img_url }}" onclick="changeMainImage(this.src)"
+                        class="h-16 w-16 object-cover rounded cursor-pointer opacity-70 hover:opacity-100 transition-opacity border-2 border-transparent hover:border-indigo-500">
                     {% endfor %}
                 </div>
                 {% endif %}
             </div>
-            
+
             <!-- Details -->
             <div class="md:w-1/2 p-8 flex flex-col justify-center">
                 <div class="flex justify-between items-start mb-4">
                     <h2 class="text-3xl font-extrabold text-gray-900">{{ pet.pet_name }}</h2>
                     <div class="flex items-center gap-3">
-                        <button onclick="toggleFavorite({{ pet.pet_id }}, this)" class="flex items-center gap-1 text-sm font-medium hover:bg-gray-100 px-2 py-1 rounded transition">
+                        <button onclick="toggleFavorite({{ pet.pet_id }}, this)"
+                            class="flex items-center gap-1 text-sm font-medium hover:bg-gray-100 px-2 py-1 rounded transition">
                             {% if is_favorite %}
-                                <svg class="w-5 h-5 text-red-500 fill-current" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-                                <span>Favorited</span>
+                            <svg class="w-5 h-5 text-cyan-700 fill-current" viewBox="0 0 24 24">
+                                <path
+                                    d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                            </svg>
+                            <span>Favorited</span>
                             {% else %}
-                                <svg class="w-5 h-5 text-gray-400 hover:text-red-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
-                                <span>Add to Favorites</span>
+                            <svg class="w-5 h-5 text-gray-400 hover:text-red-500" fill="none" stroke="currentColor"
+                                stroke-width="2" viewBox="0 0 24 24">
+                                <path
+                                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z">
+                                </path>
+                            </svg>
+                            <span>Add to Favorites</span>
                             {% endif %}
                         </button>
                         {% if pet.status == 'approved' %}
-                            <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full uppercase font-bold">Available</span>
+                        <span
+                            class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full uppercase font-bold">Available</span>
                         {% else %}
-                            <span class="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded-full uppercase font-bold">{{ pet.status }}</span>
+                        <span class="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded-full uppercase font-bold">{{
+                            pet.status }}</span>
                         {% endif %}
                     </div>
                 </div>
-                
+
                 <ul class="text-gray-700 space-y-2 mb-6">
-                    <li><strong class="font-semibold w-24 inline-block">Type:</strong> <span class="capitalize">{{ pet.animal_type }}</span></li>
-                    <li><strong class="font-semibold w-24 inline-block">Breed:</strong> {{ pet.breed or 'Unknown' }}</li>
+                    <li><strong class="font-semibold w-24 inline-block">Type:</strong> <span class="capitalize">{{
+                            pet.animal_type }}</span></li>
+                    <li><strong class="font-semibold w-24 inline-block">Breed:</strong> {{ pet.breed or 'Unknown' }}
+                    </li>
                     <li><strong class="font-semibold w-24 inline-block">Age:</strong> {{ pet.age or '?' }} yrs</li>
                     <li><strong class="font-semibold w-24 inline-block">Gender:</strong> {{ pet.gender or 'N/A' }}</li>
                     <li><strong class="font-semibold w-24 inline-block">Color:</strong> {{ pet.color or 'N/A' }}</li>
                 </ul>
-                
+
                 <div class="mb-6">
-                    <h3 class="text-lg font-bold text-gray-900 mb-2">About {{ pet.pet_name }}</h3>
-                    <p class="text-gray-600 leading-relaxed">{{ pet.description or 'No description provided.' }}</p>
+                    <h3 class="text-lg font-bold text-gray-900 mb-3">Traits</h3>
+                    {% if traits_list %}
+                    <div class="flex flex-wrap gap-2">
+                        {% for trait in traits_list %}
+                        <span class="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm font-medium">{{ trait
+                            }}</span>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-gray-600 leading-relaxed">No traits provided.</p>
+                    {% endif %}
                 </div>
-                
+
                 {% if pet.reason_for_rehoming %}
                 <div class="mb-8 p-4 bg-orange-50 rounded-lg border border-orange-100">
                     <h3 class="text-md font-bold text-orange-800 mb-1">Reason for Rehoming</h3>
@@ -119,74 +167,130 @@
 
                 <!-- Owner Information Button -->
                 <div class="mb-8">
-                    <button onclick="openOwnerModal()" class="w-full sm:w-auto bg-white border border-gray-300 text-gray-700 font-semibold py-2 px-4 rounded-lg shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition">
+                    <button onclick="openOwnerModal()"
+                        class="w-full sm:w-auto bg-white border border-gray-300 text-gray-700 font-semibold py-2 px-4 rounded-lg shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition">
                         View Owner Information
                     </button>
                 </div>
-                
+
                 {% if current_user.is_authenticated %}
-                    {% if pet.owner_id != current_user.user_id and pet.status == 'approved' %}
-                        <a href="/adopt/{{ pet.pet_id }}" class="block w-full text-center bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 transition">
-                            Apply to Adopt
-                        </a>
-                    {% elif pet.owner_id == current_user.user_id %}
-                        <div class="bg-indigo-50 text-indigo-700 p-4 rounded text-center">
-                            This is your pet.
-                        </div>
-                    {% endif %}
+                {% if pet.owner_id != current_user.user_id and pet.status == 'approved' %}
+                <a href="/adopt/{{ pet.pet_id }}"
+                    class="block w-full text-center bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 transition">
+                    Adopt Me
+                </a>
+                {% elif pet.owner_id == current_user.user_id %}
+                <div class="bg-indigo-50 text-indigo-700 p-4 rounded text-center">
+                    This is your pet.
+                </div>
+                {% endif %}
                 {% else %}
-                    <a href="/login" class="block w-full text-center bg-gray-200 text-gray-800 font-bold py-3 px-4 rounded-lg hover:bg-gray-300 transition">
-                        Login to Adopt
-                    </a>
+                <a href="/login"
+                    class="block w-full text-center bg-gray-200 text-gray-800 font-bold py-3 px-4 rounded-lg hover:bg-gray-300 transition">
+                    Login to Adopt
+                </a>
                 {% endif %}
             </div>
         </div>
+        <!-- Toast Notification -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div id="toast-container" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2">
+                    {% for category, message in messages %}
+                        {% if category == 'toast_success' %}
+                            <div class="bg-gray-800 text-white px-6 py-4 rounded-lg shadow-2xl flex items-center gap-3 transform translate-y-10 opacity-0 transition-all duration-500 ease-out" id="toast-message">
+                                <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                <span class="font-medium">{{ message }}</span>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <script>
+                    document.addEventListener("DOMContentLoaded", function() {
+                        const toast = document.getElementById('toast-message');
+                        if (toast) {
+                            setTimeout(() => {
+                                toast.classList.remove('translate-y-10', 'opacity-0');
+                                toast.classList.add('translate-y-0', 'opacity-100');
+                            }, 100);
+                            setTimeout(() => {
+                                toast.classList.remove('translate-y-0', 'opacity-100');
+                                toast.classList.add('translate-y-10', 'opacity-0');
+                                setTimeout(() => toast.remove(), 500);
+                            }, 5000);
+                        }
+                    });
+                </script>
+            {% endif %}
+        {% endwith %}
     </main>
 
     <!-- Owner Modal -->
     <div id="owner-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center">
         <!-- Backdrop -->
-        <div class="absolute inset-0 bg-black bg-opacity-40 backdrop-blur-sm transition-opacity" onclick="closeOwnerModal()"></div>
-        
+        <div class="absolute inset-0 bg-black bg-opacity-40 backdrop-blur-sm transition-opacity"
+            onclick="closeOwnerModal()"></div>
+
         <!-- Modal Content -->
-        <div class="bg-white rounded-xl shadow-2xl w-11/12 max-w-md mx-auto z-10 transform scale-95 opacity-0 transition-all duration-300 flex flex-col overflow-hidden" id="owner-modal-content">
+        <div class="bg-white rounded-xl shadow-2xl w-11/12 max-w-md mx-auto z-10 transform scale-95 opacity-0 transition-all duration-300 flex flex-col overflow-hidden"
+            id="owner-modal-content">
             <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
                 <h3 class="text-xl font-extrabold text-gray-900">Owner Information</h3>
-                <button onclick="closeOwnerModal()" class="text-gray-400 hover:text-gray-600 focus:outline-none transition">
-                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                <button onclick="closeOwnerModal()"
+                    class="text-gray-400 hover:text-gray-600 focus:outline-none transition">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                        </path>
+                    </svg>
                 </button>
             </div>
-            
+
             <div class="p-6 space-y-4">
                 <div class="flex items-center gap-4">
-                    <div class="h-12 w-12 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center font-bold text-xl uppercase">
+                    <div
+                        class="h-12 w-12 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center font-bold text-xl uppercase">
                         {{ pet.owner.first_name[0] }}{{ pet.owner.last_name[0] }}
                     </div>
                     <div>
-                        <h4 class="text-lg font-bold text-gray-900">{{ pet.owner.first_name }} {{ pet.owner.last_name }}</h4>
+                        <h4 class="text-lg font-bold text-gray-900">{{ pet.owner.first_name }} {{ pet.owner.last_name }}
+                        </h4>
                         <p class="text-sm text-gray-500">Pet Owner</p>
                     </div>
                 </div>
-                
+
                 <div class="bg-gray-50 rounded-lg p-4 space-y-3 mt-4">
                     <div class="flex items-start gap-3">
-                        <svg class="w-5 h-5 text-gray-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                        <svg class="w-5 h-5 text-gray-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
+                            </path>
+                        </svg>
                         <div>
                             <p class="text-xs font-semibold text-gray-500 uppercase">Email</p>
                             <p class="text-gray-900">{{ pet.owner.email }}</p>
                         </div>
                     </div>
-                    
+
                     <div class="flex items-start gap-3">
-                        <svg class="w-5 h-5 text-gray-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+                        <svg class="w-5 h-5 text-gray-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z">
+                            </path>
+                        </svg>
                         <div>
                             <p class="text-xs font-semibold text-gray-500 uppercase">Phone</p>
                             <p class="text-gray-900">{{ pet.owner.phone_number or 'Not provided' }}</p>
                         </div>
                     </div>
-                    
+
                     <div class="flex items-start gap-3">
-                        <svg class="w-5 h-5 text-gray-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        <svg class="w-5 h-5 text-gray-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
+                            </path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
                         <div>
                             <p class="text-xs font-semibold text-gray-500 uppercase">Address</p>
                             <p class="text-gray-900">{{ pet.owner.address or 'Not provided' }}</p>
@@ -194,9 +298,10 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="px-6 py-4 border-t border-gray-100 bg-gray-50">
-                <button onclick="closeOwnerModal()" class="w-full bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded-lg hover:bg-gray-300 transition">
+                <button onclick="closeOwnerModal()"
+                    class="w-full bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded-lg hover:bg-gray-300 transition">
                     Close
                 </button>
             </div>
@@ -204,6 +309,46 @@
     </div>
 
     <script>
+        {% if pet.images %}
+        let petImages = [
+            {% for img in pet.images %}
+                "{{ img.image_path if img.image_path.startswith('http') else url_for('static', filename=img.image_path) }}"{% if not loop.last %},{% endif %}
+            {% endfor %}
+        ];
+        let currentImageIndex = 0;
+
+        function changeMainImage(src) {
+            const mainImg = document.getElementById('main-image');
+            mainImg.style.opacity = '0.5';
+            setTimeout(() => {
+                mainImg.src = src;
+                currentImageIndex = petImages.indexOf(src);
+                mainImg.style.opacity = '1';
+            }, 150);
+        }
+        
+        function prevImage() {
+            if (petImages.length <= 1) return;
+            currentImageIndex = (currentImageIndex - 1 + petImages.length) % petImages.length;
+            const mainImg = document.getElementById('main-image');
+            mainImg.style.opacity = '0.5';
+            setTimeout(() => {
+                mainImg.src = petImages[currentImageIndex];
+                mainImg.style.opacity = '1';
+            }, 150);
+        }
+        
+        function nextImage() {
+            if (petImages.length <= 1) return;
+            currentImageIndex = (currentImageIndex + 1) % petImages.length;
+            const mainImg = document.getElementById('main-image');
+            mainImg.style.opacity = '0.5';
+            setTimeout(() => {
+                mainImg.src = petImages[currentImageIndex];
+                mainImg.style.opacity = '1';
+            }, 150);
+        }
+        {% else %}
         function changeMainImage(src) {
             const mainImg = document.getElementById('main-image');
             mainImg.style.opacity = '0.5';
@@ -212,6 +357,7 @@
                 mainImg.style.opacity = '1';
             }, 150);
         }
+        {% endif %}
 
         const modal = document.getElementById('owner-modal');
         const modalContent = document.getElementById('owner-modal-content');
@@ -234,4 +380,5 @@
         }
     </script>
 </body>
+
 </html>

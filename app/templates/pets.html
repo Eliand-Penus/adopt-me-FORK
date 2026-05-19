@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,33 +8,42 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         async function toggleFavorite(petId, btn) {
+
             // Must be logged in to toggle. If not, redirect to login.
-            const isAuthenticated = {{ 'true' if current_user.is_authenticated else 'false' }};
-            if (!isAuthenticated) {
-                window.location.href = '/login';
-                return;
+            const isAuthenticated = {{ current_user.is_authenticated | tojson
+        }};
+
+        if (!isAuthenticated) {
+            window.location.href = '/login';
+            return;
+        }
+
+        try {
+            const response = await fetch(`/toggle-favorite/${petId}`, {
+                method: 'POST'
+            });
+
+            const result = await response.json();
+
+            if (result.status === 'success') {
+                const icon = btn.querySelector('svg');
+
+                if (result.action === 'added') {
+                    icon.classList.add('text-cyan-700', 'fill-current');
+                    icon.classList.remove('text-gray-400');
+                } else {
+                    icon.classList.remove('text-cyan-700', 'fill-current');
+                    icon.classList.add('text-gray-400');
+                }
             }
 
-            try {
-                const response = await fetch(`/toggle-favorite/${petId}`, { method: 'POST' });
-                const result = await response.json();
-                
-                if (result.status === 'success') {
-                    const icon = btn.querySelector('svg');
-                    if (result.action === 'added') {
-                        icon.classList.add('text-red-500', 'fill-current');
-                        icon.classList.remove('text-gray-400');
-                    } else {
-                        icon.classList.remove('text-red-500', 'fill-current');
-                        icon.classList.add('text-gray-400');
-                    }
-                }
-            } catch (error) {
-                console.error("Error toggling favorite", error);
-            }
+        } catch (error) {
+            console.error("Error toggling favorite", error);
         }
+    }
     </script>
 </head>
+
 <body class="bg-gray-50 min-h-screen text-gray-800 font-sans">
 
     <!-- Navigation -->
@@ -43,65 +53,80 @@
             <div class="space-x-4">
                 <a href="/" class="text-gray-600 hover:text-indigo-600 font-medium">Home</a>
                 {% if current_user.is_authenticated %}
-                    <a href="/favorites" class="text-pink-600 hover:text-pink-800 font-medium">Favorites</a>
-                    <a href="/dashboard" class="text-gray-600 hover:text-indigo-600 font-medium">Dashboard</a>
-                    <a href="/my-pets" class="text-gray-600 hover:text-indigo-600 font-medium">My Pets</a>
-                    <a href="/logout" class="text-red-600 hover:text-red-800 font-medium">Logout</a>
+                <a href="/favorites" class="text-pink-600 hover:text-pink-800 font-medium">Favorites</a>
+                <a href="/dashboard" class="text-gray-600 hover:text-indigo-600 font-medium">Dashboard</a>
+                <a href="/my-pets" class="text-gray-600 hover:text-indigo-600 font-medium">My Pets</a>
+                <a href="/about" class="text-gray-600 hover:text-indigo-600 font-medium">About</a>
+                <a href="/logout" class="text-red-600 hover:text-red-800 font-medium">Logout</a>
                 {% else %}
-                    <a href="/login" class="text-gray-600 hover:text-indigo-600 font-medium">Login</a>
-                    <a href="/register" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition">Register</a>
+                <a href="/login" class="text-gray-600 hover:text-indigo-600 font-medium">Login</a>
+                <a href="/register"
+                    class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition">Register</a>
+                <a href="/about" class="text-gray-600 hover:text-indigo-600 font-medium">About</a>
                 {% endif %}
             </div>
         </div>
     </nav>
 
     <main class="max-w-7xl mx-auto px-6 mb-12 flex flex-col md:flex-row gap-8">
-        
+
         <!-- Filter Sidebar -->
         <aside class="w-full md:w-1/4 bg-white p-6 rounded-xl shadow-md h-max">
             <h3 class="text-lg font-bold text-gray-900 mb-4 border-b pb-2">Filter Pets</h3>
             <form action="/pets" method="GET" class="space-y-4">
-                
+
                 <!-- Pet Type -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Type</label>
-                    <select name="type" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none text-sm bg-gray-50">
+                    <select name="type"
+                        class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none text-sm bg-gray-50">
                         <option value="">Any</option>
-                        <option value="dog" {% if request.args.get('type') == 'dog' %}selected{% endif %}>Dog</option>
-                        <option value="cat" {% if request.args.get('type') == 'cat' %}selected{% endif %}>Cat</option>
+                        <option value="dog" {% if request.args.get('type')=='dog' %}selected{% endif %}>Dog</option>
+                        <option value="cat" {% if request.args.get('type')=='cat' %}selected{% endif %}>Cat</option>
                     </select>
                 </div>
 
                 <!-- Gender -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Gender</label>
-                    <select name="gender" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none text-sm bg-gray-50">
+                    <select name="gender"
+                        class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none text-sm bg-gray-50">
                         <option value="">Any</option>
-                        <option value="Male" {% if request.args.get('gender') == 'Male' %}selected{% endif %}>Male</option>
-                        <option value="Female" {% if request.args.get('gender') == 'Female' %}selected{% endif %}>Female</option>
+                        <option value="Male" {% if request.args.get('gender')=='Male' %}selected{% endif %}>Male
+                        </option>
+                        <option value="Female" {% if request.args.get('gender')=='Female' %}selected{% endif %}>Female
+                        </option>
                     </select>
                 </div>
 
                 <!-- Breed -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Preferred Breed</label>
-                    <input type="text" name="breed" value="{{ request.args.get('breed', '') }}" placeholder="e.g. Golden Retriever" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none text-sm bg-gray-50">
+                    <input type="text" name="breed" value="{{ request.args.get('breed', '') }}"
+                        placeholder="e.g. Golden Retriever"
+                        class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none text-sm bg-gray-50">
                 </div>
 
                 <!-- Age Range -->
                 <div class="grid grid-cols-2 gap-2">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Min Age</label>
-                        <input type="number" name="min_age" value="{{ request.args.get('min_age', '') }}" min="0" placeholder="0" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none text-sm bg-gray-50">
+                        <input type="number" name="min_age" value="{{ request.args.get('min_age', '') }}" min="0"
+                            placeholder="0"
+                            class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none text-sm bg-gray-50">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Max Age</label>
-                        <input type="number" name="max_age" value="{{ request.args.get('max_age', '') }}" min="0" placeholder="20" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none text-sm bg-gray-50">
+                        <input type="number" name="max_age" value="{{ request.args.get('max_age', '') }}" min="0"
+                            placeholder="20"
+                            class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none text-sm bg-gray-50">
                     </div>
                 </div>
 
                 <div class="pt-4">
-                    <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-2 rounded-lg hover:bg-indigo-700 transition">Apply Filters</button>
+                    <button type="submit"
+                        class="w-full bg-indigo-600 text-white font-bold py-2 rounded-lg hover:bg-indigo-700 transition">Apply
+                        Filters</button>
                 </div>
                 <div class="text-center mt-2">
                     <a href="/pets" class="text-sm text-gray-500 hover:text-indigo-600">Clear All</a>
@@ -112,82 +137,123 @@
         <!-- Pet Grid -->
         <section class="w-full md:w-3/4">
             <h2 class="text-3xl font-extrabold text-gray-900 mb-6">Pets Available for Adoption</h2>
-            
-            {% if pets %}
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {% for pet in pets %}
-                        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition flex flex-col relative group">
-                            
-                            <!-- Favorite Button -->
-                            <button onclick="toggleFavorite({{ pet.pet_id }}, this)" class="absolute top-3 right-3 bg-white p-2 rounded-full shadow hover:bg-gray-100 z-10 transition">
-                                {% if pet.pet_id in favorite_ids %}
-                                    <svg class="w-5 h-5 text-red-500 fill-current" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-                                {% else %}
-                                    <svg class="w-5 h-5 text-gray-400 hover:text-red-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
-                                {% endif %}
-                            </button>
 
-                            {% if pet.images and pet.images|length > 0 %}
-                                {% set images_list = [] %}
-                                {% for img in pet.images %}
-                                    {% set _url = img.image_path if img.image_path.startswith('http') else url_for('static', filename=img.image_path) %}
-                                    {% set _ = images_list.append(_url) %}
-                                {% endfor %}
-                                <div class="relative w-full h-48 group bg-gray-100">
-                                    <img src="{{ images_list[0] }}" alt="{{ pet.pet_name }}" class="w-full h-48 object-cover pet-carousel-img transition-opacity duration-300" data-images="{{ images_list|join(',') }}" data-current="0">
-                                    {% if images_list|length > 1 %}
-                                        <button type="button" onclick="prevImage(event, this)" class="absolute left-2 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition shadow hover:bg-opacity-75 z-20">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
-                                        </button>
-                                        <button type="button" onclick="nextImage(event, this)" class="absolute right-2 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition shadow hover:bg-opacity-75 z-20">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                                        </button>
-                                        <div class="absolute bottom-2 right-2 bg-black bg-opacity-60 text-white text-xs px-2 py-0.5 rounded-full opacity-0 group-hover:opacity-100 transition pointer-events-none z-20 font-medium">
-                                            <span class="carousel-counter">1</span> / {{ images_list|length }}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                            {% elif pet.pet_image %}
-                                {% set img_url = pet.pet_image if pet.pet_image.startswith('http') else url_for('static', filename=pet.pet_image) %}
-                                <img src="{{ img_url }}" alt="{{ pet.pet_name }}" class="w-full h-48 object-cover">
-                            {% else %}
-                                <div class="w-full h-48 bg-gray-200 flex items-center justify-center text-gray-400">
-                                    No Image Available
-                                </div>
-                            {% endif %}
-                            
-                            <div class="p-5 flex flex-col flex-grow">
-                                <div class="flex justify-between items-start mb-2">
-                                    <h3 class="text-xl font-bold text-gray-900">
-                                        <a href="/pet/{{ pet.pet_id }}" class="hover:text-indigo-600">{{ pet.pet_name }}</a>
-                                    </h3>
-                                    <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full uppercase font-bold">Available</span>
-                                </div>
-                                
-                                <p class="text-sm text-gray-600 mb-4 capitalize">
-                                    {{ pet.animal_type }} • {{ pet.breed or 'Unknown Breed' }} • {{ pet.age or '?' }} yrs
-                                </p>
-                                
-                                <p class="text-gray-500 text-sm mb-6 flex-grow line-clamp-3">
-                                    {{ pet.description or 'No description provided.' }}
-                                </p>
-                                
-                                <a href="/pet/{{ pet.pet_id }}" class="block w-full text-center bg-indigo-50 text-indigo-700 font-semibold py-2 rounded hover:bg-indigo-100 transition mt-auto">
-                                    View Details
-                                </a>
-                            </div>
-                        </div>
+            {% if pets %}
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {% for pet in pets %}
+                <div
+                    class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition flex flex-col relative group">
+
+                    <!-- Favorite Button -->
+                    <button onclick="toggleFavorite({{ pet.pet_id }}, this)"
+                        class="absolute top-3 right-3 bg-white p-2 rounded-full shadow hover:bg-gray-100 z-10 transition">
+                        {% if pet.pet_id in favorite_ids %}
+                        <svg class="w-5 h-5 text-cyan-700 fill-current" viewBox="0 0 24 24">
+                            <path
+                                d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                        </svg>
+                        {% else %}
+                        <svg class="w-5 h-5 text-gray-400 hover:text-cyan-700" fill="none" stroke="currentColor"
+                            stroke-width="2" viewBox="0 0 24 24">
+                            <path
+                                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z">
+                            </path>
+                        </svg>
+                        {% endif %}
+                    </button>
+
+                    {% if pet.images and pet.images|length > 0 %}
+                    {% set images_list = [] %}
+                    {% for img in pet.images %}
+                    {% set _url = img.image_path if img.image_path.startswith('http') else url_for('static',
+                    filename=img.image_path) %}
+                    {% set _ = images_list.append(_url) %}
                     {% endfor %}
+                    <div class="relative w-full h-48 group bg-gray-100">
+                        <img src="{{ images_list[0] }}" alt="{{ pet.pet_name }}"
+                            class="w-full h-48 object-cover pet-carousel-img transition-opacity duration-300"
+                            data-images="{{ images_list|join(',') }}" data-current="0">
+                        {% if images_list|length > 1 %}
+                        <button type="button" onclick="prevImage(event, this)"
+                            class="absolute left-2 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition shadow hover:bg-opacity-75 z-20">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 19l-7-7 7-7"></path>
+                            </svg>
+                        </button>
+                        <button type="button" onclick="nextImage(event, this)"
+                            class="absolute right-2 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition shadow hover:bg-opacity-75 z-20">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7">
+                                </path>
+                            </svg>
+                        </button>
+                        <div
+                            class="absolute bottom-2 right-2 bg-black bg-opacity-60 text-white text-xs px-2 py-0.5 rounded-full opacity-0 group-hover:opacity-100 transition pointer-events-none z-20 font-medium">
+                            <span class="carousel-counter">1</span> / {{ images_list|length }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% elif pet.pet_image %}
+                    {% set img_url = pet.pet_image if pet.pet_image.startswith('http') else url_for('static',
+                    filename=pet.pet_image) %}
+                    <img src="{{ img_url }}" alt="{{ pet.pet_name }}" class="w-full h-48 object-cover">
+                    {% else %}
+                    <div class="w-full h-48 bg-gray-200 flex items-center justify-center text-gray-400">
+                        No Image Available
+                    </div>
+                    {% endif %}
+
+                    <div class="p-5 flex flex-col flex-grow">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-xl font-bold text-gray-900">
+                                <a href="/pet/{{ pet.pet_id }}" class="hover:text-indigo-600">{{ pet.pet_name }}</a>
+                            </h3>
+                            <span
+                                class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full uppercase font-bold">Available</span>
+                        </div>
+
+                        <p class="text-sm text-gray-600 mb-4 capitalize">
+                            {{ pet.animal_type }} • {{ pet.breed or 'Unknown Breed' }} • {{ pet.age or '?' }} yrs
+                        </p>
+
+                        <div class="mb-4">
+                            {% if pet.traits_list %}
+                            <div class="flex flex-wrap gap-1">
+                                {% for trait in pet.traits_list[:3] %}
+                                <span class="bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded text-xs font-medium">{{
+                                    trait }}</span>
+                                {% endfor %}
+                                {% if pet.traits_list|length > 3 %}
+                                <span class="text-xs text-gray-500 font-medium ml-1">+{{ pet.traits_list|length - 3
+                                    }}</span>
+                                {% endif %}
+                            </div>
+                            {% else %}
+                            <span class="text-sm text-gray-500">No traits listed</span>
+                            {% endif %}
+                        </div>
+
+                        <a href="/pet/{{ pet.pet_id }}"
+                            class="block w-full text-center bg-indigo-50 text-indigo-700 font-semibold py-2 rounded hover:bg-indigo-100 transition mt-auto">
+                            View Details
+                        </a>
+                    </div>
                 </div>
+                {% endfor %}
+            </div>
             {% else %}
-                <div class="bg-white p-12 text-center rounded-xl shadow-sm border border-gray-100">
-                    <svg class="mx-auto h-16 w-16 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                    </svg>
-                    <h3 class="text-xl font-bold text-gray-900 mb-2">No pets match your criteria</h3>
-                    <p class="text-gray-500 mb-6">Try adjusting your filters or clearing them entirely.</p>
-                    <a href="/pets" class="text-indigo-600 hover:text-indigo-800 font-medium bg-indigo-50 px-4 py-2 rounded">Clear Filters</a>
-                </div>
+            <div class="bg-white p-12 text-center rounded-xl shadow-sm border border-gray-100">
+                <svg class="mx-auto h-16 w-16 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+                <h3 class="text-xl font-bold text-gray-900 mb-2">No pets match your criteria</h3>
+                <p class="text-gray-500 mb-6">Try adjusting your filters or clearing them entirely.</p>
+                <a href="/pets"
+                    class="text-indigo-600 hover:text-indigo-800 font-medium bg-indigo-50 px-4 py-2 rounded">Clear
+                    Filters</a>
+            </div>
             {% endif %}
         </section>
     </main>
@@ -202,12 +268,12 @@
             const images = img.getAttribute('data-images').split(',');
             let current = parseInt(img.getAttribute('data-current'));
             current = (current + 1) % images.length;
-            
+
             img.style.opacity = '0.7';
             setTimeout(() => {
                 img.src = images[current];
                 img.setAttribute('data-current', current);
-                if(counter) counter.innerText = current + 1;
+                if (counter) counter.innerText = current + 1;
                 img.style.opacity = '1';
             }, 150);
         }
@@ -221,15 +287,16 @@
             const images = img.getAttribute('data-images').split(',');
             let current = parseInt(img.getAttribute('data-current'));
             current = (current - 1 + images.length) % images.length;
-            
+
             img.style.opacity = '0.7';
             setTimeout(() => {
                 img.src = images[current];
                 img.setAttribute('data-current', current);
-                if(counter) counter.innerText = current + 1;
+                if (counter) counter.innerText = current + 1;
                 img.style.opacity = '1';
             }, 150);
         }
     </script>
 </body>
+
 </html>

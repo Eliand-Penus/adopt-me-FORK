@@ -30,7 +30,7 @@ class Pet(db.Model):
 
     color = db.Column(db.String(50))
 
-    description = db.Column(db.Text)
+    traits = db.Column(db.Text)
 
     pet_image = db.Column(db.Text)
 
@@ -76,3 +76,13 @@ class Pet(db.Model):
         lazy=True,
         cascade="all, delete-orphan"
     )
+
+    @property
+    def traits_list(self):
+        if self.traits:
+            import json
+            try:
+                return json.loads(self.traits)
+            except:
+                return []
+        return []

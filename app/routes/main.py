@@ -18,8 +18,11 @@ from app.models.pet import Pet
 from app.models.adoption_request import AdoptionRequest
 from app.models.pet_image import PetImage
 from app.models.pet_valid_id import PetValidId
+from app.models.favorite import Favorite
+from app.models.notification import Notification
 
 from app.utils import save_file, allowed_file, ALLOWED_IMAGE_EXTENSIONS, ALLOWED_EXTENSIONS
+import json
 
 main = Blueprint("main", __name__)
 
@@ -41,10 +44,8 @@ def home():
 @main.route("/dashboard")
 @login_required
 def dashboard():
-
-    return render_template(
-        "dashboard.html"
-    )
+    notifications = Notification.query.filter_by(user_id=current_user.user_id).order_by(Notification.created_at.desc()).all()
+    return render_template("dashboard.html", notifications=notifications)
 
 @main.route("/about")
 def about():
@@ -57,22 +58,46 @@ def about():
 @login_required
 def profile():
     if request.method == "POST":
-        current_user.first_name = request.form.get("first_name")
-        current_user.last_name = request.form.get("last_name")
-        current_user.username = request.form.get("username")
-        current_user.email = request.form.get("email")
-        current_user.phone_number = request.form.get("phone_number")
-        current_user.address = request.form.get("address")
-        
-        # Profile Picture Upload
-        profile_picture = request.files.get("profile_picture")
-        if profile_picture and profile_picture.filename != "":
-            from app.utils import save_file
-            current_user.profile_picture = save_file(profile_picture, "profile_pictures")
+        if request.form.get("form_type") == "password_update":
+            current_password = request.form.get("current_password")
+            new_password = request.form.get("new_password")
+            confirm_password = request.form.get("confirm_password")
             
-        db.session.commit()
-        flash("Profile updated successfully.", "success")
-        return redirect(url_for('main.profile'))
+            if not current_password or not new_password or not confirm_password:
+                flash("All password fields are required.", "error")
+                return redirect(url_for('main.profile'))
+                
+            from app import bcrypt
+            if not current_user.password_hash or not bcrypt.check_password_hash(current_user.password_hash, current_password):
+                flash("Incorrect current password.", "error")
+                return redirect(url_for('main.profile'))
+                
+            if new_password != confirm_password:
+                flash("New passwords do not match.", "error")
+                return redirect(url_for('main.profile'))
+                
+            current_user.password_hash = bcrypt.generate_password_hash(new_password).decode("utf-8")
+            db.session.commit()
+            flash("Password updated successfully.", "success")
+            return redirect(url_for('main.profile'))
+            
+        else:
+            current_user.first_name = request.form.get("first_name")
+            current_user.last_name = request.form.get("last_name")
+            current_user.username = request.form.get("username")
+            current_user.email = request.form.get("email")
+            current_user.phone_number = request.form.get("phone_number")
+            current_user.address = request.form.get("address")
+            
+            # Profile Picture Upload
+            profile_picture = request.files.get("profile_picture")
+            if profile_picture and profile_picture.filename != "":
+                from app.utils import save_file
+                current_user.profile_picture = save_file(profile_picture, "profile_pictures")
+                
+            db.session.commit()
+            flash("Profile updated successfully.", "success")
+            return redirect(url_for('main.profile'))
         
     return render_template("profile.html")
 
@@ -118,7 +143,8 @@ def add_pet():
         age = request.form.get("age")
         gender = request.form.get("gender")
         color = request.form.get("color")
-        description = request.form.get("description")
+        traits_list = request.form.getlist("traits[]")
+        traits = json.dumps(traits_list) if traits_list else json.dumps([])
         reason_for_rehoming = request.form.get("reason_for_rehoming")
 
         # Handle file uploads
@@ -152,7 +178,7 @@ def add_pet():
             age=age,
             gender=gender,
             color=color,
-            description=description,
+            traits=traits,
             reason_for_rehoming=reason_for_rehoming,
             pet_image=pet_image_path,
             owner_valid_id=owner_valid_id_path,
@@ -289,10 +315,13 @@ def pet_details(pet_id):
         if fav:
             is_favorite = True
 
+    traits_list = json.loads(pet.traits) if pet.traits else []
+    
     return render_template(
         "pet_details.html",
         pet=pet,
-        is_favorite=is_favorite
+        is_favorite=is_favorite,
+        traits_list=traits_list
     )
 
 # =========================
@@ -330,9 +359,18 @@ def adopt_pet(pet_id):
 
     db.session.add(adoption_request)
 
+    # Create notification for requester
+    notification = Notification(
+        user_id=current_user.user_id,
+        pet_id=pet.pet_id,
+        message=f"Your adoption request for {pet.pet_name} has been submitted."
+    )
+    db.session.add(notification)
+    
     db.session.commit()
-
-    return "Adoption request submitted!"
+    
+    flash("Your adoption request has been submitted successfully.", "toast_success")
+    return redirect(url_for('main.pet_details', pet_id=pet.pet_id))
 
 # =========================
 # MY PETS
@@ -390,9 +428,8 @@ def edit_pet(pet_id):
             "color"
         )
 
-        pet.description = request.form.get(
-            "description"
-        )
+        traits_list = request.form.getlist("traits[]")
+        pet.traits = json.dumps(traits_list) if traits_list else json.dumps([])
         
         pet.reason_for_rehoming = request.form.get(
             "reason_for_rehoming"
@@ -436,9 +473,11 @@ def edit_pet(pet_id):
 
         return redirect("/owner-dashboard")
 
+    traits_list = json.loads(pet.traits) if pet.traits else []
     return render_template(
         "edit_pet.html",
-        pet=pet
+        pet=pet,
+        traits_list=traits_list
     )
 
 # =========================
