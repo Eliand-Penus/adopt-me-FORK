@@ -1,5 +1,6 @@
 from datetime import datetime
 from app import db
+# pyrefly: ignore [missing-import]
 from flask_login import UserMixin
 
 class User(db.Model, UserMixin):
