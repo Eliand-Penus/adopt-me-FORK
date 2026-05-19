@@ -5,64 +5,370 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Choose Pet Category - Adopt Me</title>
+
     <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
+
+        body {
+            font-family: 'Nunito', sans-serif;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-in-up {
+            animation: fadeInUp 0.8s ease forwards;
+        }
+
+        @keyframes blob {
+            0% {
+                transform: translate(0px, 0px) scale(1);
+            }
+
+            33% {
+                transform: translate(30px, -50px) scale(1.1);
+            }
+
+            66% {
+                transform: translate(-20px, 20px) scale(0.9);
+            }
+
+            100% {
+                transform: translate(0px, 0px) scale(1);
+            }
+        }
+
+        .animate-blob {
+            animation: blob 10s infinite;
+        }
+
+        .animation-delay-2000 {
+            animation-delay: 2s;
+        }
+
+        .nav-link {
+            position: relative;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0%;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background: #14b8a6;
+            transition: 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+    </style>
 </head>
 
-<body class="bg-gray-50 min-h-screen text-gray-800 font-sans flex flex-col">
+<body class="bg-[#f7f7f7] min-h-screen overflow-x-hidden flex flex-col">
 
-    <!-- Navigation -->
-    <nav class="bg-white shadow px-6 py-4">
-        <div class="max-w-6xl mx-auto flex justify-between items-center">
-            <h1 class="text-2xl font-bold text-indigo-600">Adopt Me</h1>
-            <div class="space-x-4">
-                <a href="/" class="text-gray-600 hover:text-indigo-600 font-medium">Home</a>
-                <a href="/about" class="text-gray-600 hover:text-indigo-600 font-medium">About</a>
+    <!-- NAVBAR -->
+    <nav
+        class="fixed top-0 left-0 w-full h-24 bg-white/90 backdrop-blur-md border-b border-gray-100 z-50 flex items-center">
+
+        <div class="max-w-7xl w-full mx-auto px-6 flex justify-between items-center">
+
+            <!-- Logo -->
+            <a href="/" class="hover:scale-105 transition duration-300">
+
+                <img src="{{ url_for('static', filename='images/ADOPT_ME_LOGO.png') }}" alt="Adopt Me Logo"
+                    class="h-28 w-auto object-contain">
+
+            </a>
+
+            <!-- Nav -->
+            <div class="hidden md:flex items-center space-x-10">
+
+                <a href="/" class="nav-link text-gray-700 hover:text-teal-500 font-semibold transition">
+                    Home
+                </a>
+
+                <a href="/about" class="nav-link text-gray-700 hover:text-teal-500 font-semibold transition">
+                    About
+                </a>
+
             </div>
+
+            <!-- Login / Logout -->
+            {% if current_user.is_authenticated %}
+
+            <a href="/logout"
+                class="bg-gradient-to-r from-red-500 to-rose-500 text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:shadow-red-200 hover:scale-105 transition duration-300">
+
+                Logout
+
+            </a>
+
+            {% else %}
+
+            <a href="/login"
+                class="bg-gradient-to-r from-teal-500 to-cyan-500 text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:shadow-teal-200 hover:scale-105 transition duration-300">
+
+                Login
+
+            </a>
+
+            {% endif %}
+
         </div>
+
     </nav>
 
-    <main class="flex-grow flex items-center justify-center p-6">
-        <div class="max-w-4xl w-full text-center">
-            <h2 class="text-4xl font-extrabold text-gray-900 mb-4">What kind of friend are you looking for?</h2>
-            <p class="text-lg text-gray-500 mb-12">Select a category below to view all available pets.</p>
+    <!-- MAIN -->
+    <main class="flex-grow pt-36 px-6 pb-20 relative overflow-hidden">
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 max-w-2xl mx-auto">
-
-                <!-- Dog Card -->
-                <a href="/pets?type=dog" class="block group">
-                    <div
-                        class="bg-white rounded-3xl p-10 shadow-lg border-2 border-transparent hover:border-indigo-400 hover:shadow-2xl transition transform hover:-translate-y-2 cursor-pointer flex flex-col items-center">
-                        <div
-                            class="w-32 h-32 bg-indigo-50 rounded-full flex items-center justify-center mb-6 group-hover:bg-indigo-100 transition">
-                            <span class="text-6xl">🐶</span>
-                        </div>
-                        <h3 class="text-2xl font-bold text-gray-900 group-hover:text-indigo-600 transition">Dogs</h3>
-                    </div>
-                </a>
-
-                <!-- Cat Card -->
-                <a href="/pets?type=cat" class="block group">
-                    <div
-                        class="bg-white rounded-3xl p-10 shadow-lg border-2 border-transparent hover:border-indigo-400 hover:shadow-2xl transition transform hover:-translate-y-2 cursor-pointer flex flex-col items-center">
-                        <div
-                            class="w-32 h-32 bg-indigo-50 rounded-full flex items-center justify-center mb-6 group-hover:bg-indigo-100 transition">
-                            <span class="text-6xl">🐱</span>
-                        </div>
-                        <h3 class="text-2xl font-bold text-gray-900 group-hover:text-indigo-600 transition">Cats</h3>
-                    </div>
-                </a>
-
-            </div>
-
-            <div class="mt-12">
-                <a href="/pets" class="text-indigo-600 font-medium hover:underline">Or view all pets &rarr;</a>
-            </div>
+        <!-- Decorative Blobs -->
+        <div class="absolute top-20 left-0 w-96 h-96 bg-teal-200 rounded-full blur-3xl opacity-20 animate-blob">
         </div>
+
+        <div
+            class="absolute bottom-10 right-0 w-96 h-96 bg-orange-200 rounded-full blur-3xl opacity-20 animate-blob animation-delay-2000">
+        </div>
+
+        <div class="max-w-7xl mx-auto relative z-10">
+
+            <!-- Heading -->
+            <div class="text-center mb-20 animate-fade-in-up">
+
+                <h1 class="text-5xl md:text-6xl font-extrabold text-gray-800 leading-tight mb-4">
+
+                    <span class="text-teal-600">Choose</span>
+                    Your New Companion
+
+                </h1>
+
+                <p class="text-xl text-gray-500 font-medium">
+
+                    Browse pets by category and discover your future best friend
+
+                </p>
+
+            </div>
+
+            <!-- CARDS -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
+
+                <!-- DOG CARD -->
+                <a href="/pets?type=dog" class="group block animate-fade-in-up">
+
+                    <div class="relative overflow-hidden rounded-[2.5rem]
+                               bg-gradient-to-br from-cyan-50 to-blue-100
+                               shadow-xl hover:shadow-2xl
+                               transition-all duration-500
+                               hover:-translate-y-3 hover:scale-[1.02]
+                               min-h-[520px]">
+
+                        <!-- Decorative Blob -->
+                        <div class="absolute -bottom-16 -left-16 w-60 h-60
+                                   bg-cyan-300 opacity-30 rounded-full">
+                        </div>
+
+                        <!-- Available Badge -->
+                        <div class="absolute top-8 right-8
+                                   bg-white/90 backdrop-blur-md
+                                   shadow-lg rounded-full
+                                   w-20 h-20
+                                   flex flex-col items-center justify-center
+                                   border border-cyan-100 z-20">
+
+                            <span class="text-cyan-600 font-extrabold text-2xl">
+                                {{ dog_count }}
+                            </span>
+
+                            <span class="text-gray-500 text-xs font-semibold">
+                                Available
+                            </span>
+
+                        </div>
+
+                        <!-- DOG IMAGE -->
+                        <img src="{{ url_for('static', filename='images/ADOPT_A_DOG.png') }}" alt="Dog" class="absolute
+                                   bottom-[-45px]
+                                   left-[-100px]
+                                   w-[720px]
+                                   z-20
+                                   pointer-events-none
+                                   drop-shadow-2xl">
+
+                        <!-- CONTENT -->
+                        <div class="relative z-30 h-full flex justify-end px-10 py-12">
+
+                            <div class="w-[48%] flex flex-col items-center text-center pt-16">
+
+                                <h2 class="text-6xl font-extrabold text-cyan-700 mb-8">
+                                    Dogs
+                                </h2>
+
+                                <p class="text-gray-600 text-2xl leading-relaxed mb-8 font-semibold">
+                                    Friendly, loyal and energetic companions
+                                </p>
+
+                                <div class="w-32 h-1 bg-cyan-400 rounded-full mb-10">
+                                </div>
+
+                                <div class="inline-flex items-center justify-center gap-3
+                                           bg-cyan-600 text-white
+                                           px-12 py-5 rounded-2xl
+                                           font-bold text-2xl
+                                           shadow-lg
+                                           group-hover:bg-cyan-700
+                                           transition duration-300">
+
+                                    <span class="whitespace-nowrap">
+                                        View Dogs
+                                    </span>
+
+                                    <span class="group-hover:translate-x-1 transition">
+                                        →
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </a>
+
+                <!-- CAT CARD -->
+                <a href="/pets?type=cat" class="group block animate-fade-in-up">
+
+                    <div class="relative overflow-hidden rounded-[2.5rem]
+                               bg-gradient-to-br from-orange-50 to-amber-100
+                               shadow-xl hover:shadow-2xl
+                               transition-all duration-500
+                               hover:-translate-y-3 hover:scale-[1.02]
+                               min-h-[520px]">
+
+                        <!-- Decorative Blob -->
+                        <div class="absolute -bottom-16 -left-16 w-60 h-60
+                                   bg-orange-300 opacity-30 rounded-full">
+                        </div>
+
+                        <!-- Available Badge -->
+                        <div class="absolute top-8 right-8
+                                   bg-white/90 backdrop-blur-md
+                                   shadow-lg rounded-full
+                                   w-20 h-20
+                                   flex flex-col items-center justify-center
+                                   border border-orange-100 z-20">
+
+                            <span class="text-orange-500 font-extrabold text-2xl">
+                                {{ cat_count }}
+                            </span>
+
+                            <span class="text-gray-500 text-xs font-semibold">
+                                Available
+                            </span>
+
+                        </div>
+
+                        <!-- CAT IMAGE -->
+                        <img src="{{ url_for('static', filename='images/ADOPT_A_CAT.png') }}" alt="Cat" class="absolute
+                                   bottom-[-45px]
+                                   left-[-100px]
+                                   w-[760px]
+                                   z-20
+                                   pointer-events-none
+                                   drop-shadow-2xl">
+
+                        <!-- CONTENT -->
+                        <div class="relative z-30 h-full flex justify-end px-10 py-12">
+
+                            <div class="w-[48%] flex flex-col items-center text-center pt-16">
+
+                                <h2 class="text-6xl font-extrabold text-orange-500 mb-8">
+                                    Cats
+                                </h2>
+
+                                <p class="text-gray-600 text-2xl leading-relaxed mb-8 font-semibold">
+                                    Independent, affectionate, and calm pets
+                                </p>
+
+                                <div class="w-32 h-1 bg-orange-400 rounded-full mb-10">
+                                </div>
+
+                                <div class="inline-flex items-center justify-center gap-3
+                                           bg-orange-500 text-white
+                                           px-12 py-5 rounded-2xl
+                                           font-bold text-2xl
+                                           shadow-lg
+                                           group-hover:bg-orange-600
+                                           transition duration-300">
+
+                                    <span class="whitespace-nowrap">
+                                        View Cats
+                                    </span>
+
+                                    <span class="group-hover:translate-x-1 transition">
+                                        →
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </a>
+
+            </div>
+
+            <!-- VIEW ALL PETS BUTTON -->
+            <div class="flex justify-center mt-16 animate-fade-in-up">
+
+                <a href="/pets" class="group inline-flex items-center gap-4
+                           bg-white text-gray-800
+                           px-10 py-5 rounded-2xl
+                           text-2xl font-extrabold
+                           shadow-lg border border-gray-200
+                           hover:bg-gray-900 hover:text-white
+                           hover:shadow-2xl hover:scale-105
+                           transition duration-300">
+
+                    View All Pets
+
+                    <span class="group-hover:translate-x-1 transition">
+                        →
+                    </span>
+
+                </a>
+
+            </div>
+
+        </div>
+
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-white border-t py-8 text-center text-gray-500 mt-auto">
-        <p>&copy; 2026 Adopt Me Platform. All rights reserved.</p>
+    <!-- FOOTER -->
+    <footer class="bg-white border-t border-gray-100 py-8 text-center text-gray-500 mt-auto">
+
+        <p class="font-medium">
+            © 2026 Adopt Me Platform. All rights reserved.
+        </p>
+
     </footer>
 
 </body>

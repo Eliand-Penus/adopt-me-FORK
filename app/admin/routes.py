@@ -159,11 +159,17 @@ def edit_pet(pet_id):
         pet.pet_name = request.form.get("pet_name")
         pet.breed = request.form.get("breed")
         pet.age = request.form.get("age")
-        pet.gender = request.form.get("gender")
+        gender_val = request.form.get("gender")
+        if gender_val in ["Male", "Female"]:
+            pet.gender = gender_val
+            
         pet.color = request.form.get("color")
         
         traits_list = request.form.getlist("traits[]")
         pet.traits = json.dumps(traits_list) if traits_list else json.dumps([])
+        
+        pet.spayed_neutered = request.form.get("spayed_neutered", "No")
+        pet.vaccinated = request.form.get("vaccinated", "No")
         
         pet.reason_for_rehoming = request.form.get("reason_for_rehoming")
 
