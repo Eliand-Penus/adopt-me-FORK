@@ -134,6 +134,75 @@ def approve_pet(pet_id):
     return redirect("/admin")
 
 # =========================
+# EDIT PET (ADMIN)
+# =========================
+
+@admin.route("/edit-pet/<int:pet_id>", methods=["GET", "POST"])
+@login_required
+@admin_required
+def edit_pet(pet_id):
+
+    pet = Pet.query.get_or_404(pet_id)
+
+    if request.method == "POST":
+        pet.pet_name = request.form.get("pet_name")
+        pet.breed = request.form.get("breed")
+        pet.age = request.form.get("age")
+        gender_val = request.form.get("gender")
+        if gender_val in ["Male", "Female"]:
+            pet.gender = gender_val
+            
+        pet.color = request.form.get("color")
+        
+        traits_list = request.form.getlist("traits[]")
+        pet.traits = json.dumps(traits_list) if traits_list else json.dumps([])
+        
+        pet.spayed_neutered = request.form.get("spayed_neutered", "No")
+        pet.vaccinated = request.form.get("vaccinated", "No")
+        
+        pet.reason_for_rehoming = request.form.get("reason_for_rehoming")
+
+        # Admin can update status
+        new_status = request.form.get("status")
+        if new_status:
+            pet.status = new_status
+
+        # Handle file uploads
+        pet_image_files = request.files.getlist("pet_image")
+        valid_id_files = request.files.getlist("valid_id")
+        medical_record_file_req = request.files.get("medical_record")
+
+        if pet_image_files and pet_image_files[0].filename:
+            for img in pet_image_files:
+                if img and allowed_file(img.filename, ALLOWED_IMAGE_EXTENSIONS):
+                    path = save_file(img, "pets")
+                    if path:
+                        pet.images.append(PetImage(image_path=path))
+                        if not pet.pet_image:
+                            pet.pet_image = path
+                        
+        if valid_id_files and valid_id_files[0].filename:
+            for vid in valid_id_files:
+                if vid and allowed_file(vid.filename, ALLOWED_IMAGE_EXTENSIONS):
+                    path = save_file(vid, "valid_ids")
+                    if path:
+                        pet.valid_ids.append(PetValidId(image_path=path))
+                        if not pet.owner_valid_id:
+                            pet.owner_valid_id = path
+            
+        if medical_record_file_req and allowed_file(medical_record_file_req.filename, ALLOWED_EXTENSIONS):
+            pet.medical_record_file = save_file(medical_record_file_req, "medical_records")
+
+        db.session.commit()
+        
+        flash("Pet details updated successfully.", "success")
+        return redirect("/admin")
+
+    traits_list = json.loads(pet.traits) if pet.traits else []
+    return render_template("admin_edit_pet.html", pet=pet, traits_list=traits_list)
+
+
+# =========================
 # REJECT PET
 # =========================
 

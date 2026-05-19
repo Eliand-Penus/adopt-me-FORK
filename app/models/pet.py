@@ -38,6 +38,10 @@ class Pet(db.Model):
 
     medical_record_file = db.Column(db.Text)
 
+    spayed_neutered = db.Column(db.String(10), default="No")
+
+    vaccinated = db.Column(db.String(10), default="No")
+
     status = db.Column(
         db.String(50),
         default="pending"

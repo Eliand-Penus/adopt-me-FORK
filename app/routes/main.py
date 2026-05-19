@@ -142,10 +142,17 @@ def add_pet():
         breed = request.form.get("breed")
         age = request.form.get("age")
         gender = request.form.get("gender")
+        if gender not in ["Male", "Female"]:
+            flash("Invalid gender selected.", "error")
+            return redirect(url_for("main.add_pet"))
+            
         color = request.form.get("color")
         traits_list = request.form.getlist("traits[]")
         traits = json.dumps(traits_list) if traits_list else json.dumps([])
         reason_for_rehoming = request.form.get("reason_for_rehoming")
+        
+        spayed_neutered = request.form.get("spayed_neutered", "No")
+        vaccinated = request.form.get("vaccinated", "No")
 
         # Handle file uploads
         pet_image_files = request.files.getlist("pet_image")
@@ -180,6 +187,8 @@ def add_pet():
             color=color,
             traits=traits,
             reason_for_rehoming=reason_for_rehoming,
+            spayed_neutered=spayed_neutered,
+            vaccinated=vaccinated,
             pet_image=pet_image_path,
             owner_valid_id=owner_valid_id_path,
             medical_record_file=medical_record_path,
@@ -217,7 +226,9 @@ def add_pet():
 
 @main.route("/choose-category")
 def choose_category():
-    return render_template("choose_category.html")
+    dog_count = Pet.query.filter_by(animal_type="dog", status="approved").count()
+    cat_count = Pet.query.filter_by(animal_type="cat", status="approved").count()
+    return render_template("choose_category.html", dog_count=dog_count, cat_count=cat_count)
 
 # =========================
 # PUBLIC PETS PAGE
@@ -420,9 +431,9 @@ def edit_pet(pet_id):
             "age"
         )
 
-        pet.gender = request.form.get(
-            "gender"
-        )
+        gender_val = request.form.get("gender")
+        if gender_val in ["Male", "Female"]:
+            pet.gender = gender_val
 
         pet.color = request.form.get(
             "color"
@@ -430,6 +441,9 @@ def edit_pet(pet_id):
 
         traits_list = request.form.getlist("traits[]")
         pet.traits = json.dumps(traits_list) if traits_list else json.dumps([])
+        
+        pet.spayed_neutered = request.form.get("spayed_neutered", "No")
+        pet.vaccinated = request.form.get("vaccinated", "No")
         
         pet.reason_for_rehoming = request.form.get(
             "reason_for_rehoming"
