@@ -3,7 +3,8 @@ from flask import (
     Blueprint,
     render_template,
     request,
-    redirect
+    redirect,
+    flash
 )
 
 # pyrefly: ignore [missing-import]
@@ -13,6 +14,8 @@ from flask_login import (
     logout_user,
     current_user
 )
+
+import json
 
 from app.admin.utils import admin_required
 
@@ -47,23 +50,33 @@ def admin_home():
 @login_required
 @admin_required
 def admin_dashboard():
+    from app.models.user import User
+    from app.models.adoption_request import AdoptionRequest
 
-    pending_pets = Pet.query.filter_by(
-        status="pending"
-    ).all()
-
-    accepted_pets = Pet.query.filter_by(
-        status="available"
-    ).all()
-
-    rejected_pets = Pet.query.filter_by(
-        status="rejected"
-    ).all()
+    pending_pets = Pet.query.filter_by(status="pending").all()
+    accepted_pets = Pet.query.filter(Pet.status.ilike("approved") | Pet.status.ilike("available")).all()
+    rejected_pets = Pet.query.filter(Pet.status.ilike("rejected")).all()
+    cancelled_pets = Pet.query.filter(Pet.status.ilike("cancelled")).all()
+    
+    total_pets = Pet.query.count() or 0
+    approved_pets_count = Pet.query.filter(Pet.status.ilike("approved")).count() or 0
+    # Also include available just in case, or just approved as requested. The user's system sometimes uses "available". Let's stick to "approved" as requested.
+    rejected_pets_count = Pet.query.filter(Pet.status.ilike("rejected")).count() or 0
+    cancelled_pets_count = Pet.query.filter(Pet.status.ilike("cancelled")).count() or 0
+    pending_pets_count = Pet.query.filter(Pet.status.ilike("pending")).count() or 0
+    
+    total_users = User.query.count() or 0
+    # Adoptions could be where AdoptionRequest status = 'approved'
+    total_adoptions = AdoptionRequest.query.filter(AdoptionRequest.status.ilike("approved")).count() or 0
 
     stats = {
-        "pending": len(pending_pets),
-        "approved": len(accepted_pets),
-        "rejected": len(rejected_pets)
+        "total_pets": total_pets,
+        "pending": pending_pets_count,
+        "approved": approved_pets_count,
+        "rejected": rejected_pets_count,
+        "adopted": total_adoptions,
+        "cancelled": cancelled_pets_count,
+        "total_users": total_users
     }
 
     return render_template(
@@ -71,6 +84,7 @@ def admin_dashboard():
         pending_pets=pending_pets,
         accepted_pets=accepted_pets,
         rejected_pets=rejected_pets,
+        cancelled_pets=cancelled_pets,
         stats=stats
     )
 
@@ -218,3 +232,51 @@ def reject_pet(pet_id):
     db.session.commit()
 
     return redirect("/admin")
+
+# =========================
+# DELETE PET
+# =========================
+
+@admin.route("/delete-pet/<int:pet_id>")
+@login_required
+@admin_required
+def delete_pet(pet_id):
+
+    pet = Pet.query.get_or_404(pet_id)
+
+    db.session.delete(pet)
+    db.session.commit()
+
+    flash("Pet deleted successfully.", "success")
+    return redirect("/admin")
+
+# =========================
+# ADMIN USERS PAGE
+# =========================
+
+@admin.route("/users")
+@login_required
+@admin_required
+def admin_users():
+    from app.models.user import User
+
+    search = request.args.get("search", "")
+
+    if search:
+        users = User.query.filter(
+            User.email.ilike(f"%{search}%") | 
+            User.username.ilike(f"%{search}%") |
+            User.first_name.ilike(f"%{search}%") |
+            User.last_name.ilike(f"%{search}%")
+        ).order_by(User.user_id.desc()).all()
+    else:
+        users = User.query.order_by(User.user_id.desc()).all()
+
+    total_users = User.query.count() or 0
+
+    return render_template(
+        "admin_users.html",
+        users=users,
+        total_users=total_users,
+        search=search
+    )
