@@ -2,9 +2,14 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Choose Pet Category - Adopt Me</title>
+
+    <title>
+        Choose Pet Category - Adopt Me
+    </title>
 
     <script src="https://cdn.tailwindcss.com"></script>
 
@@ -16,6 +21,7 @@
         }
 
         @keyframes fadeInUp {
+
             from {
                 opacity: 0;
                 transform: translateY(40px);
@@ -32,6 +38,7 @@
         }
 
         @keyframes blob {
+
             0% {
                 transform: translate(0px, 0px) scale(1);
             }
@@ -62,13 +69,21 @@
         }
 
         .nav-link::after {
+
             content: '';
+
             position: absolute;
+
             width: 0%;
+
             height: 2px;
+
             bottom: -5px;
+
             left: 0;
+
             background: #14b8a6;
+
             transition: 0.3s ease;
         }
 
@@ -76,86 +91,130 @@
             width: 100%;
         }
     </style>
+
 </head>
 
 <body class="bg-[#f7f7f7] min-h-screen overflow-x-hidden flex flex-col">
 
     <!-- NAVBAR -->
     <nav
-        class="fixed top-0 left-0 w-full h-24 bg-white/90 backdrop-blur-md border-b border-gray-100 z-50 flex items-center">
+        class="fixed top-0 left-0 w-full h-20 md:h-24 bg-white/90 backdrop-blur-md border-b border-gray-100 z-50 flex items-center shadow-sm">
 
-        <div class="max-w-7xl w-full mx-auto px-6 flex justify-between items-center">
+        <div class="max-w-7xl w-full mx-auto px-4 sm:px-6 flex justify-between items-center">
 
-            <!-- Logo -->
+            <!-- LOGO -->
             <a href="/" class="hover:scale-105 transition duration-300">
 
                 <img src="{{ url_for('static', filename='images/ADOPT_ME_LOGO.png') }}" alt="Adopt Me Logo"
-                    class="h-28 w-auto object-contain">
+                    class="h-16 md:h-24 w-auto object-contain">
 
             </a>
 
-            <!-- Nav -->
-            <div class="hidden md:flex items-center space-x-10">
+            <!-- NAV -->
+            <div class="hidden lg:flex items-center space-x-10">
 
                 <a href="/" class="nav-link text-gray-700 hover:text-teal-500 font-semibold transition">
+
                     Home
+
+                </a>
+
+                <a href="/choose-category" class="nav-link text-gray-700 hover:text-teal-500 font-semibold transition">
+
+                    Adopt
+
                 </a>
 
                 <a href="/about" class="nav-link text-gray-700 hover:text-teal-500 font-semibold transition">
+
                     About
+
                 </a>
 
             </div>
 
-            <!-- Login / Logout -->
-            {% if current_user.is_authenticated %}
+            <!-- AUTH -->
+            <div class="flex items-center gap-3 sm:gap-5">
 
-            <a href="/logout"
-                class="bg-gradient-to-r from-red-500 to-rose-500 text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:shadow-red-200 hover:scale-105 transition duration-300">
+                {% if current_user.is_authenticated %}
 
-                Logout
+                <a href="/profile"
+                    class="hidden sm:block nav-link text-gray-700 hover:text-teal-500 font-semibold transition">
 
-            </a>
+                    Profile
 
-            {% else %}
+                </a>
 
-            <a href="/login"
-                class="bg-gradient-to-r from-teal-500 to-cyan-500 text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:shadow-teal-200 hover:scale-105 transition duration-300">
+                <a href="/logout" class="bg-gradient-to-r from-red-500 to-rose-500
+                           text-white
+                           px-4 sm:px-6
+                           py-2 sm:py-3
+                           rounded-xl
+                           font-bold
+                           text-sm sm:text-base
+                           shadow-lg
+                           hover:shadow-red-200
+                           hover:scale-105
+                           transition duration-300">
 
-                Login
+                    Logout
 
-            </a>
+                </a>
 
-            {% endif %}
+                {% else %}
+
+                <a href="/login" class="bg-gradient-to-r from-teal-500 to-cyan-500
+                           text-white
+                           px-4 sm:px-6
+                           py-2 sm:py-3
+                           rounded-xl
+                           font-bold
+                           text-sm sm:text-base
+                           shadow-lg
+                           hover:shadow-teal-200
+                           hover:scale-105
+                           transition duration-300">
+
+                    Login
+
+                </a>
+
+                {% endif %}
+
+            </div>
 
         </div>
 
     </nav>
 
     <!-- MAIN -->
-    <main class="flex-grow pt-36 px-6 pb-20 relative overflow-hidden">
+    <main class="flex-grow pt-28 md:pt-36 px-4 sm:px-6 pb-20 relative overflow-hidden">
 
-        <!-- Decorative Blobs -->
-        <div class="absolute top-20 left-0 w-96 h-96 bg-teal-200 rounded-full blur-3xl opacity-20 animate-blob">
+        <!-- BLOBS -->
+        <div
+            class="absolute top-20 left-0 w-72 sm:w-96 h-72 sm:h-96 bg-teal-200 rounded-full blur-3xl opacity-20 animate-blob">
         </div>
 
         <div
-            class="absolute bottom-10 right-0 w-96 h-96 bg-orange-200 rounded-full blur-3xl opacity-20 animate-blob animation-delay-2000">
+            class="absolute bottom-10 right-0 w-72 sm:w-96 h-72 sm:h-96 bg-orange-200 rounded-full blur-3xl opacity-20 animate-blob animation-delay-2000">
         </div>
 
         <div class="max-w-7xl mx-auto relative z-10">
 
-            <!-- Heading -->
-            <div class="text-center mb-20 animate-fade-in-up">
+            <!-- HEADING -->
+            <div class="text-center mb-14 lg:mb-20 animate-fade-in-up">
 
-                <h1 class="text-5xl md:text-6xl font-extrabold text-gray-800 leading-tight mb-4">
+                <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-gray-800 leading-tight mb-4">
 
-                    <span class="text-teal-600">Choose</span>
+                    <span class="text-teal-600">
+                        Choose
+                    </span>
+
                     Your New Companion
 
                 </h1>
 
-                <p class="text-xl text-gray-500 font-medium">
+                <p class="text-base sm:text-lg lg:text-xl text-gray-500 font-medium px-4">
 
                     Browse pets by category and discover your future best friend
 
@@ -164,7 +223,7 @@
             </div>
 
             <!-- CARDS -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
+            <div class="grid grid-cols-1 xl:grid-cols-2 gap-8 lg:gap-12 max-w-6xl mx-auto">
 
                 <!-- DOG CARD -->
                 <a href="/pets?type=dog" class="group block animate-fade-in-up">
@@ -174,70 +233,90 @@
                                shadow-xl hover:shadow-2xl
                                transition-all duration-500
                                hover:-translate-y-3 hover:scale-[1.02]
-                               min-h-[520px]">
+                               min-h-[420px] lg:min-h-[520px]">
 
-                        <!-- Decorative Blob -->
-                        <div class="absolute -bottom-16 -left-16 w-60 h-60
-                                   bg-cyan-300 opacity-30 rounded-full">
+                        <!-- BLOB -->
+                        <div class="absolute -bottom-16 -left-16 w-60 h-60 bg-cyan-300 opacity-30 rounded-full">
                         </div>
 
-                        <!-- Available Badge -->
-                        <div class="absolute top-8 right-8
+                        <!-- BADGE -->
+                        <div class="absolute top-6 sm:top-8 right-6 sm:right-8
                                    bg-white/90 backdrop-blur-md
                                    shadow-lg rounded-full
-                                   w-20 h-20
+                                   w-16 sm:w-20 h-16 sm:h-20
                                    flex flex-col items-center justify-center
                                    border border-cyan-100 z-20">
 
-                            <span class="text-cyan-600 font-extrabold text-2xl">
+                            <span class="text-cyan-600 font-extrabold text-xl sm:text-2xl">
+
                                 {{ dog_count }}
+
                             </span>
 
-                            <span class="text-gray-500 text-xs font-semibold">
+                            <span class="text-gray-500 text-[10px] sm:text-xs font-semibold">
+
                                 Available
+
                             </span>
 
                         </div>
 
-                        <!-- DOG IMAGE -->
+                        <!-- IMAGE -->
                         <img src="{{ url_for('static', filename='images/ADOPT_A_DOG.png') }}" alt="Dog" class="absolute
-                                   bottom-[-45px]
-                                   left-[-100px]
-                                   w-[720px]
+                                   bottom-[-10px]
+                                   left-[-40px]
+                                   w-[420px]
+                                   sm:w-[500px]
+                                   lg:w-[650px]
+                                   xl:w-[720px]
                                    z-20
                                    pointer-events-none
-                                   drop-shadow-2xl">
+                                   drop-shadow-2xl
+                                   transition duration-500">
 
                         <!-- CONTENT -->
-                        <div class="relative z-30 h-full flex justify-end px-10 py-12">
+                        <div
+                            class="relative z-30 h-full flex items-center lg:items-start justify-center lg:justify-end px-6 lg:px-10 py-10 lg:py-12">
 
-                            <div class="w-[48%] flex flex-col items-center text-center pt-16">
+                            <div class="w-full lg:w-[48%] flex flex-col items-center text-center pt-6 lg:pt-16">
 
-                                <h2 class="text-6xl font-extrabold text-cyan-700 mb-8">
+                                <h2 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-cyan-700 mb-6 lg:mb-8">
+
                                     Dogs
+
                                 </h2>
 
-                                <p class="text-gray-600 text-2xl leading-relaxed mb-8 font-semibold">
+                                <p
+                                    class="text-gray-600 text-lg sm:text-xl lg:text-2xl leading-relaxed mb-6 lg:mb-8 font-semibold">
+
                                     Friendly, loyal and energetic companions
+
                                 </p>
 
-                                <div class="w-32 h-1 bg-cyan-400 rounded-full mb-10">
+                                <div class="w-24 lg:w-32 h-1 bg-cyan-400 rounded-full mb-8 lg:mb-10">
                                 </div>
 
                                 <div class="inline-flex items-center justify-center gap-3
                                            bg-cyan-600 text-white
-                                           px-12 py-5 rounded-2xl
-                                           font-bold text-2xl
+                                           px-8 lg:px-12
+                                           py-4 lg:py-5
+                                           rounded-2xl
+                                           font-bold
+                                           text-lg lg:text-2xl
                                            shadow-lg
                                            group-hover:bg-cyan-700
                                            transition duration-300">
 
                                     <span class="whitespace-nowrap">
+
                                         View Dogs
+
                                     </span>
 
                                     <span class="group-hover:translate-x-1 transition">
+
                                         →
+
                                     </span>
 
                                 </div>
@@ -258,70 +337,91 @@
                                shadow-xl hover:shadow-2xl
                                transition-all duration-500
                                hover:-translate-y-3 hover:scale-[1.02]
-                               min-h-[520px]">
+                               min-h-[420px] lg:min-h-[520px]">
 
-                        <!-- Decorative Blob -->
-                        <div class="absolute -bottom-16 -left-16 w-60 h-60
-                                   bg-orange-300 opacity-30 rounded-full">
+                        <!-- BLOB -->
+                        <div class="absolute -bottom-16 -left-16 w-60 h-60 bg-orange-300 opacity-30 rounded-full">
                         </div>
 
-                        <!-- Available Badge -->
-                        <div class="absolute top-8 right-8
+                        <!-- BADGE -->
+                        <div class="absolute top-6 sm:top-8 right-6 sm:right-8
                                    bg-white/90 backdrop-blur-md
                                    shadow-lg rounded-full
-                                   w-20 h-20
+                                   w-16 sm:w-20 h-16 sm:h-20
                                    flex flex-col items-center justify-center
                                    border border-orange-100 z-20">
 
-                            <span class="text-orange-500 font-extrabold text-2xl">
+                            <span class="text-orange-500 font-extrabold text-xl sm:text-2xl">
+
                                 {{ cat_count }}
+
                             </span>
 
-                            <span class="text-gray-500 text-xs font-semibold">
+                            <span class="text-gray-500 text-[10px] sm:text-xs font-semibold">
+
                                 Available
+
                             </span>
 
                         </div>
 
-                        <!-- CAT IMAGE -->
+                        <!-- IMAGE -->
                         <img src="{{ url_for('static', filename='images/ADOPT_A_CAT.png') }}" alt="Cat" class="absolute
-                                   bottom-[-45px]
-                                   left-[-100px]
-                                   w-[760px]
+                                   bottom-[-10px]
+                                   left-[-40px]
+                                   w-[430px]
+                                   sm:w-[520px]
+                                   lg:w-[680px]
+                                   xl:w-[760px]
                                    z-20
                                    pointer-events-none
-                                   drop-shadow-2xl">
+                                   drop-shadow-2xl
+                                   transition duration-500">
 
                         <!-- CONTENT -->
-                        <div class="relative z-30 h-full flex justify-end px-10 py-12">
+                        <div
+                            class="relative z-30 h-full flex items-center lg:items-start justify-center lg:justify-end px-6 lg:px-10 py-10 lg:py-12">
 
-                            <div class="w-[48%] flex flex-col items-center text-center pt-16">
+                            <div class="w-full lg:w-[48%] flex flex-col items-center text-center pt-6 lg:pt-16">
 
-                                <h2 class="text-6xl font-extrabold text-orange-500 mb-8">
+                                <h2
+                                    class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-orange-500 mb-6 lg:mb-8">
+
                                     Cats
+
                                 </h2>
 
-                                <p class="text-gray-600 text-2xl leading-relaxed mb-8 font-semibold">
+                                <p
+                                    class="text-gray-600 text-lg sm:text-xl lg:text-2xl leading-relaxed mb-6 lg:mb-8 font-semibold">
+
                                     Independent, affectionate, and calm pets
+
                                 </p>
 
-                                <div class="w-32 h-1 bg-orange-400 rounded-full mb-10">
+                                <div class="w-24 lg:w-32 h-1 bg-orange-400 rounded-full mb-8 lg:mb-10">
                                 </div>
 
                                 <div class="inline-flex items-center justify-center gap-3
                                            bg-orange-500 text-white
-                                           px-12 py-5 rounded-2xl
-                                           font-bold text-2xl
+                                           px-8 lg:px-12
+                                           py-4 lg:py-5
+                                           rounded-2xl
+                                           font-bold
+                                           text-lg lg:text-2xl
                                            shadow-lg
                                            group-hover:bg-orange-600
                                            transition duration-300">
 
                                     <span class="whitespace-nowrap">
+
                                         View Cats
+
                                     </span>
 
                                     <span class="group-hover:translate-x-1 transition">
+
                                         →
+
                                     </span>
 
                                 </div>
@@ -336,13 +436,16 @@
 
             </div>
 
-            <!-- VIEW ALL PETS BUTTON -->
-            <div class="flex justify-center mt-16 animate-fade-in-up">
+            <!-- VIEW ALL -->
+            <div class="flex justify-center mt-14 lg:mt-16 animate-fade-in-up">
 
                 <a href="/pets" class="group inline-flex items-center gap-4
                            bg-white text-gray-800
-                           px-10 py-5 rounded-2xl
-                           text-2xl font-extrabold
+                           px-6 sm:px-8 lg:px-10
+                           py-4 lg:py-5
+                           rounded-2xl
+                           text-lg sm:text-xl lg:text-2xl
+                           font-extrabold
                            shadow-lg border border-gray-200
                            hover:bg-gray-900 hover:text-white
                            hover:shadow-2xl hover:scale-105
@@ -351,7 +454,9 @@
                     View All Pets
 
                     <span class="group-hover:translate-x-1 transition">
+
                         →
+
                     </span>
 
                 </a>
@@ -365,7 +470,7 @@
     <!-- FOOTER -->
     <footer class="bg-white border-t border-gray-100 py-8 text-center text-gray-500 mt-auto">
 
-        <p class="font-medium">
+        <p class="font-medium text-sm sm:text-base">
             © 2026 Adopt Me Platform. All rights reserved.
         </p>
 

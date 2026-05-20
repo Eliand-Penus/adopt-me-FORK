@@ -1,4 +1,5 @@
 # pyrefly: ignore [missing-import]
+
 from flask import (
     Blueprint,
     render_template,
@@ -16,9 +17,6 @@ from flask_login import (
 )
 
 import json
-import os
-from uuid import uuid4
-from werkzeug.utils import secure_filename
 
 from app.admin.utils import admin_required
 
@@ -35,7 +33,11 @@ admin = Blueprint(
     url_prefix="/admin"
 )
 
-from app.utils import upload_to_cloudinary, ALLOWED_EXTENSIONS, ALLOWED_IMAGE_EXTENSIONS
+from app.utils import (
+    upload_to_cloudinary,
+    ALLOWED_EXTENSIONS,
+    ALLOWED_IMAGE_EXTENSIONS
+)
 
 # =========================
 # ADMIN ENTRYPOINT
@@ -44,7 +46,6 @@ from app.utils import upload_to_cloudinary, ALLOWED_EXTENSIONS, ALLOWED_IMAGE_EX
 @admin.route("/")
 def admin_home():
 
-    # If not logged in
     if not current_user.is_authenticated:
         return redirect("/admin/login")
 
@@ -57,24 +58,60 @@ def admin_home():
 @login_required
 @admin_required
 def admin_dashboard():
+
     from app.models.user import User
     from app.models.adoption_request import AdoptionRequest
 
-    pending_pets = Pet.query.filter_by(status="pending").all()
-    accepted_pets = Pet.query.filter(Pet.status.ilike("approved") | Pet.status.ilike("available")).all()
-    rejected_pets = Pet.query.filter(Pet.status.ilike("rejected")).all()
-    cancelled_pets = Pet.query.filter(Pet.status.ilike("cancelled")).all()
-    
+    # PENDING PETS
+    pending_pets = Pet.query.filter(
+        Pet.status.ilike("pending")
+    ).all()
+
+    # APPROVED PETS
+    accepted_pets = Pet.query.filter(
+        Pet.status.ilike("approved")
+    ).all()
+
+    # REJECTED PETS
+    rejected_pets = Pet.query.filter(
+        Pet.status.ilike("rejected")
+    ).all()
+
+    # CANCELLED PETS
+    cancelled_pets = Pet.query.filter(
+        Pet.status.ilike("cancelled")
+    ).all()
+
+    # TOTAL PETS
     total_pets = Pet.query.count() or 0
-    approved_pets_count = Pet.query.filter(Pet.status.ilike("approved")).count() or 0
-    # Also include available just in case, or just approved as requested. The user's system sometimes uses "available". Let's stick to "approved" as requested.
-    rejected_pets_count = Pet.query.filter(Pet.status.ilike("rejected")).count() or 0
-    cancelled_pets_count = Pet.query.filter(Pet.status.ilike("cancelled")).count() or 0
-    pending_pets_count = Pet.query.filter(Pet.status.ilike("pending")).count() or 0
-    
+
+    # APPROVED COUNT
+    approved_pets_count = Pet.query.filter(
+        Pet.status.ilike("approved")
+    ).count() or 0
+
+    # REJECTED COUNT
+    rejected_pets_count = Pet.query.filter(
+        Pet.status.ilike("rejected")
+    ).count() or 0
+
+    # CANCELLED COUNT
+    cancelled_pets_count = Pet.query.filter(
+        Pet.status.ilike("cancelled")
+    ).count() or 0
+
+    # PENDING COUNT
+    pending_pets_count = Pet.query.filter(
+        Pet.status.ilike("pending")
+    ).count() or 0
+
+    # USERS
     total_users = User.query.count() or 0
-    # Adoptions could be where AdoptionRequest status = 'approved'
-    total_adoptions = AdoptionRequest.query.filter(AdoptionRequest.status.ilike("approved")).count() or 0
+
+    # ADOPTIONS
+    total_adoptions = AdoptionRequest.query.filter(
+        AdoptionRequest.status.ilike("approved")
+    ).count() or 0
 
     stats = {
         "total_pets": total_pets,
@@ -120,7 +157,10 @@ def admin_login():
 
             return redirect("/admin")
 
-        return "Invalid admin credentials"
+        flash(
+            "Invalid admin credentials.",
+            "danger"
+        )
 
     return render_template("admin_login.html")
 
@@ -148,9 +188,28 @@ def approve_pet(pet_id):
 
     pet = Pet.query.get_or_404(pet_id)
 
-    pet.status = "available"
+    # UPDATE STATUS TO APPROVED
+    pet.status = "approved"
 
-    db.session.commit()
+    try:
+
+        db.session.commit()
+
+        flash(
+            f"{pet.pet_name} has been approved successfully.",
+            "success"
+        )
+
+    except Exception as e:
+
+        db.session.rollback()
+
+        print("APPROVE ERROR:", e)
+
+        flash(
+            "Failed to approve pet.",
+            "danger"
+        )
 
     return redirect("/admin")
 
@@ -166,62 +225,148 @@ def edit_pet(pet_id):
     pet = Pet.query.get_or_404(pet_id)
 
     if request.method == "POST":
+
         pet.pet_name = request.form.get("pet_name")
         pet.breed = request.form.get("breed")
         pet.age = request.form.get("age")
+
         gender_val = request.form.get("gender")
+
         if gender_val in ["Male", "Female"]:
             pet.gender = gender_val
-            
-        pet.color = request.form.get("color")
-        
-        traits_list = request.form.getlist("traits[]")
-        pet.traits = json.dumps(traits_list) if traits_list else json.dumps([])
-        
-        pet.spayed_neutered = request.form.get("spayed_neutered", "No")
-        pet.vaccinated = request.form.get("vaccinated", "No")
-        
-        pet.reason_for_rehoming = request.form.get("reason_for_rehoming")
 
-        # Admin can update status
+        pet.color = request.form.get("color")
+
+        traits_list = request.form.getlist("traits[]")
+
+        pet.traits = json.dumps(
+            traits_list
+        ) if traits_list else json.dumps([])
+
+        pet.spayed_neutered = request.form.get(
+            "spayed_neutered",
+            "No"
+        )
+
+        pet.vaccinated = request.form.get(
+            "vaccinated",
+            "No"
+        )
+
+        pet.reason_for_rehoming = request.form.get(
+            "reason_for_rehoming"
+        )
+
+        # STATUS UPDATE
         new_status = request.form.get("status")
+
         if new_status:
             pet.status = new_status
 
-        # Handle file uploads
-        pet_image_files = request.files.getlist("pet_image")
-        valid_id_files = request.files.getlist("valid_id")
-        medical_record_file_req = request.files.get("medical_record")
+        # =========================
+        # PET IMAGES
+        # =========================
+
+        pet_image_files = request.files.getlist(
+            "pet_image"
+        )
 
         if pet_image_files and pet_image_files[0].filename:
+
             for img in pet_image_files:
-                path = upload_to_cloudinary(img, "pets", ALLOWED_IMAGE_EXTENSIONS)
+
+                path = upload_to_cloudinary(
+                    img,
+                    "pets",
+                    ALLOWED_IMAGE_EXTENSIONS
+                )
+
                 if path:
-                    pet.images.append(PetImage(image_path=path))
+
+                    pet.images.append(
+                        PetImage(image_path=path)
+                    )
+
                     if not pet.pet_image:
                         pet.pet_image = path
-                        
+
+        # =========================
+        # VALID IDS
+        # =========================
+
+        valid_id_files = request.files.getlist(
+            "valid_id"
+        )
+
         if valid_id_files and valid_id_files[0].filename:
+
             for vid in valid_id_files:
-                path = upload_to_cloudinary(vid, "valid_ids", ALLOWED_IMAGE_EXTENSIONS)
+
+                path = upload_to_cloudinary(
+                    vid,
+                    "valid_ids",
+                    ALLOWED_IMAGE_EXTENSIONS
+                )
+
                 if path:
-                    pet.valid_ids.append(PetValidId(image_path=path))
+
+                    pet.valid_ids.append(
+                        PetValidId(image_path=path)
+                    )
+
                     if not pet.owner_valid_id:
                         pet.owner_valid_id = path
-            
+
+        # =========================
+        # MEDICAL RECORD
+        # =========================
+
+        medical_record_file_req = request.files.get(
+            "medical_record"
+        )
+
         if medical_record_file_req:
-            path = upload_to_cloudinary(medical_record_file_req, "medical_records", ALLOWED_EXTENSIONS)
+
+            path = upload_to_cloudinary(
+                medical_record_file_req,
+                "medical_records",
+                ALLOWED_EXTENSIONS
+            )
+
             if path:
                 pet.medical_record_file = path
 
-        db.session.commit()
-        
-        flash("Pet details updated successfully.", "success")
+        try:
+
+            db.session.commit()
+
+            flash(
+                "Pet details updated successfully.",
+                "success"
+            )
+
+        except Exception as e:
+
+            db.session.rollback()
+
+            print("EDIT PET ERROR:", e)
+
+            flash(
+                "Failed to update pet details.",
+                "danger"
+            )
+
         return redirect("/admin")
 
-    traits_list = json.loads(pet.traits) if pet.traits else []
-    return render_template("admin_edit_pet.html", pet=pet, traits_list=traits_list)
+    traits_list = json.loads(
+        pet.traits
+    ) if pet.traits else []
 
+    return render_template(
+        "admin_edit_pet.html",
+        pet=pet,
+        traits_list=traits_list
+    )
 
 # =========================
 # REJECT PET
@@ -236,7 +381,25 @@ def reject_pet(pet_id):
 
     pet.status = "rejected"
 
-    db.session.commit()
+    try:
+
+        db.session.commit()
+
+        flash(
+            f"{pet.pet_name} has been rejected.",
+            "warning"
+        )
+
+    except Exception as e:
+
+        db.session.rollback()
+
+        print("REJECT ERROR:", e)
+
+        flash(
+            "Failed to reject pet.",
+            "danger"
+        )
 
     return redirect("/admin")
 
@@ -251,10 +414,28 @@ def delete_pet(pet_id):
 
     pet = Pet.query.get_or_404(pet_id)
 
-    db.session.delete(pet)
-    db.session.commit()
+    try:
 
-    flash("Pet deleted successfully.", "success")
+        db.session.delete(pet)
+
+        db.session.commit()
+
+        flash(
+            "Pet deleted successfully.",
+            "success"
+        )
+
+    except Exception as e:
+
+        db.session.rollback()
+
+        print("DELETE ERROR:", e)
+
+        flash(
+            "Failed to delete pet.",
+            "danger"
+        )
+
     return redirect("/admin")
 
 # =========================
@@ -265,19 +446,27 @@ def delete_pet(pet_id):
 @login_required
 @admin_required
 def admin_users():
+
     from app.models.user import User
 
     search = request.args.get("search", "")
 
     if search:
+
         users = User.query.filter(
-            User.email.ilike(f"%{search}%") | 
+            User.email.ilike(f"%{search}%") |
             User.username.ilike(f"%{search}%") |
             User.first_name.ilike(f"%{search}%") |
             User.last_name.ilike(f"%{search}%")
-        ).order_by(User.user_id.desc()).all()
+        ).order_by(
+            User.user_id.desc()
+        ).all()
+
     else:
-        users = User.query.order_by(User.user_id.desc()).all()
+
+        users = User.query.order_by(
+            User.user_id.desc()
+        ).all()
 
     total_users = User.query.count() or 0
 
