@@ -1,524 +1,300 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends 'layout/base.html' %}
 
-<head>
+{% block title %}Owner Dashboard - Adopt Me{% endblock %}
 
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% block body_class %}bg-brand-bg min-h-screen text-brand-text font-sans flex flex-col pt-[76px]{% endblock %}
 
-    <title>
-        Owner Dashboard - Adopt Me
-    </title>
+{% block page_actions %}{% endblock %}
 
-    <script src="https://cdn.tailwindcss.com"></script>
-
-</head>
-
-<body class="bg-[#f5f7fb] min-h-screen text-slate-800 font-sans flex flex-col">
-
-    <!-- NAVIGATION -->
-    <nav class="bg-white/90 backdrop-blur-md border-b border-slate-200 sticky top-0 z-50 shadow-sm">
-
-        <div class="max-w-7xl mx-auto px-6 h-24 flex items-center justify-between">
-
-            <!-- LOGO -->
-            <a href="/" class="flex items-center hover:scale-105 transition duration-300">
-
-                <img src="{{ url_for('static', filename='images/ADOPT_ME_LOGO.png') }}" alt="Adopt Me Logo"
-                    class="h-24 w-auto object-contain">
-
-            </a>
-
-            <!-- NAV LINKS -->
-            <div class="flex items-center gap-8">
-
-                <a href="/dashboard" class="text-teal-700 hover:text-teal-500 font-semibold transition">
-
-                    Main Dashboard
-
-                </a>
-
-                <a href="/profile" class="text-slate-600 hover:text-teal-500 font-semibold transition">
-
-                    Profile
-
-                </a>
-
-                <a href="/about" class="text-slate-600 hover:text-teal-500 font-semibold transition">
-
-                    About
-
-                </a>
-
-                <a href="/logout" class="text-red-500 hover:text-red-600 font-bold transition">
-
-                    Logout
-
-                </a>
-            </div>
-        </div>
-    </nav>
-
+{% block content %}
     <!-- MAIN -->
-    <main class="flex-grow max-w-7xl mx-auto px-6 py-14 w-full">
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 py-12 w-full animate-fade-in-up">
 
         <!-- FLASH -->
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
-
-        <div class="mb-8 space-y-4">
-
+        <div class="mb-8 space-y-3">
             {% for category, message in messages %}
-
-            <div
-                class="px-6 py-4 rounded-2xl shadow-sm border font-medium {% if category == 'success' %}bg-green-50 border-green-200 text-green-700{% else %}bg-cyan-50 border-cyan-200 text-cyan-700{% endif %}">
-
-                {{ message }}
-
+            <div class="px-5 py-4 rounded-2xl shadow-sm border font-bold text-sm flex items-center gap-2
+                        {% if category == 'success' %}bg-green-50 border-green-150 text-green-700{% else %}bg-brand-primary/5 border-brand-primary/15 text-brand-primary{% endif %}">
+                <i data-lucide="{% if category == 'success' %}check-circle{% else %}info{% endif %}" class="w-5 h-5 shrink-0"></i>
+                <span>{{ message }}</span>
             </div>
-
             {% endfor %}
-
         </div>
-
         {% endif %}
         {% endwith %}
 
         <!-- HEADER -->
-        <div class="mb-12">
-
-            <h2 class="text-5xl font-black text-slate-800">
-                Pet Owner Dashboard
-            </h2>
-
-            <p class="text-slate-500 mt-3 text-lg">
+        <div class="mb-10 text-left">
+            <div class="inline-flex items-center gap-2 bg-brand-primary/10 text-brand-primary px-3.5 py-1.5 rounded-full text-xs font-extrabold uppercase tracking-wider mb-3">
+                <i data-lucide="shield" class="w-3.5 h-3.5"></i>
+                Management Hub
+            </div>
+            <h2 class="text-3xl sm:text-4xl font-extrabold text-brand-text tracking-tight">Pet Owner Dashboard</h2>
+            <p class="text-slate-500 font-semibold text-sm sm:text-base mt-1.5">
                 Manage your listed pets and review incoming adoption requests.
             </p>
-
         </div>
 
-        <!-- PENDING -->
+        <!-- PENDING REVIEW BANNER (Lucide icon, no emojis) -->
         {% if pending_count > 0 %}
-
-        <div class="mb-10 bg-yellow-50 border border-yellow-200 rounded-3xl p-5 flex items-center shadow-sm">
-
-            <div class="bg-yellow-100 text-yellow-700 rounded-2xl p-3 mr-4">
-
-                ⚠️
-
+        <div class="mb-8 bg-amber-50 border border-amber-250 rounded-3xl p-5 flex items-center shadow-sm gap-4">
+            <div class="bg-amber-100 text-amber-800 rounded-2xl p-3.5 shrink-0 flex items-center justify-center">
+                <i data-lucide="alert-triangle" class="w-6 h-6"></i>
             </div>
-
-            <p class="text-yellow-800 font-semibold text-lg">
-
-                You have {{ pending_count }} pet(s) currently under review by the admin.
-
+            <p class="text-amber-900 font-bold text-sm sm:text-base">
+                You have {{ pending_count }} pet(s) currently under review by the administrator. They will be visible to public once approved.
             </p>
-
         </div>
-
         {% endif %}
 
-        <!-- TOP CARDS -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+        <!-- TOP CARDS (QUICK NAVIGATION) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 mb-12">
 
-            <!-- ADD PET -->
-            <a href="/add-pet" class="group">
-
-                <div
-                    class="bg-white rounded-[32px] border border-slate-200 p-10 shadow-sm hover:shadow-xl hover:border-teal-200 transition duration-300 h-full text-center flex flex-col items-center">
-
-                    <div
-                        class="bg-cyan-50 text-cyan-700 p-6 rounded-full mb-6 group-hover:bg-cyan-700 group-hover:text-white transition duration-300">
-
-                        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4">
-                            </path>
-
-                        </svg>
+            <!-- PUT UP FOR ADOPTION -->
+            <a href="/add-pet" class="group block h-full">
+                <div class="bg-white rounded-[2rem] border border-brand-border p-8 shadow-sm hover:shadow-xl hover:shadow-brand-primary/5 hover:border-brand-primary/30 transition duration-300 h-full text-center flex flex-col items-center justify-center">
+                    <div class="bg-brand-primary/10 text-brand-primary p-5 rounded-full mb-5 group-hover:bg-brand-primary group-hover:text-white transition duration-300">
+                        <i data-lucide="plus-circle" class="w-8 h-8"></i>
                     </div>
-
-                    <h3 class="text-2xl font-black text-slate-800 mb-3">
-
-                        Put Up for Adoption
-
-                    </h3>
-
-                    <p class="text-slate-500 text-lg">
-
-                        Submit your pet for adoption and help them find a loving new home.
-
+                    <h3 class="text-xl font-bold text-brand-text mb-2">Put Up for Adoption</h3>
+                    <p class="text-slate-500 text-sm font-semibold max-w-sm">
+                        Submit a new pet's profile for adoption and help them find a loving family.
                     </p>
-
                 </div>
             </a>
 
-            <!-- NOTIFICATIONS -->
-            <a href="/notifications" class="group">
-
-                <div
-                    class="bg-white rounded-[32px] border border-slate-200 p-10 shadow-sm hover:shadow-xl hover:border-pink-200 transition duration-300 h-full text-center flex flex-col items-center">
-
-                    <div
-                        class="bg-pink-50 text-pink-600 p-6 rounded-full mb-6 group-hover:bg-pink-600 group-hover:text-white transition duration-300">
-
-                        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9">
-                            </path>
-
-                        </svg>
+            <!-- NOTIFICATIONS & REQUESTS -->
+            <a href="/notifications" class="group block h-full">
+                <div class="bg-white rounded-[2rem] border border-brand-border p-8 shadow-sm hover:shadow-xl hover:shadow-brand-accent/5 hover:border-brand-accent/30 transition duration-300 h-full text-center flex flex-col items-center justify-center">
+                    <div class="bg-brand-accent/10 text-brand-accent p-5 rounded-full mb-5 group-hover:bg-brand-accent group-hover:text-white transition duration-300">
+                        <i data-lucide="bell" class="w-8 h-8"></i>
                     </div>
-
-                    <h3 class="text-2xl font-black text-slate-800 mb-3">
-
-                        Notifications & Requests
-
-                    </h3>
-
-                    <p class="text-slate-500 text-lg">
-
-                        Check adoption requests from people wanting to adopt your pets.
-
+                    <h3 class="text-xl font-bold text-brand-text mb-2">Notifications & Requests</h3>
+                    <p class="text-slate-500 text-sm font-semibold max-w-sm">
+                        Check active adoption requests from users wishing to adopt your listed pets.
                     </p>
-
                 </div>
             </a>
         </div>
 
         <!-- LISTED PETS -->
-        <div class="mt-14">
-
-            <!-- HEADER -->
-            <div class="flex items-center justify-between mb-8">
-
-                <div>
-
-                    <h3 class="text-4xl font-black text-slate-800">
-                        Your Listed Pets
-                    </h3>
-
-                    <p class="text-slate-500 mt-2">
-                        Manage your adoption listings
-                    </p>
-
-                </div>
+        <div class="mt-12">
+            
+            <div class="flex items-center gap-2 mb-6">
+                <div class="w-1.5 h-6 bg-brand-primary rounded-full"></div>
+                <h3 class="text-xl sm:text-2xl font-extrabold text-brand-text">Your Listed Pets</h3>
             </div>
 
             {% if pets %}
 
             <!-- FILTER TABS -->
-            <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden mb-8">
-
-                <div class="grid grid-cols-3">
-
+            <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden mb-8">
+                <div class="grid grid-cols-3 divide-x divide-slate-150">
                     <!-- ALL -->
                     <button onclick="filterPets('all')" id="tab-all"
-                        class="pet-tab active-tab flex items-center justify-center gap-3 py-5 font-bold text-teal-600 border-b-4 border-teal-500 transition">
-
-                        🐾 All ({{ pets|length }})
-
+                            class="pet-tab active-tab flex items-center justify-center gap-2 py-4 font-bold text-[#007d8e] border-b-2 border-[#007d8e] transition text-xs sm:text-sm cursor-pointer hover:bg-slate-50">
+                        <i data-lucide="paw-print" class="w-4 h-4"></i>
+                        <span>All ({{ pets|length }})</span>
                     </button>
 
                     <!-- AVAILABLE -->
                     <button onclick="filterPets('approved')" id="tab-approved"
-                        class="pet-tab flex items-center justify-center gap-3 py-5 font-bold text-slate-500 hover:text-teal-600 transition">
-
-                        ⏳ Available
-                        ({{ pets|selectattr("status", "equalto", "approved")|list|length }})
-
+                            class="pet-tab flex items-center justify-center gap-2 py-4 font-bold text-slate-500 hover:text-[#007d8e] transition text-xs sm:text-sm cursor-pointer hover:bg-slate-50">
+                        <i data-lucide="check-circle" class="w-4 h-4"></i>
+                        <span>Available ({{ pets|selectattr("status", "equalto", "approved")|list|length }})</span>
                     </button>
 
                     <!-- ADOPTED -->
                     <button onclick="filterPets('adopted')" id="tab-adopted"
-                        class="pet-tab flex items-center justify-center gap-3 py-5 font-bold text-slate-500 hover:text-teal-600 transition">
-
-                        💙 Adopted
-                        ({{ pets|selectattr("status", "equalto", "adopted")|list|length }})
-
+                            class="pet-tab flex items-center justify-center gap-2 py-4 font-bold text-slate-500 hover:text-[#007d8e] transition text-xs sm:text-sm cursor-pointer hover:bg-slate-50">
+                        <i data-lucide="heart" class="w-4 h-4"></i>
+                        <span>Adopted ({{ pets|selectattr("status", "equalto", "adopted")|list|length }})</span>
                     </button>
-
                 </div>
             </div>
 
             <!-- PET LIST -->
             <div class="space-y-6">
-
                 {% for pet in pets %}
-
                 <div class="pet-card" data-status="{{ pet.status }}">
-
-                    <div
-                        class="bg-white rounded-[32px] border border-slate-200 shadow-sm hover:shadow-xl transition duration-300 overflow-hidden p-6">
-
+                    <div class="bg-white rounded-[2.5rem] border-2 border-slate-200/60 shadow-md hover:shadow-2xl hover:shadow-[#007d8e]/10 transition duration-300 overflow-hidden p-6 sm:p-8">
                         <div class="flex flex-col lg:flex-row gap-6">
 
                             <!-- IMAGE -->
-                            <div class="w-full lg:w-52 h-52 flex-shrink-0">
-
+                            <div class="w-full lg:w-48 h-48 flex-shrink-0 relative rounded-[2rem] overflow-hidden bg-slate-50 border border-slate-200/60 shadow-inner">
                                 {% if pet.pet_image %}
-
-                                {% set img_url = pet.pet_image if pet.pet_image.startswith('http') else
-                                url_for('static', filename=pet.pet_image) %}
-
-                                <img src="{{ img_url }}" alt="{{ pet.pet_name }}"
-                                    class="w-full h-full object-cover rounded-3xl hover:scale-105 transition duration-500">
-
+                                    {% set img_url = pet.pet_image if pet.pet_image.startswith('http') else url_for('static', filename=pet.pet_image) %}
+                                    <img src="{{ img_url }}" alt="{{ pet.pet_name }}"
+                                         class="w-full h-full object-cover hover:scale-105 transition duration-500">
                                 {% else %}
-
-                                <div
-                                    class="w-full h-full rounded-3xl bg-slate-100 flex items-center justify-center text-slate-400">
-
-                                    No Image
-
-                                </div>
-
+                                    <div class="w-full h-full flex flex-col items-center justify-center text-slate-400">
+                                        <i data-lucide="image-off" class="w-8 h-8 mb-1.5 text-slate-300"></i>
+                                        <span class="text-xs font-semibold">No Image</span>
+                                    </div>
                                 {% endif %}
                             </div>
 
                             <!-- CONTENT -->
-                            <div class="flex-1 flex flex-col">
+                            <div class="flex-grow flex flex-col justify-between">
+                                <div>
+                                    <!-- TOP TITLE & GENDER -->
+                                    <div class="flex justify-between items-start gap-4">
+                                        <div>
+                                            <div class="flex items-center gap-2.5">
+                                                <h4 class="text-2xl sm:text-3xl font-black text-brand-text">{{ pet.pet_name }}</h4>
+                                                {% if pet.gender == 'Male' %}
+                                                    <span class="text-blue-500 bg-blue-50 p-1.5 rounded-lg flex items-center justify-center" title="Male">
+                                                        <i data-lucide="mars" class="w-4 h-4"></i>
+                                                    </span>
+                                                {% elif pet.gender == 'Female' %}
+                                                    <span class="text-pink-500 bg-pink-50 p-1.5 rounded-lg flex items-center justify-center" title="Female">
+                                                        <i data-lucide="venus" class="w-4 h-4"></i>
+                                                    </span>
+                                                {% endif %}
+                                            </div>
 
-                                <!-- TOP -->
-                                <div class="flex justify-between items-start gap-4">
+                                            <!-- TAGS -->
+                                            <div class="flex flex-wrap gap-2 mt-3">
+                                                <span class="bg-[#007d8e]/5 text-[#007d8e] border border-[#007d8e]/10 px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5">
+                                                    <i data-lucide="paw-print" class="w-3.5 h-3.5 text-[#007d8e]"></i>
+                                                    <span>{{ pet.breed or 'Unknown Breed' }}</span>
+                                                </span>
+                                                <span class="bg-[#007d8e]/5 text-[#007d8e] border border-[#007d8e]/10 px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5">
+                                                    <i data-lucide="calendar" class="w-3.5 h-3.5 text-[#007d8e]"></i>
+                                                    <span>{{ pet.age or '?' }} yrs</span>
+                                                </span>
+                                                <span class="bg-[#ff5e1c]/5 text-[#ff5e1c] border border-[#ff5e1c]/10 px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5">
+                                                    <i data-lucide="map-pin" class="w-3.5 h-3.5 text-[#ff5e1c]"></i>
+                                                    <span>Laguna</span>
+                                                </span>
+                                            </div>
+                                        </div>
 
-                                    <div>
-
-                                        <div class="flex items-center gap-3">
-
-                                            <h4 class="text-4xl font-black text-slate-800">
-
-                                                {{ pet.pet_name }}
-
-                                            </h4>
-
-                                            {% if pet.gender == 'Male' %}
-
-                                            <span class="text-blue-500 text-2xl font-bold">
-
-                                                ♂
-
-                                            </span>
-
-                                            {% elif pet.gender == 'Female' %}
-
-                                            <span class="text-pink-500 text-2xl font-bold">
-
-                                                ♀
-
-                                            </span>
-
+                                        <!-- STATUS BADGE -->
+                                        <div>
+                                            {% if pet.status == 'approved' %}
+                                                <span class="inline-flex items-center gap-1 bg-green-50 text-green-700 border border-green-200 px-4 py-2 rounded-xl font-bold text-xs uppercase tracking-wider">
+                                                    <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                                                    <span>Available</span>
+                                                </span>
+                                            {% elif pet.status == 'adopted' %}
+                                                <span class="inline-flex items-center gap-1 bg-brand-primary/10 text-brand-primary border border-brand-primary/20 px-4 py-2 rounded-xl font-bold text-xs uppercase tracking-wider">
+                                                    <i data-lucide="heart" class="w-3.5 h-3.5 fill-current"></i>
+                                                    <span>Adopted</span>
+                                                </span>
+                                            {% elif pet.status == 'pending' %}
+                                                <span class="inline-flex items-center gap-1 bg-amber-50 text-amber-700 border border-amber-200 px-4 py-2 rounded-xl font-bold text-xs uppercase tracking-wider">
+                                                    <i data-lucide="clock" class="w-3.5 h-3.5"></i>
+                                                    <span>Waiting Review</span>
+                                                </span>
                                             {% endif %}
                                         </div>
+                                    </div>
 
-                                        <!-- TAGS -->
-                                        <div class="flex flex-wrap gap-3 mt-4">
-
-                                            <span
-                                                class="bg-slate-100 text-slate-600 px-4 py-2 rounded-full text-sm font-medium">
-
-                                                🐾 {{ pet.breed or 'Unknown Breed' }}
-
-                                            </span>
-
-                                            <span
-                                                class="bg-slate-100 text-slate-600 px-4 py-2 rounded-full text-sm font-medium">
-
-                                                📅 {{ pet.age or '?' }} years old
-
-                                            </span>
-
-                                            <span
-                                                class="bg-slate-100 text-slate-600 px-4 py-2 rounded-full text-sm font-medium">
-
-                                                📍 Laguna
-
-                                            </span>
+                                    <!-- INFO -->
+                                    <div class="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-slate-400">
+                                        <div class="flex items-center gap-1">
+                                            <i data-lucide="calendar-plus" class="w-3.5 h-3.5"></i>
+                                            <span>Added {{ pet.created_at.strftime('%B %d, %Y') if pet.created_at else 'Recently' }}</span>
+                                        </div>
+                                        <div>
+                                            {% if pet.status == 'approved' %}
+                                                <span class="text-brand-primary font-black">Looking for a loving home</span>
+                                            {% elif pet.status == 'adopted' %}
+                                                <span class="text-slate-500 font-black">Successfully matched</span>
+                                            {% endif %}
                                         </div>
                                     </div>
-
-                                    <!-- STATUS -->
-                                    <div>
-
-                                        {% if pet.status == 'approved' %}
-
-                                        <span
-                                            class="bg-green-100 text-green-700 px-5 py-3 rounded-2xl font-bold text-sm">
-
-                                            ✅ Available
-
-                                        </span>
-
-                                        {% elif pet.status == 'adopted' %}
-
-                                        <span class="bg-cyan-100 text-cyan-700 px-5 py-3 rounded-2xl font-bold text-sm">
-
-                                            💙 Adopted
-
-                                        </span>
-
-                                        {% elif pet.status == 'pending' %}
-
-                                        <span
-                                            class="bg-yellow-100 text-yellow-700 px-5 py-3 rounded-2xl font-bold text-sm">
-
-                                            ⏳ Waiting
-
-                                        </span>
-
-                                        {% endif %}
-                                    </div>
-                                </div>
-
-                                <!-- INFO -->
-                                <div class="mt-6 pt-6 border-t border-slate-200">
-
-                                    <p class="text-slate-500 text-sm">
-
-                                        Added on
-                                        {{ pet.created_at.strftime('%B %d, %Y') if pet.created_at else 'Recently' }}
-
-                                    </p>
-
-                                    {% if pet.status == 'approved' %}
-
-                                    <p class="text-slate-600 mt-1">
-
-                                        Still looking for a loving home.
-
-                                    </p>
-
-                                    {% elif pet.status == 'adopted' %}
-
-                                    <p class="text-slate-600 mt-1">
-
-                                        Successfully adopted.
-
-                                    </p>
-
-                                    {% endif %}
                                 </div>
 
                                 <!-- BUTTONS -->
-                                <div class="flex flex-wrap gap-4 mt-6">
-
+                                <div class="flex flex-wrap gap-3 mt-6">
                                     <a href="/pet/{{ pet.pet_id }}"
-                                        class="px-8 py-3 rounded-2xl border border-teal-200 text-teal-700 hover:bg-teal-50 font-bold transition">
-
-                                        View Details
-
+                                       class="px-5 py-2.5 rounded-xl border border-brand-primary text-brand-primary hover:bg-brand-primary hover:text-white font-bold text-sm transition flex items-center gap-1.5 shadow-sm hover:shadow-md cursor-pointer">
+                                        <i data-lucide="eye" class="w-4 h-4"></i>
+                                        <span>View Details</span>
                                     </a>
-
                                     <a href="/edit-pet/{{ pet.pet_id }}"
-                                        class="px-8 py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition">
-
-                                        Edit Pet
-
+                                       class="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm transition flex items-center gap-1.5 shadow-sm hover:shadow-md cursor-pointer">
+                                        <i data-lucide="edit" class="w-4 h-4"></i>
+                                        <span>Edit Pet</span>
                                     </a>
-
                                     <a href="/delete-pet/{{ pet.pet_id }}"
-                                        onclick="return confirm('Are you sure you want to remove this pet?');"
-                                        class="px-8 py-3 rounded-2xl bg-red-50 hover:bg-red-100 text-red-600 font-bold transition">
-
-                                        Cancel Adoption
-
+                                       onclick="return confirm('Are you sure you want to remove this pet?');"
+                                       class="px-5 py-2.5 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 font-bold text-sm transition flex items-center gap-1.5 ml-auto shadow-sm hover:shadow-md cursor-pointer">
+                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                        <span>Cancel Adoption</span>
                                     </a>
-
                                 </div>
+
                             </div>
                         </div>
                     </div>
                 </div>
-
                 {% endfor %}
             </div>
 
             {% else %}
-
-            <!-- EMPTY -->
-            <div class="bg-white rounded-[32px] border border-slate-200 shadow-sm p-16 text-center">
-
-                <img src="{{ url_for('static', filename='images/ADOPT_ME_LOGO.png') }}" class="h-24 mx-auto mb-6">
-
-                <h3 class="text-3xl font-black text-slate-800 mb-3">
-
-                    No Active Listings
-
-                </h3>
-
-                <p class="text-slate-500 mb-8">
-
-                    You do not have any pets listed yet.
-
-                </p>
-
+            <!-- EMPTY LISTING STATE -->
+            <div class="bg-white rounded-[2.5rem] border border-brand-border shadow-sm p-16 text-center max-w-md mx-auto space-y-6">
+                <div class="w-16 h-16 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center mx-auto">
+                    <i data-lucide="paw-print" class="w-8 h-8"></i>
+                </div>
+                <div class="space-y-2">
+                    <h3 class="text-2xl font-black text-brand-text">No Active Listings</h3>
+                    <p class="text-slate-500 font-semibold text-sm leading-relaxed">
+                        You do not have any pets listed for adoption at the moment. Put up a pet to find them a loving family.
+                    </p>
+                </div>
                 <a href="/add-pet"
-                    class="inline-flex items-center gap-3 bg-teal-600 hover:bg-teal-700 text-white font-bold px-8 py-4 rounded-2xl transition">
-
-                    + Put a Pet for Adoption
-
+                   class="inline-flex items-center gap-2 bg-brand-primary hover:bg-[#006674] text-white font-bold px-6 py-3.5 rounded-xl transition shadow shadow-brand-primary/15 text-sm">
+                    <i data-lucide="plus" class="w-4 h-4"></i>
+                    <span>List a Pet for Adoption</span>
                 </a>
-
             </div>
-
             {% endif %}
         </div>
     </main>
 
     <!-- FOOTER -->
-    <footer class="bg-white border-t border-slate-200 py-8 text-center text-slate-500 mt-auto">
-
-        <p>
-            &copy; 2026 Adopt Me Platform. All rights reserved.
-        </p>
-
+    <footer class="bg-white border-t border-brand-border py-8 text-center text-xs font-extrabold text-slate-400 mt-auto">
+        <div class="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <p>&copy; 2026 Adopt Me Platform. All rights reserved.</p>
+            <div class="flex gap-6">
+                <a href="#" class="hover:text-brand-primary transition">Privacy Policy</a>
+                <a href="#" class="hover:text-brand-primary transition">Terms of Service</a>
+            </div>
+        </div>
     </footer>
+{% endblock %}
 
+{% block extra_js %}
     <!-- FILTER SCRIPT -->
     <script>
-
         function filterPets(status) {
-
             const cards = document.querySelectorAll('.pet-card');
-
             const tabs = document.querySelectorAll('.pet-tab');
 
             tabs.forEach(tab => {
-
-                tab.classList.remove(
-                    'text-teal-600',
-                    'border-b-4',
-                    'border-teal-500'
-                );
-
+                tab.classList.remove('text-[#007d8e]', 'border-b-2', 'border-[#007d8e]');
                 tab.classList.add('text-slate-500');
             });
 
-            document.getElementById(`tab-${status}`).classList.add(
-                'text-teal-600',
-                'border-b-4',
-                'border-teal-500'
-            );
+            const activeTab = document.getElementById(`tab-${status}`);
+            if (activeTab) {
+                activeTab.classList.remove('text-slate-500');
+                activeTab.classList.add('text-[#007d8e]', 'border-b-2', 'border-[#007d8e]');
+            }
 
             cards.forEach(card => {
-
-                if (
-                    status === 'all' ||
-                    card.dataset.status === status
-                ) {
-
+                if (status === 'all' || card.dataset.status === status) {
                     card.style.display = 'block';
-
                 } else {
-
                     card.style.display = 'none';
                 }
             });
         }
-
     </script>
-
-</body>
-
-</html>
+{% endblock %}

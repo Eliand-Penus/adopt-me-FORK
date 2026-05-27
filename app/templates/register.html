@@ -1,453 +1,122 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends 'layout/base.html' %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Account - Adopt Me</title>
-    <!-- Tailwind -->
-    <script src="https://cdn.tailwindcss.com"></script>
+{% block title %}Create Account - Adopt Me{% endblock %}
 
+{% block extra_head %}
     <!-- Intl Tel Input CSS & JS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap');
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #F5F5F5;
-            margin: 0;
-            padding: 0;
-            overflow-x: hidden;
-            color: #444444;
+        /* Smooth transitions */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
-        .navbar {
-            height: 80px;
-            background-color: #FFFFFF;
-            border-bottom: 1px solid #D9D9D9;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 40px;
+        .animate-fade-in-up {
+            animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
-        .nav-links {
-            display: flex;
-            gap: 48px;
-        }
-
-        .nav-links a {
-            color: #333333;
-            font-weight: 500;
-            font-size: 16px;
-            text-decoration: none;
-        }
-
-        .nav-login {
-            background-color: #008C95;
-            color: #FFFFFF;
-            border-radius: 14px;
-            padding: 14px 34px;
-            font-weight: 500;
-            text-decoration: none;
-            font-size: 16px;
-        }
-
-        .main-container {
-            max-width: 620px;
-            margin: 50px auto 100px auto;
-            position: relative;
-        }
-
-        .back-button {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            color: #008C95;
-            text-decoration: none;
-            margin-bottom: 24px;
-        }
-
-        .title {
-            font-size: 52px;
-            font-weight: 700;
-            color: #444444;
-            margin: 0 0 16px 0;
-            line-height: 1.1;
-        }
-
-        .subtitle {
-            font-size: 18px;
-            color: #555555;
-            max-width: 620px;
-            margin: 0 0 28px 0;
-            line-height: 1.5;
-        }
-
-        .form-label {
-            display: flex;
-            align-items: center;
-            font-size: 15px;
-            font-weight: 600;
-            color: #444444;
-            margin-bottom: 8px;
-            gap: 6px;
-        }
-
-        .form-input {
-            height: 62px;
-            border: 1px solid #BDBDBD;
-            border-radius: 16px;
-            background-color: #FFFFFF;
-            width: 100%;
-            padding: 0 18px;
-            font-size: 16px;
-            box-sizing: border-box;
-            outline: none;
-            color: #333333;
-            transition: 0.2s ease;
-        }
-
-        .form-input:focus {
-            border-color: #007d8e;
-            box-shadow: 0 0 0 3px rgba(0, 125, 142, 0.15);
-        }
-
-        .form-input.error {
-            border-color: #EF4444;
-        }
-
-        .form-input.error:focus {
-            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
-        }
-
-        .form-input::placeholder {
-            color: #999999;
-        }
-
-        /* Intl Tel Input Overrides */
+        /* Intl Tel Input Plugin styling custom overrides for premium feel */
         .iti {
             width: 100%;
         }
-
+        
         .iti__flag-container {
-            padding-left: 13px !important;
+            padding-left: 14px !important;
+            border-radius: 16px 0 0 16px;
         }
-
+        
         .iti__selected-country {
             padding-left: 8px !important;
-        }
-
-        .iti:focus-within .iti__selected-country {
-
-            background: #F8FBFC;
-
-            border-top-left-radius: 16px;
-
-            border-bottom-left-radius: 16px;
-
-        }
-
-        .iti:focus-within .iti__selected-country {
-
-            background-color: #F4FCFD;
-
-            border-top-left-radius: 16px;
-
-            border-bottom-left-radius: 16px;
-
-        }
-
-        .iti__selected-country {
-
             height: 100%;
-
             display: flex;
-
             align-items: center;
-
         }
-
-        #phone_number {
-
-            padding-left: 60px !important;
-
+        
+        .iti:focus-within .iti__selected-country {
+            background-color: #f1f8f9;
+            border-top-left-radius: 16px;
+            border-bottom-left-radius: 16px;
         }
-
+        
         .iti__flag {
             background-image: url("https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/img/flags.png");
         }
-
-        @media (-webkit-min-device-pixel-ratio: 2),
-        (min-resolution: 192dpi) {
+        
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
             .iti__flag {
                 background-image: url("https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/img/flags@2x.png");
             }
         }
 
-        .iti__flag-container {
-            border-radius: 16px 0 0 16px;
-        }
-
         input#phone_number {
-            height: 62px;
-            border: 1px solid #BDBDBD;
+            height: 56px;
+            border: 1px solid #E2E8F0;
             border-radius: 16px;
-            background-color: #FFFFFF;
+            background-color: #F8FAFB;
             width: 100%;
-            font-size: 16px;
+            padding-left: 60px !important;
+            font-size: 15px;
+            font-weight: 500;
             box-sizing: border-box;
             outline: none;
-            color: #333333;
-            transition: 0.2s ease;
+            color: #2A2A2A;
+            transition: all 0.3s ease;
         }
-
+        
         input#phone_number:focus {
             border-color: #007d8e;
+            background-color: #FFFFFF;
             box-shadow: 0 0 0 3px rgba(0, 125, 142, 0.15);
-        }
-
-        .helper-text {
-            font-size: 15px;
-            color: #666666;
-            margin-top: 10px;
-            line-height: 1.5;
-        }
-
-        .helper-text a {
-            color: #008C95;
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        .validation-text {
-            font-size: 14px;
-            margin-top: 8px;
-            font-weight: 500;
-            display: none;
-        }
-
-        .validation-text.valid {
-            color: #10B981;
-            /* green-500 */
-            display: block;
-        }
-
-        .validation-text.invalid {
-            color: #EF4444;
-            /* red-500 */
-            display: block;
-        }
-
-        .terms-text {
-            font-size: 14px;
-            color: #666666;
-            margin-top: 24px;
-            margin-bottom: 32px;
-            line-height: 1.6;
-        }
-
-        .terms-text a {
-            color: #008C95;
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        .create-btn {
-            height: 64px;
-            background-color: #008C95;
-            border-radius: 999px;
-            color: #FFFFFF;
-            font-size: 16px;
-            width: 100%;
-            border: none;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            box-sizing: border-box;
-            transition: opacity 0.2s ease;
-        }
-
-        .create-btn:disabled {
-            background-color: #9CA3AF;
-            cursor: not-allowed;
-            opacity: 0.7;
-        }
-
-        .divider {
-            text-align: center;
-            color: #999999;
-            font-size: 16px;
-            margin: 28px 0;
-            position: relative;
-        }
-
-        .divider::before,
-        .divider::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            width: 44%;
-            height: 1px;
-            background-color: #D9D9D9;
-        }
-
-        .divider::before {
-            left: 0;
-        }
-
-        .divider::after {
-            right: 0;
-        }
-
-        .google-btn {
-            height: 64px;
-            border: 2px solid #008C95;
-            border-radius: 999px;
-            color: #333333;
-            font-size: 16px;
-            width: 100%;
-            background: transparent;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-decoration: none;
-            box-sizing: border-box;
-            font-weight: 600;
-            gap: 12px;
-        }
-
-        .form-row {
-            margin-bottom: 24px;
-        }
-
-        #toast-container {
-            position: fixed;
-            top: 24px;
-            right: 24px;
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .toast-popup {
-            padding: 16px 20px;
-            border-radius: 12px;
-            font-size: 15px;
-            font-weight: 500;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            animation: slideIn 0.3s ease forwards, fadeOut 0.3s ease 3.7s forwards;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .toast-error {
-            background-color: #fee2e2;
-            border: 1px solid #fca5a5;
-            color: #991b1b;
-        }
-
-        .toast-success {
-            background-color: #dff4f5;
-            border: 1px solid #83d8df;
-            color: #007f8b;
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        @keyframes fadeOut {
-            from {
-                opacity: 1;
-            }
-
-            to {
-                opacity: 0;
-            }
+            transform: scale(1.01);
         }
     </style>
-</head>
+{% endblock %}
 
-<body>
+{% block body_class %}bg-brand-bg min-h-screen overflow-x-hidden pt-[76px]{% endblock %}
 
-    <!-- NAVBAR -->
-    <nav
-        class="fixed top-0 left-0 w-full h-24 bg-white/90 backdrop-blur-md border-b border-gray-100 z-50 flex items-center">
+{% block page_actions %}{% endblock %}
 
-        <div class="max-w-7xl w-full mx-auto px-6 flex justify-between items-center">
-
-            <!-- Logo -->
-            <a href="/" class="hover:scale-105 transition duration-300">
-
-                <img src="{{ url_for('static', filename='images/Adopt Me Icon.png') }}" alt="Adopt Me Logo"
-                    class="h-28 w-auto object-contain">
-
-            </a>
-
-            <!-- Navigation -->
-            <div class="hidden md:flex items-center space-x-10">
-
-                <a href="/" class="nav-link text-gray-600 hover:text-teal-500 font-semibold transition">
-                    Home
-                </a>
-
-                <a href="/pets" class="nav-link text-gray-600 hover:text-teal-500 font-semibold transition">
-                    Adopt
-                </a>
-
-                <a href="/about" class="nav-link text-gray-600 hover:text-teal-500 font-semibold transition">
-                    About
-                </a>
-
-                <a href="/resources" class="nav-link text-gray-600 hover:text-teal-500 font-semibold transition">
-                    Resources
-                </a>
-
-                <a href="/contact" class="nav-link text-gray-600 hover:text-teal-500 font-semibold transition">
-                    Contact
-                </a>
-
+{% block content %}
+    <div class="max-w-2xl mx-auto px-4 sm:px-6 py-12 animate-fade-in-up">
+        
+        <!-- Back Button -->
+        <a href="/login" class="inline-flex items-center gap-2 text-slate-500 hover:text-brand-primary font-bold text-sm transition mb-8 group">
+            <div class="w-8 h-8 rounded-full border border-slate-200 flex items-center justify-center group-hover:border-brand-primary group-hover:bg-brand-primary/5 transition">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i>
             </div>
-            <a href="/login" class="nav-login">Login</a>
-    </nav>
-
-    <div class="main-container">
-
-        <a href="/login" class="back-button">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round">
-                <path d="M19 12H5"></path>
-                <polyline points="12 19 5 12 12 5"></polyline>
-            </svg>
+            <span>Back to Login</span>
         </a>
 
-        <h1 class="title">Let's get started</h1>
-        <p class="subtitle">Join a trusted community dedicated to helping pets connect with safe, caring, and loving
-            homes.</p>
+        <!-- Header -->
+        <div class="mb-10 text-left">
+            <div class="inline-flex items-center gap-2 bg-brand-primary/10 text-brand-primary px-3.5 py-1.5 rounded-full text-xs font-extrabold uppercase tracking-wider mb-3">
+                <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+                Start Your Journey
+            </div>
+            <h1 class="text-4xl font-extrabold text-brand-text mb-3 leading-tight tracking-tight">Let's get started</h1>
+            <p class="text-slate-500 font-semibold text-base leading-relaxed">
+                Join a trusted community dedicated to helping pets connect with safe, caring, and loving homes.
+            </p>
+        </div>
 
+        <!-- Custom Toast alerts for registering user (no emojis) -->
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
-        <div id="toast-container">
+        <div id="toast-container" class="fixed top-6 right-6 z-50 flex flex-col gap-3">
             {% for category, message in messages %}
-            <div class="toast-popup {% if category == 'error' %}toast-error{% else %}toast-success{% endif %}">
-                {% if category == 'error' %}⚠ {% endif %}{{ message }}
+            <div class="px-5 py-4 rounded-2xl shadow-xl flex items-center gap-3 border transition duration-300 animate-slide-in
+                        {% if category == 'error' %}bg-red-50 text-red-700 border-red-200{% else %}bg-green-50 text-green-700 border-green-200{% endif %}">
+                <i data-lucide="{% if category == 'error' %}alert-triangle{% else %}check-circle{% endif %}" class="w-5 h-5 shrink-0"></i>
+                <span class="font-bold text-sm">{{ message }}</span>
             </div>
             {% endfor %}
         </div>
@@ -455,260 +124,193 @@
             setTimeout(() => {
                 const toastContainer = document.getElementById('toast-container');
                 if (toastContainer) {
-                    toastContainer.remove();
+                    toastContainer.style.opacity = '0';
+                    setTimeout(() => toastContainer.remove(), 300);
                 }
             }, 4000);
         </script>
         {% endif %}
         {% endwith %}
 
-        <form method="POST" action="/register" id="registerForm">
-
-            <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-                <div style="grid-column: 1 / -1;">
-                    <label class="form-label">Name</label>
+        <!-- FORM CARD -->
+        <div class="bg-white rounded-3xl border border-brand-border/80 shadow-2xl p-8 sm:p-10">
+            
+            <form method="POST" action="/register" id="registerForm" class="space-y-6">
+                
+                <!-- Name Row (Grid) -->
+                <div class="space-y-2">
+                    <label class="block text-sm font-extrabold text-slate-700 flex items-center gap-1.5">
+                        <i data-lucide="user" class="w-4 h-4 text-slate-400"></i>
+                        <span>Full Name</span>
+                    </label>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <input type="text" name="first_name" required placeholder="First name"
+                               class="w-full px-5 py-3.5 rounded-2xl border border-slate-200 bg-slate-50/50 focus:outline-none focus:ring-2 focus:ring-brand-primary focus:border-brand-primary transition duration-300 focus:scale-[1.01] text-brand-text font-medium text-sm placeholder-slate-400">
+                        <input type="text" name="last_name" required placeholder="Last name"
+                               class="w-full px-5 py-3.5 rounded-2xl border border-slate-200 bg-slate-50/50 focus:outline-none focus:ring-2 focus:ring-brand-primary focus:border-brand-primary transition duration-300 focus:scale-[1.01] text-brand-text font-medium text-sm placeholder-slate-400">
+                    </div>
                 </div>
-                <div style="margin-top: -8px;">
-                    <input type="text" name="first_name" class="form-input" placeholder="First name" required>
+
+                <!-- Username -->
+                <div class="space-y-2">
+                    <label class="block text-sm font-extrabold text-slate-700 flex items-center gap-1.5">
+                        <i data-lucide="at-sign" class="w-4 h-4 text-slate-400"></i>
+                        <span>Username</span>
+                    </label>
+                    <input type="text" name="username" required placeholder="Choose a unique username"
+                           class="w-full px-5 py-3.5 rounded-2xl border border-slate-200 bg-slate-50/50 focus:outline-none focus:ring-2 focus:ring-brand-primary focus:border-brand-primary transition duration-300 focus:scale-[1.01] text-brand-text font-medium text-sm placeholder-slate-400">
                 </div>
-                <div style="margin-top: -8px;">
-                    <input type="text" name="last_name" class="form-input" placeholder="Last name" required>
+
+                <!-- Email -->
+                <div class="space-y-2">
+                    <label class="block text-sm font-extrabold text-slate-700 flex items-center gap-1.5">
+                        <i data-lucide="mail" class="w-4 h-4 text-slate-400"></i>
+                        <span>Email Address</span>
+                    </label>
+                    <input type="email" name="email" required placeholder="Enter your email"
+                           class="w-full px-5 py-3.5 rounded-2xl border border-slate-200 bg-slate-50/50 focus:outline-none focus:ring-2 focus:ring-brand-primary focus:border-brand-primary transition duration-300 focus:scale-[1.01] text-brand-text font-medium text-sm placeholder-slate-400">
+                    <p class="text-xs text-slate-400 font-semibold leading-relaxed flex items-start gap-1.5 mt-1">
+                        <i data-lucide="info" class="w-3.5 h-3.5 text-slate-400 mt-0.5 shrink-0"></i>
+                        <span>You may receive adoption notifications from us. <a href="#" class="text-brand-primary hover:underline">Learn why we ask for contact details</a>.</span>
+                    </p>
                 </div>
-            </div>
 
-            <div class="form-row">
-                <label class="form-label">Username</label>
-                <input type="text" name="username" class="form-input" placeholder="Username" required>
-            </div>
-
-            <div class="form-row">
-                <label class="form-label">Email</label>
-                <input type="email" name="email" class="form-input" placeholder="Email address" required>
-                <div class="helper-text">
-                    You may receive notification from us.<br>
-                    <a href="#">Learn why we ask for your contact information.</a>
+                <!-- Mobile Phone Number -->
+                <div class="space-y-2">
+                    <label class="block text-sm font-extrabold text-slate-700 flex items-center gap-1.5">
+                        <i data-lucide="phone" class="w-4 h-4 text-slate-400"></i>
+                        <span>Mobile Number</span>
+                    </label>
+                    <div>
+                        <input type="tel" inputmode="numeric" id="phone_number" name="phone_number" required placeholder="Enter mobile number">
+                    </div>
                 </div>
-            </div>
 
-            <div class="form-row">
-                <label class="form-label">
-                    Mobile
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#999999" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <line x1="12" y1="16" x2="12" y2="12"></line>
-                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                    </svg>
-                </label>
-                <div>
-                    <input type="tel" inputmode="numeric" id="phone_number" name="phone_number"
-                        placeholder="Enter mobile number" required>
+                <!-- Passwords Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                        <label class="block text-sm font-extrabold text-slate-700 flex items-center gap-1.5">
+                            <i data-lucide="lock" class="w-4 h-4 text-slate-400"></i>
+                            <span>Password</span>
+                        </label>
+                        <input type="password" id="password" name="password" required placeholder="Create password"
+                               class="w-full px-5 py-3.5 rounded-2xl border border-slate-200 bg-slate-50/50 focus:outline-none focus:ring-2 focus:ring-brand-primary focus:border-brand-primary transition duration-300 focus:scale-[1.01] text-brand-text font-medium text-sm placeholder-slate-400">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-sm font-extrabold text-slate-700 flex items-center gap-1.5">
+                            <i data-lucide="shield-check" class="w-4 h-4 text-slate-400"></i>
+                            <span>Confirm Password</span>
+                        </label>
+                        <input type="password" id="confirm_password" required placeholder="Confirm password"
+                               class="w-full px-5 py-3.5 rounded-2xl border border-slate-200 bg-slate-50/50 focus:outline-none focus:ring-2 focus:ring-brand-primary focus:border-brand-primary transition duration-300 focus:scale-[1.01] text-brand-text font-medium text-sm placeholder-slate-400">
+                    </div>
                 </div>
+                
+                <!-- Password Match Validation Msg -->
+                <div id="password_validation_msg" class="text-xs font-bold transition-all duration-200"></div>
+
+                <!-- Terms Text -->
+                <p class="text-xs text-slate-500 font-semibold leading-relaxed mt-4">
+                    Your contact information will be used for adoption communication and verified security updates.<br>
+                    By creating an account, you agree to Adopt Me's 
+                    <a href="#" class="text-brand-primary hover:underline font-bold">Terms of Service</a> and 
+                    <a href="#" class="text-brand-primary hover:underline font-bold">Privacy Policy</a>.
+                </p>
+
+                <!-- Create Account Button -->
+                <button type="submit" id="createBtn"
+                        class="w-full py-4 rounded-full bg-brand-primary hover:bg-[#006674] text-white font-bold text-base shadow-lg shadow-brand-primary/10 hover:shadow-brand-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-2">
+                    <i data-lucide="user-plus" class="w-5 h-5"></i>
+                    <span>Create Account</span>
+                </button>
+
+            </form>
+
+            <!-- Divider -->
+            <div class="my-6 flex items-center">
+                <div class="flex-1 border-t border-slate-100"></div>
+                <span class="px-4 text-slate-400 font-bold text-xs uppercase tracking-wider">Or register with</span>
+                <div class="flex-1 border-t border-slate-100"></div>
             </div>
 
-            <div class="form-row">
-                <label class="form-label">Password</label>
-                <input type="password" id="password" name="password" class="form-input" placeholder="Password" required>
+            <!-- Google Sign up -->
+            <a href="/login/google"
+               class="w-full flex justify-center items-center gap-3 border border-slate-200 rounded-full py-3.5 font-bold text-slate-700 hover:border-brand-primary hover:bg-slate-50 transition duration-300 group text-sm">
+                <svg class="w-5 h-5 group-hover:scale-110 transition shrink-0" viewBox="0 0 24 24">
+                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
+                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
+                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
+                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
+                </svg>
+                <span>Continue with Google</span>
+            </a>
+
+            <!-- Login Link -->
+            <div class="mt-8 text-center text-sm font-semibold text-slate-500">
+                Already have an account? 
+                <a href="/login" class="text-brand-primary hover:underline font-bold ml-1">Sign In</a>
             </div>
 
-            <div class="form-row">
-                <label class="form-label">Confirm Password</label>
-                <input type="password" id="confirm_password" class="form-input" placeholder="Confirm Password" required>
-                <div id="password_validation_msg" class="validation-text"></div>
-            </div>
-
-            <div class="terms-text">
-                Your contact information may be used for adoption-related communication and account
-                verification.<br><br>
-                By creating an account, you agree to Adopt Me's <a href="#">Terms of Service</a> and <a href="#">Privacy
-                    Policy</a>.
-            </div>
-
-            <button type="submit" id="createBtn" class="create-btn">Create Account</button>
-
-        </form>
-
-        <div class="divider">or</div>
-
-        <a href="/login/google" class="google-btn">
-            <svg class="h-6 w-6" viewBox="0 0 24 24">
-                <path
-                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                    fill="#4285F4" />
-                <path
-                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                    fill="#34A853" />
-                <path
-                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                    fill="#FBBC05" />
-                <path
-                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                    fill="#EA4335" />
-                <path d="M1 1h22v22H1z" fill="none" />
-            </svg>
-            Continue with Google
-        </a>
-
-        <div style="height: 120px;"></div>
-
+        </div>
     </div>
+{% endblock %}
 
+{% block extra_js %}
     <script>
-
-
         // Initialize intlTelInput
-        const phoneInputField =
-            document.querySelector("#phone_number");
+        const phoneInputField = document.querySelector("#phone_number");
 
-        const phoneInput =
-            window.intlTelInput(
-                phoneInputField,
-                {
-                    initialCountry: "ph",
-
-                    preferredCountries: [
-                        "ph",
-                        "us",
-                        "gb",
-                        "jp"
-                    ],
-
-                    separateDialCode: false,
-
-                    utilsScript:
-                        "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"
-                }
-            );
+        const phoneInput = window.intlTelInput(phoneInputField, {
+            initialCountry: "ph",
+            preferredCountries: ["ph", "us", "gb", "jp"],
+            separateDialCode: false,
+            utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"
+        });
 
         function setCountryCode() {
-
-            const country =
-                phoneInput.getSelectedCountryData();
-
-            phoneInputField.value =
-                "+" +
-                country.dialCode +
-                " ";
-
+            const country = phoneInput.getSelectedCountryData();
+            phoneInputField.value = "+" + country.dialCode + " ";
         }
 
         const phoneLengths = {
-
             ph: 10, // +63 + 10 digits
-
             us: 10,
-
             gb: 10,
-
             jp: 10,
-
             kr: 10,
-
             sg: 8,
-
             my: 9,
-
             au: 9,
-
             cn: 11,
-
             in: 10
-
         };
 
-        phoneInputField.addEventListener(
-            "input",
-            function () {
+        phoneInputField.addEventListener("input", function () {
+            const country = phoneInput.getSelectedCountryData();
+            const prefix = "+" + country.dialCode + " ";
+            const limit = phoneLengths[country.iso2] || 15;
 
-                const country =
-                    phoneInput.getSelectedCountryData();
+            let numbers = this.value.replace(prefix, "").replace(/\D/g, '');
+            numbers = numbers.substring(0, limit);
+            this.value = prefix + numbers;
+        });
 
-                const prefix =
-                    "+" +
-                    country.dialCode +
-                    " ";
+        phoneInputField.addEventListener("countrychange", setCountryCode);
 
-                const limit =
-                    phoneLengths[
-                    country.iso2
-                    ] || 15;
+        phoneInputField.addEventListener("input", function () {
+            const country = phoneInput.getSelectedCountryData();
+            const prefix = "+" + country.dialCode + " ";
+            let numbers = this.value.replace(prefix, "").replace(/\D/g, '');
+            this.value = prefix + numbers;
+        });
 
-                let numbers =
-                    this.value
-                        .replace(prefix, "")
-                        .replace(/\D/g, '');
-
-                numbers =
-                    numbers.substring(
-                        0,
-                        limit
-                    );
-
-                this.value =
-                    prefix +
-                    numbers;
-
+        phoneInputField.addEventListener("keydown", function (e) {
+            const country = phoneInput.getSelectedCountryData();
+            const prefix = "+" + country.dialCode + " ";
+            if ((e.key === "Backspace" || e.key === "Delete") && this.selectionStart <= prefix.length) {
+                e.preventDefault();
             }
-        );
-
-        phoneInputField.addEventListener(
-            "countrychange",
-            setCountryCode
-        );
-
-        phoneInputField.addEventListener(
-            "input",
-            function () {
-
-                const country =
-                    phoneInput.getSelectedCountryData();
-
-                const prefix =
-                    "+" +
-                    country.dialCode +
-                    " ";
-
-                let numbers =
-                    this.value
-                        .replace(prefix, "")
-                        .replace(/\D/g, '');
-
-                this.value =
-                    prefix +
-                    numbers;
-
-            }
-        );
-
-        phoneInputField.addEventListener(
-            "keydown",
-            function (e) {
-
-                const country =
-                    phoneInput.getSelectedCountryData();
-
-                const prefix =
-                    "+" +
-                    country.dialCode +
-                    " ";
-
-                if (
-
-                    (e.key === "Backspace" ||
-                        e.key === "Delete")
-
-                    &&
-
-                    this.selectionStart <= prefix.length
-
-                ) {
-
-                    e.preventDefault();
-
-                }
-
-            }
-        );
+        });
 
         setCountryCode();
 
@@ -719,31 +321,50 @@
         const createBtn = document.getElementById('createBtn');
 
         function validatePassword() {
-            // Only validate if confirm password field has content
             if (confirm_password.value === '') {
-                msg.className = 'validation-text';
-                confirm_password.classList.remove('error');
-                createBtn.disabled = false; // Usually disabled on load if you want strict validation, but keeping true to prompt instructions.
+                msg.textContent = '';
+                confirm_password.classList.remove('border-red-400', 'border-green-400');
+                createBtn.disabled = false;
                 return;
             }
 
             if (password.value === confirm_password.value) {
                 msg.textContent = 'Passwords match';
-                msg.className = 'validation-text valid';
-                confirm_password.classList.remove('error');
+                msg.className = 'text-xs font-bold text-green-600 mt-2 flex items-center gap-1';
+                msg.innerHTML = '<i data-lucide="check" class="w-3.5 h-3.5"></i> Passwords match';
+                confirm_password.classList.remove('border-red-400');
+                confirm_password.classList.add('border-green-400');
                 createBtn.disabled = false;
             } else {
                 msg.textContent = 'Passwords do not match';
-                msg.className = 'validation-text invalid';
-                confirm_password.classList.add('error');
+                msg.className = 'text-xs font-bold text-red-600 mt-2 flex items-center gap-1';
+                msg.innerHTML = '<i data-lucide="alert-circle" class="w-3.5 h-3.5"></i> Passwords do not match';
+                confirm_password.classList.remove('border-green-400');
+                confirm_password.classList.add('border-red-400');
                 createBtn.disabled = true;
+            }
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
             }
         }
 
         password.addEventListener('input', validatePassword);
         confirm_password.addEventListener('input', validatePassword);
 
-    </script>
-</body>
+        // Handle Loading State on Register
+        const registerForm = document.getElementById('registerForm');
+        registerForm.addEventListener('submit', () => {
+            createBtn.innerHTML = `
+                <div class="flex items-center justify-center gap-2">
+                    <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+                    </svg>
+                    <span>Creating Account...</span>
+                </div>
+            `;
+            createBtn.disabled = true;
+        });
 
-</html>
+    </script>
+{% endblock %}
