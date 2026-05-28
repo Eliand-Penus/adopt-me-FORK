@@ -63,40 +63,53 @@
         100% {
             transform: translateY(0px);
         }
-    </style>
-</head>
+    }
+</style>
+{% endblock %}
 
-<body class="bg-[#f7f7f7] overflow-x-hidden min-h-screen">
+{% block body_class %}bg-brand-bg min-h-screen overflow-x-hidden{% endblock %}
 
-    <!-- NAVBAR -->
-    <nav
-        class="fixed top-0 left-0 w-full h-24 bg-white/90 backdrop-blur-md border-b border-gray-100 z-50 flex items-center">
+{% block page_actions %}{% endblock %}
 
-        <div class="max-w-7xl w-full mx-auto px-6 flex justify-between items-center">
+{% block content %}
+<!-- MAIN -->
+<main
+    class="min-h-screen pt-[76px] flex items-center justify-center relative overflow-hidden bg-brand-bg px-4 sm:px-6 lg:px-8">
 
-            <!-- Logo -->
-            <a href="/" class="hover:scale-105 transition duration-300">
+    <!-- Background Blobs -->
+    <div
+        class="absolute top-1/4 left-1/4 w-80 h-80 bg-brand-primary/10 rounded-full mix-blend-multiply blur-3xl opacity-60 animate-blob pointer-events-none">
+    </div>
+    <div
+        class="absolute bottom-1/4 right-1/4 w-80 h-80 bg-brand-accent/10 rounded-full mix-blend-multiply blur-3xl opacity-60 animate-blob animation-delay-2000 pointer-events-none">
+    </div>
 
-                <img src="{{ url_for('static', filename='images/ADOPT_ME_LOGO.png') }}" alt="Adopt Me Logo"
-                    class="h-28 w-auto object-contain">
+    <div
+        class="max-w-6xl w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start relative z-10 py-12">
 
-            </a>
+        <!-- LEFT HERO SECTION (Hidden on mobile for super clean UI, or display nicely as grid) -->
+        <div
+            class="hidden lg:flex lg:col-span-6 flex-col justify-start items-start text-left space-y-6 animate-fade-in-up -mt-15">
 
-            <!-- Nav -->
-            <div class="hidden md:flex items-center space-x-10">
+            <h1 class="text-5xl font-black text-brand-text leading-tight tracking-tight">
+                Every pet deserves a<br>
+                <span class="text-brand-primary">
+                    loving home.
+                </span>
+            </h1>
+            <p class="text-slate-600 text-lg font-medium leading-relaxed max-w-md">
+                Find your new best friend and change a life today. Connect with thousands of verified pet shelters and
+                loving owners.
+            </p>
 
-                <a href="/" class="nav-link text-gray-600 hover:text-teal-500 font-semibold transition">
-                    Home
-                </a>
-
-                <a href="/choose-category" class="nav-link text-gray-600 hover:text-teal-500 font-semibold transition">
-                    Adopt
-                </a>
-
-                <a href="/about" class="nav-link text-gray-600 hover:text-teal-500 font-semibold transition">
-                    About
-                </a>
-
+            <!-- Floating Pet Illustration -->
+            <div class="relative w-full max-w-lg pt-4 floating flex justify-center lg:pl-10">
+                <div class="absolute inset-0 flex items-center justify-center opacity-5 scale-125">
+                    <i data-lucide="paw-print" class="w-64 h-64 text-brand-primary"></i>
+                </div>
+                <img id="heroPets" src="{{ url_for('static', filename='images/LOGIN_DOGS.png') }}" alt="Pets"
+                    class="relative z-10 w-[500%] max-w-[700px] object-contain transition-all duration-500 ease-in-out hover:scale-110 filter drop-shadow-2xl"
+                    onerror="this.style.display='none';">
             </div>
         </div>
 
