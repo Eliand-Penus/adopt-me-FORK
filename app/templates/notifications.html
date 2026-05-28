@@ -1,73 +1,117 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Adoption Requests - Adopt Me</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-50 min-h-screen text-gray-800 font-sans flex flex-col">
+{% extends 'layout/base.html' %}
 
-    <!-- Navigation -->
-    <nav class="bg-white shadow px-6 py-4">
-        <div class="max-w-6xl mx-auto flex justify-between items-center">
-            <h1 class="text-2xl font-bold text-indigo-600">Adopt Me</h1>
-            <a href="/owner-dashboard" class="text-gray-600 hover:text-indigo-600 font-medium">Back to Owner Dashboard</a>
-        </div>
-    </nav>
+{% block title %}Adoption Requests - Adopt Me{% endblock %}
 
-    <main class="flex-grow max-w-4xl mx-auto px-6 py-12 w-full">
-        <div class="flex items-center justify-between mb-8">
-            <h2 class="text-3xl font-extrabold text-gray-900">Adoption Requests</h2>
+{% block body_class %}bg-brand-bg min-h-screen text-brand-text font-sans flex flex-col pt-[76px]{% endblock %}
+
+{% block page_actions %}{% endblock %}
+
+{% block content %}
+    <main class="flex-grow max-w-4xl mx-auto px-4 sm:px-6 py-12 w-full animate-fade-in-up">
+        
+        <!-- Back Button -->
+        <a href="/owner-dashboard" class="inline-flex items-center gap-2 text-slate-500 hover:text-brand-primary font-bold text-sm transition mb-6 group">
+            <div class="w-8 h-8 rounded-full border border-slate-200 flex items-center justify-center group-hover:border-brand-primary group-hover:bg-brand-primary/5 transition">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i>
+            </div>
+            <span>Back to Owner Dashboard</span>
+        </a>
+
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-8 pb-4 border-b border-slate-100">
+            <div>
+                <h2 class="text-3xl font-extrabold text-brand-text tracking-tight flex items-center gap-2.5">
+                    <i data-lucide="bell" class="text-brand-accent w-7 h-7"></i>
+                    Adoption Requests
+                </h2>
+                <p class="text-slate-500 font-semibold text-sm mt-1">Review contact information of people interested in adopting your listed pets.</p>
+            </div>
         </div>
 
         {% if requests %}
             <div class="space-y-6">
                 {% for request in requests %}
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition">
-                        <div class="border-b bg-gray-50 px-6 py-4 flex justify-between items-center">
-                            <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
-                                <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
-                                Request for {{ request.pet.pet_name }}
+                    <div class="bg-white rounded-3xl border border-brand-border overflow-hidden shadow-sm hover:shadow-lg transition duration-300">
+                        <!-- Request Card Header -->
+                        <div class="bg-slate-50/50 px-6 py-4 flex flex-col sm:flex-row justify-between sm:items-center gap-2 border-b border-brand-border/60">
+                            <h3 class="text-base sm:text-lg font-bold text-brand-text flex items-center gap-2">
+                                <i data-lucide="heart-handshake" class="w-5 h-5 text-brand-primary"></i>
+                                <span>Request for <span class="text-brand-primary font-black">{{ request.pet.pet_name }}</span></span>
                             </h3>
-                            <span class="bg-gray-100 text-gray-600 text-sm px-3 py-1 rounded-full font-medium flex items-center gap-1.5 border border-gray-200">
-                                <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                {{ request.created_at|ph_time }}
+                            <span class="bg-white text-slate-500 text-xs px-3 py-1.5 rounded-full font-bold flex items-center gap-1.5 border border-slate-150 w-fit">
+                                <i data-lucide="clock" class="w-3.5 h-3.5 text-slate-400"></i>
+                                <span>{{ request.created_at|ph_time }}</span>
                             </span>
                         </div>
                         
-                        <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <p class="text-sm text-gray-500 mb-1">Requester Name</p>
-                                <p class="font-medium text-gray-900">{{ request.requester.first_name }} {{ request.requester.last_name }} ({{ request.requester.username }})</p>
+                        <!-- Details Grid -->
+                        <div class="p-6 grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            
+                            <!-- Requester -->
+                            <div class="flex gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 shrink-0">
+                                    <i data-lucide="user" class="w-5 h-5"></i>
+                                </div>
+                                <div class="space-y-0.5">
+                                    <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Requester Name</p>
+                                    <p class="font-bold text-brand-text text-sm sm:text-base">
+                                        {{ request.requester.first_name }} {{ request.requester.last_name }}
+                                        <span class="text-xs text-slate-400 font-semibold">(@{{ request.requester.username }})</span>
+                                    </p>
+                                </div>
                             </div>
                             
-                            <div>
-                                <p class="text-sm text-gray-500 mb-1">Email Address</p>
-                                <a href="mailto:{{ request.requester.email }}" class="font-medium text-indigo-600 hover:underline">{{ request.requester.email }}</a>
+                            <!-- Email -->
+                            <div class="flex gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 shrink-0">
+                                    <i data-lucide="mail" class="w-5 h-5"></i>
+                                </div>
+                                <div class="space-y-0.5">
+                                    <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Email Address</p>
+                                    <a href="mailto:{{ request.requester.email }}" class="font-bold text-brand-primary hover:underline text-sm sm:text-base">
+                                        {{ request.requester.email }}
+                                    </a>
+                                </div>
                             </div>
 
-                            <div>
-                                <p class="text-sm text-gray-500 mb-1">Phone Number</p>
-                                <p class="font-medium text-gray-900">{{ request.requester.phone_number }}</p>
+                            <!-- Phone -->
+                            <div class="flex gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 shrink-0">
+                                    <i data-lucide="phone" class="w-5 h-5"></i>
+                                </div>
+                                <div class="space-y-0.5">
+                                    <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Phone Number</p>
+                                    <p class="font-bold text-brand-text text-sm sm:text-base">{{ request.requester.phone_number }}</p>
+                                </div>
                             </div>
 
-                            <div>
-                                <p class="text-sm text-gray-500 mb-1">Physical Address</p>
-                                <p class="font-medium text-gray-900">{{ request.requester.address }}</p>
+                            <!-- Address -->
+                            <div class="flex gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 shrink-0">
+                                    <i data-lucide="map-pin" class="w-5 h-5"></i>
+                                </div>
+                                <div class="space-y-0.5">
+                                    <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Physical Address</p>
+                                    <p class="font-bold text-brand-text text-sm sm:text-base">{{ request.requester.address or 'No address provided' }}</p>
+                                </div>
                             </div>
                         </div>
                     </div>
                 {% endfor %}
             </div>
         {% else %}
-            <div class="bg-white p-12 text-center rounded-xl shadow-sm border border-gray-100">
-                <svg class="mx-auto h-12 w-12 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                <h3 class="text-xl font-bold text-gray-900 mb-2">No Requests Yet</h3>
-                <p class="text-gray-500">You haven't received any adoption requests for your pets.</p>
+            <!-- Empty state (no requests) -->
+            <div class="bg-white rounded-[2.5rem] border border-brand-border p-16 text-center shadow-md max-w-md mx-auto space-y-6">
+                <div class="w-16 h-16 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center mx-auto">
+                    <i data-lucide="inbox" class="w-8 h-8"></i>
+                </div>
+                <div class="space-y-2">
+                    <h3 class="text-2xl font-black text-brand-text">No Requests Yet</h3>
+                    <p class="text-slate-500 font-semibold text-sm leading-relaxed">
+                        You haven't received any adoption requests for your pets yet. We'll alert you as soon as someone expresses interest.
+                    </p>
+                </div>
             </div>
         {% endif %}
     </main>
-
-</body>
-</html>
+{% endblock %}

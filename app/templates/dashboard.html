@@ -1,87 +1,124 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Adopt Me</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-50 min-h-screen text-gray-800 font-sans flex flex-col">
+{% extends 'layout/base.html' %}
 
-    <!-- Navigation -->
-    <nav class="bg-white shadow px-6 py-4">
-        <div class="max-w-6xl mx-auto flex justify-between items-center">
-            <h1 class="text-2xl font-bold text-indigo-600">Adopt Me</h1>
-            <div class="space-x-4">
-                <a href="/" class="text-gray-600 hover:text-indigo-600 font-medium">Home</a>
-                <a href="/logout" class="text-red-600 hover:text-red-800 font-medium">Logout</a>
-            </div>
-        </div>
-    </nav>
+{% block title %}Dashboard - Adopt Me{% endblock %}
 
+{% block body_class %}bg-brand-bg min-h-screen text-brand-text font-sans flex flex-col pt-[76px]{% endblock %}
+
+{% block page_actions %}{% endblock %}
+
+{% block content %}
     <!-- Dashboard Content -->
-    <main class="flex-grow max-w-6xl mx-auto px-6 py-12 w-full">
+    <main class="flex-grow max-w-6xl mx-auto px-4 sm:px-6 py-12 w-full animate-fade-in-up">
         
-        <div class="bg-gradient-to-r from-indigo-500 to-teal-500 rounded-2xl shadow-lg p-8 mb-10 text-white">
-            <h2 class="text-4xl font-extrabold mb-2">Welcome, {{ current_user.username }}! 👋</h2>
-            <p class="text-indigo-100 text-lg">Ready to make a difference in a pet's life today?</p>
+        <!-- Welcome Premium Banner -->
+        <div class="bg-gradient-to-br from-brand-primary via-[#007d8e] to-[#005e6b] rounded-[2.5rem] p-8 sm:p-10 mb-10 text-white relative overflow-hidden shadow-xl shadow-brand-primary/15 border border-[#007d8e]/20">
+            <!-- Floating Graphic Blobs inside welcome banner -->
+            <div class="absolute -top-12 -left-12 w-48 h-48 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
+            <div class="absolute -right-6 -top-6 w-36 h-36 bg-[#ff5e1c]/20 rounded-full blur-2xl pointer-events-none"></div>
+            
+            <!-- Decorative Large SVG Paw -->
+            <div class="absolute right-0 bottom-0 translate-x-6 translate-y-6 opacity-10 pointer-events-none">
+                <i data-lucide="paw-print" class="w-72 h-72"></i>
+            </div>
+            
+            <div class="relative z-10 space-y-3">
+                <span class="inline-flex items-center gap-1.5 bg-white/20 backdrop-blur-md px-3.5 py-1.5 rounded-full text-xs font-extrabold uppercase tracking-wider">
+                    <i data-lucide="award" class="w-3.5 h-3.5"></i>
+                    Pet Lover Community Member
+                </span>
+                <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight">Welcome back, {{ current_user.username }}!</h2>
+                <p class="text-slate-100 text-sm sm:text-base font-semibold max-w-lg leading-relaxed">
+                    Ready to make a difference in a pet's life today? Browse cute animals waiting for a new family, or manage your active rehoming listings.
+                </p>
+            </div>
         </div>
 
-        <h3 class="text-2xl font-bold text-gray-900 mb-6">Quick Actions</h3>
+        <!-- Section Title -->
+        <div class="flex items-center gap-2 mb-6">
+            <div class="w-1.5 h-6 bg-brand-primary rounded-full"></div>
+            <h3 class="text-xl sm:text-2xl font-extrabold text-brand-text">Quick Actions</h3>
+        </div>
         
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <!-- Browse Pets Card -->
-            <div class="bg-white rounded-xl shadow-md p-8 hover:shadow-xl transition transform hover:-translate-y-1 border border-gray-100 flex flex-col items-start">
-                <div class="bg-indigo-100 text-indigo-600 p-4 rounded-full mb-6">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                </div>
-                <h4 class="text-xl font-bold text-gray-900 mb-2">Browse Pets</h4>
-                <p class="text-gray-500 mb-6 flex-grow">Look through our list of adorable pets currently looking for a loving home.</p>
-                <a href="/pets" class="w-full text-center bg-indigo-600 text-white font-bold py-3 rounded-lg hover:bg-indigo-700 transition">
-                    View Available Pets
-                </a>
-            </div>
-
+        <!-- Quick Actions Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 max-w-4xl mx-auto">
+            
             <!-- Owner Dashboard Card -->
-            <div class="bg-white rounded-xl shadow-md p-8 hover:shadow-xl transition transform hover:-translate-y-1 border border-gray-100 flex flex-col items-start">
-                <div class="bg-teal-100 text-teal-600 p-4 rounded-full mb-6">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+            <div class="bg-white rounded-3xl border-2 border-slate-100 hover:border-[#ff5e1c]/20 p-8 shadow-md hover:shadow-2xl hover:shadow-[#ff5e1c]/5 transition-all duration-300 flex flex-col items-start group transform hover:-translate-y-1.5 min-h-[360px]">
+                <div class="bg-[#ff5e1c]/10 text-[#ff5e1c] p-4 rounded-2xl mb-6 group-hover:scale-110 transition duration-300 shadow-inner">
+                    <i data-lucide="layout-dashboard" class="w-7 h-7"></i>
                 </div>
-                <h4 class="text-xl font-bold text-gray-900 mb-2">Pet Owner Area</h4>
-                <p class="text-gray-500 mb-6 flex-grow">Manage your uploaded pets, review adoption requests, or list a new pet.</p>
-                <a href="/owner-dashboard" class="w-full text-center bg-teal-600 text-white font-bold py-3 rounded-lg hover:bg-teal-700 transition">
-                    Go to Owner Dashboard
+                <h4 class="text-xl sm:text-2xl font-black text-brand-text mb-2 group-hover:text-[#ff5e1c] transition">Pet Owner Area</h4>
+                <p class="text-slate-500 text-sm font-semibold mb-6 flex-grow leading-relaxed">
+                    Review incoming adoption requests, manage your active pet rehoming listings, update pet profiles, or add new pets to our system.
+                </p>
+                <a href="/owner-dashboard" class="w-full text-center bg-[#ff5e1c] hover:bg-[#e04f14] text-white font-bold py-4 rounded-xl shadow-lg shadow-[#ff5e1c]/10 transition duration-200 text-sm flex items-center justify-center gap-2">
+                    <i data-lucide="user-check" class="w-4 h-4"></i>
+                    <span>Go to Owner Dashboard</span>
                 </a>
             </div>
+
+            <!-- List a Pet Card -->
+            <div class="bg-white rounded-3xl border-2 border-slate-100 hover:border-[#007d8e]/20 p-8 shadow-md hover:shadow-2xl hover:shadow-[#007d8e]/5 transition-all duration-300 flex flex-col items-start group transform hover:-translate-y-1.5 min-h-[360px]">
+                <div class="bg-brand-primary/10 text-brand-primary p-4 rounded-2xl mb-6 group-hover:scale-110 transition duration-300 shadow-inner">
+                    <i data-lucide="plus-circle" class="w-7 h-7"></i>
+                </div>
+                <h4 class="text-xl sm:text-2xl font-black text-brand-text mb-2 group-hover:text-brand-primary transition">List a Pet</h4>
+                <p class="text-slate-500 text-sm font-semibold mb-6 flex-grow leading-relaxed">
+                    Help a pet find their forever home by creating a new rehoming profile with photos, health records, and descriptions.
+                </p>
+                <a href="/add-pet" class="w-full text-center bg-brand-primary hover:bg-[#006674] text-white font-bold py-4 rounded-xl shadow-lg shadow-brand-primary/10 transition duration-200 text-sm flex items-center justify-center gap-2">
+                    <i data-lucide="plus" class="w-4 h-4"></i>
+                    <span>Create a Listing</span>
+                </a>
+            </div>
+
         </div>
 
-        <h3 class="text-2xl font-bold text-gray-900 mt-12 mb-6">Recent Notifications</h3>
+        <!-- Section Title: Notifications -->
+        <div class="flex items-center gap-2 mt-12 mb-6">
+            <div class="w-1.5 h-6 bg-brand-primary rounded-full"></div>
+            <h3 class="text-xl sm:text-2xl font-extrabold text-brand-text">Recent Updates</h3>
+        </div>
         
         {% if notifications %}
             <div class="space-y-4">
                 {% for notification in notifications %}
-                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex items-start gap-4">
-                    <div class="bg-indigo-100 text-indigo-500 rounded-full p-2 shrink-0">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <div class="bg-white rounded-2xl border border-brand-border p-5 flex items-start gap-4 hover:border-brand-primary/20 transition duration-200">
+                    <div class="bg-brand-primary/10 text-brand-primary rounded-xl p-2.5 shrink-0">
+                        <i data-lucide="bell" class="w-5 h-5"></i>
                     </div>
-                    <div>
-                        <p class="text-gray-800 font-medium">{{ notification.message }}</p>
-                        <p class="text-xs text-gray-500 mt-1 font-semibold uppercase tracking-wider">{{ notification.created_at|ph_time }}</p>
+                    <div class="space-y-1">
+                        <p class="text-brand-text font-bold text-sm sm:text-base">{{ notification.message }}</p>
+                        <div class="flex items-center gap-1.5 text-xs text-slate-400 font-bold uppercase tracking-wider">
+                            <i data-lucide="calendar" class="w-3.5 h-3.5 text-slate-400"></i>
+                            <span>{{ notification.created_at|ph_time }}</span>
+                        </div>
                     </div>
                 </div>
                 {% endfor %}
             </div>
         {% else %}
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-8 text-center text-gray-500">
-                You have no new notifications.
+            <!-- Beautiful Empty State Card -->
+            <div class="bg-white rounded-3xl border border-brand-border p-12 text-center flex flex-col items-center justify-center space-y-4">
+                <div class="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
+                    <i data-lucide="bell-off" class="w-8 h-8"></i>
+                </div>
+                <div class="space-y-1">
+                    <h4 class="text-base font-extrabold text-brand-text">All quiet for now</h4>
+                    <p class="text-slate-400 font-bold text-xs">You have no new notifications or updates in your inbox.</p>
+                </div>
             </div>
         {% endif %}
     </main>
 
     <!-- Footer -->
-    <footer class="bg-white border-t py-8 text-center text-gray-500 mt-auto">
-        <p>&copy; 2026 Adopt Me Platform. All rights reserved.</p>
+    <footer class="bg-white border-t border-brand-border py-8 text-center text-xs font-extrabold text-slate-400 mt-auto">
+        <div class="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <p>&copy; 2026 Adopt Me Platform. All rights reserved.</p>
+            <div class="flex gap-6">
+                <a href="#" class="hover:text-brand-primary transition">Privacy Policy</a>
+                <a href="#" class="hover:text-brand-primary transition">Terms of Service</a>
+            </div>
+        </div>
     </footer>
-
-</body>
-</html>
+{% endblock %}

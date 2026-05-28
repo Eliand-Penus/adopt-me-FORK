@@ -1,924 +1,642 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends 'layout/base.html' %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ pet.pet_name }} - Adopt Me</title>
+{% block title %}{{ pet.pet_name }} - Adopt Me{% endblock %}
 
-    <script src="https://cdn.tailwindcss.com"></script>
+{% block extra_head %}
+<script>
+    async function toggleFavorite(petId, btn) {
 
-    <script>
-        async function toggleFavorite(petId, btn) {
+        const isAuthenticated = {{ current_user.is_authenticated | tojson
+    }};
 
-            const isAuthenticated = {{ current_user.is_authenticated | tojson
-        }};
+    if (!isAuthenticated) {
+        window.location.href = '/login';
+        return;
+    }
 
-        if (!isAuthenticated) {
-            window.location.href = '/login';
-            return;
-        }
+    try {
 
-        try {
+        const response = await fetch(`/toggle-favorite/${petId}`, {
+            method: 'POST'
+        });
 
-            const response = await fetch(`/toggle-favorite/${petId}`, {
-                method: 'POST'
-            });
+        const result = await response.json();
 
-            const result = await response.json();
+        if (result.status === 'success') {
 
-            if (result.status === 'success') {
+            const icon = btn.querySelector('.heart-icon');
 
-                const icon = btn.querySelector('svg');
+            if (result.action === 'added') {
 
-                if (result.action === 'added') {
+                // FAVORITED
+                icon.classList.remove(
+                    'text-slate-400',
+                    'stroke-slate-400'
+                );
 
-                    icon.classList.add('text-teal-600', 'fill-current');
-                    icon.classList.remove('text-gray-400');
+                icon.classList.add(
+                    'fill-[#007d8e]',
+                    'text-[#007d8e]'
+                );
 
-                } else {
+            } else {
 
-                    icon.classList.remove('text-teal-600', 'fill-current');
-                    icon.classList.add('text-gray-400');
-                }
+                // UNFAVORITED
+                icon.classList.remove(
+                    'fill-[#007d8e]',
+                    'text-[#007d8e]'
+                );
+
+                icon.classList.add(
+                    'text-slate-400'
+                );
+
             }
 
-        } catch (error) {
+            lucide.createIcons();
 
-            console.error("Error toggling favorite", error);
         }
-        }
-    </script>
-</head>
 
-<body class="bg-[#f4f6f8] min-h-screen text-slate-700 font-sans">
+    } catch (error) {
 
-    <!-- NAVBAR -->
-    <nav
-        class="fixed top-0 left-0 w-full h-24 bg-white/90 backdrop-blur-md border-b border-gray-100 z-50 flex items-center">
+        console.error(
+            "Error toggling favorite:",
+            error
+        );
 
-        <div class="max-w-7xl w-full mx-auto px-6 flex justify-between items-center">
+    }
 
-            <!-- LOGO -->
-            <a href="/" class="hover:scale-105 transition duration-300">
+}
+</script>
+{% endblock %}
 
-                <img src="{{ url_for('static', filename='images/ADOPT_ME_LOGO.png') }}" alt="Adopt Me Logo"
-                    class="h-28 w-auto object-contain">
+{% block body_class %}bg-[#F8FAFB] min-h-screen text-slate-800 font-sans pt-[76px]{% endblock %}
 
-            </a>
+{% block page_actions %}{% endblock %}
 
-            <!-- NAV LINKS -->
-            <div class="hidden md:flex items-center space-x-10">
+{% block content %}
+<!-- MAIN -->
+<main class="max-w-6xl mx-auto px-6 py-12">
 
-                <a href="/pets" class="text-gray-600 hover:text-teal-500 font-semibold transition">
+    <div class="bg-white border border-gray-100 rounded-[2.5rem] shadow-2xl overflow-hidden">
+        <div class="grid grid-cols-1 lg:grid-cols-2">
 
-                    Back to Pets
+            <!-- LEFT SIDE: MEDIA CAROUSEL & DOCUMENTS -->
+            <div class="p-8 border-r border-gray-100 space-y-8">
 
-                </a>
-            </div>
-        </div>
-    </nav>
+                {% if pet.images %}
+                {% set image_urls = [] %}
+                {% for img in pet.images %}
+                {% set _url = img.image_path if img.image_path.startswith('http') else url_for('static',
+                filename=img.image_path) %}
+                {% set _ = image_urls.append(_url) %}
+                {% endfor %}
 
-    <!-- MAIN -->
-    <main class="max-w-6xl mx-auto px-6 pt-36 pb-12">
+                <!-- MAIN IMAGE DISPLAY -->
+                <div class="relative rounded-[2rem] overflow-hidden bg-slate-50 group border border-gray-100">
+                    <img id="main-image" src="{{ image_urls[0] }}" alt="{{ pet.pet_name }}"
+                        class="w-full h-[400px] object-cover transition-opacity duration-300">
 
-        <div class="bg-white border border-slate-200 rounded-[35px] shadow-lg overflow-hidden">
-
-            <div class="grid grid-cols-1 lg:grid-cols-2">
-
-                <!-- LEFT -->
-                <div class="p-7 border-r border-slate-200">
-
-                    {% if pet.images %}
-
-                    {% set image_urls = [] %}
-
-                    {% for img in pet.images %}
-
-                    {% set _url = img.image_path if img.image_path.startswith('http') else url_for('static',
-                    filename=img.image_path) %}
-
-                    {% set _ = image_urls.append(_url) %}
-
-                    {% endfor %}
-
-                    <!-- MAIN IMAGE -->
-                    <div class="relative rounded-[28px] overflow-hidden bg-slate-100 group">
-
-                        <img id="main-image" src="{{ image_urls[0] }}" alt="{{ pet.pet_name }}"
-                            class="w-full h-[430px] object-cover transition duration-300">
-
-                        {% if image_urls|length > 1 %}
-
-                        <!-- PREV -->
-                        <button onclick="prevMainImage()"
-                            class="absolute left-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white p-3 rounded-full opacity-0 group-hover:opacity-100 transition duration-300">
-
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M15 19l-7-7 7-7">
-                                </path>
-
-                            </svg>
-                        </button>
-
-                        <!-- NEXT -->
-                        <button onclick="nextMainImage()"
-                            class="absolute right-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white p-3 rounded-full opacity-0 group-hover:opacity-100 transition duration-300">
-
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7">
-                                </path>
-
-                            </svg>
-                        </button>
-
-                        <!-- COUNTER -->
-                        <div class="absolute bottom-4 right-4 bg-black/60 text-white px-3 py-1 rounded-full text-sm">
-
-                            <span id="image-counter">
-                                1
-                            </span>
-
-                            / {{ image_urls|length }}
-                        </div>
-
-                        {% endif %}
-                    </div>
-
-                    <!-- THUMBNAILS -->
                     {% if image_urls|length > 1 %}
+                    <!-- PREV -->
+                    <button onclick="prevMainImage()"
+                        class="absolute left-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white p-3 rounded-full opacity-0 group-hover:opacity-100 transition duration-300 cursor-pointer flex items-center justify-center">
+                        <i data-lucide="chevron-left" class="w-5 h-5"></i>
+                    </button>
 
-                    <div class="flex gap-4 mt-5">
+                    <!-- NEXT -->
+                    <button onclick="nextMainImage()"
+                        class="absolute right-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white p-3 rounded-full opacity-0 group-hover:opacity-100 transition duration-300 cursor-pointer flex items-center justify-center">
+                        <i data-lucide="chevron-right" class="w-5 h-5"></i>
+                    </button>
 
-                        {% for img_url in image_urls %}
-
-                        <img src="{{ img_url }}" onclick="changeMainImage('{{ img_url }}', {{ loop.index0 }})"
-                            class="h-24 w-24 object-cover rounded-2xl cursor-pointer border-4 border-transparent hover:border-teal-500 transition">
-
-                        {% endfor %}
-                    </div>
-
-                    {% endif %}
-
-                    {% else %}
-
+                    <!-- COUNTER BADGE -->
                     <div
-                        class="w-full h-[430px] rounded-[28px] bg-slate-100 flex items-center justify-center text-slate-400">
-
-                        No Image Available
-
+                        class="absolute bottom-4 right-4 bg-black/60 text-white px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider">
+                        <span id="image-counter">1</span> / {{ image_urls|length }}
                     </div>
-
                     {% endif %}
-
-                    <!-- MEDICAL CERTIFICATE -->
-                    <div class="mt-7">
-
-                        <h4 class="text-xl font-black text-teal-700 mb-4">
-                            Medical Certificate
-                        </h4>
-
-                        {% if pet.medical_record_file %}
-
-                        {% set med_url = pet.medical_record_file if pet.medical_record_file.startswith('http') else
-                        url_for('static', filename=pet.medical_record_file) %}
-                        {% set is_pdf = med_url.lower().endswith('.pdf') %}
-
-                        {% if is_pdf %}
-
-                        <a href="{{ med_url }}" target="_blank"
-                            class="group flex items-center justify-between bg-white border border-slate-200 hover:border-teal-400 rounded-[28px] p-5 transition duration-300 hover:shadow-lg">
-
-                            <div class="flex items-center gap-4">
-
-                                <div class="bg-red-100 text-red-600 p-4 rounded-2xl text-2xl">
-
-                                    📄
-
-                                </div>
-
-                                <div>
-
-                                    <p class="font-black text-slate-700 text-lg">
-
-                                        PDF Medical Certificate
-
-                                    </p>
-
-                                    <p class="text-sm text-slate-500">
-
-                                        Click to open certificate
-
-                                    </p>
-
-                                </div>
-                            </div>
-
-                            <div class="text-teal-600 text-2xl group-hover:translate-x-1 transition">
-
-                                →
-
-                            </div>
-                        </a>
-
-                        {% else %}
-
-                        <button onclick="openMedModal('{{ med_url }}')"
-                            class="group w-full flex items-center justify-between bg-white border border-slate-200 hover:border-teal-400 rounded-[28px] overflow-hidden transition duration-300 hover:shadow-lg">
-
-                            <div class="flex items-center gap-5">
-
-                                <img src="{{ med_url }}" alt="Medical Certificate" class="w-36 h-28 object-cover">
-
-                                <div class="text-left">
-
-                                    <p class="font-black text-slate-700 text-lg">
-
-                                        Medical Certificate
-
-                                    </p>
-
-                                    <p class="text-sm text-slate-500">
-
-                                        Click to preview certificate
-
-                                    </p>
-
-                                </div>
-                            </div>
-
-                            <div class="pr-5 text-teal-600 text-2xl group-hover:translate-x-1 transition">
-
-                                →
-
-                            </div>
-                        </button>
-
-                        {% endif %}
-
-                        {% else %}
-
-                        <div
-                            class="bg-slate-100 border border-slate-200 rounded-[28px] p-8 text-center text-slate-400 font-medium">
-
-                            No Medical Certificate Uploaded
-
-                        </div>
-
-                        {% endif %}
-                    </div>
                 </div>
 
-                <!-- RIGHT -->
-                <div class="p-8 flex flex-col">
-
-                    <!-- TOP -->
-                    <div class="flex items-start justify-between mb-4">
-
-                        <div>
-
-                            <h1 class="text-6xl font-black text-teal-700 leading-none">
-
-                                {{ pet.pet_name }}
-
-                            </h1>
-
-                            <div class="flex items-center gap-2 mt-4 text-teal-600">
-
-                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-
-                                    <path fill-rule="evenodd"
-                                        d="M5.05 3.636a7 7 0 119.9 9.9L10 18.485l-4.95-4.95a7 7 0 010-9.899z"
-                                        clip-rule="evenodd">
-                                    </path>
-
-                                </svg>
-
-                                <p class="italic font-medium">
-                                    Laguna, Philippines
-                                </p>
-                            </div>
-                        </div>
-
-                        <!-- FAVORITE -->
-                        <button onclick="toggleFavorite({{ pet.pet_id }}, this)"
-                            class="text-teal-600 hover:scale-110 transition">
-
-                            {% if is_favorite %}
-
-                            <svg class="w-10 h-10 fill-current" viewBox="0 0 24 24">
-
-                                <path
-                                    d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-
-                            </svg>
-
-                            {% else %}
-
-                            <svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="2"
-                                viewBox="0 0 24 24">
-
-                                <path
-                                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z">
-                                </path>
-
-                            </svg>
-
-                            {% endif %}
-                        </button>
-                    </div>
-
-                    <hr class="my-5 border-slate-300">
-
-                    <!-- DETAILS -->
-                    <div class="space-y-5 text-lg">
-
-                        <div class="grid grid-cols-2">
-
-                            <span class="font-black text-slate-700">
-
-                                BREED:
-
-                            </span>
-
-                            <span class="text-slate-600">
-
-                                {{ pet.breed or 'Unknown' }}
-
-                            </span>
-                        </div>
-
-                        <div class="grid grid-cols-2">
-
-                            <span class="font-black text-slate-700">
-
-                                AGE:
-
-                            </span>
-
-                            <span class="text-slate-600">
-
-                                {{ pet.age or '?' }} year old
-
-                            </span>
-                        </div>
-
-                        <div class="grid grid-cols-2">
-
-                            <span class="font-black text-slate-700">
-
-                                GENDER:
-
-                            </span>
-
-                            <span class="text-slate-600">
-
-                                {{ pet.gender or 'N/A' }}
-
-                            </span>
-                        </div>
-
-                        <div class="grid grid-cols-2">
-
-                            <span class="font-black text-slate-700">
-
-                                COLOR:
-
-                            </span>
-
-                            <span class="text-slate-600">
-
-                                {{ pet.color or 'N/A' }}
-
-                            </span>
-                        </div>
-
-                        <div class="grid grid-cols-2">
-
-                            <span class="font-black text-slate-700">
-
-                                TYPE:
-
-                            </span>
-
-                            <span class="capitalize text-slate-600">
-
-                                {{ pet.animal_type }}
-
-                            </span>
-                        </div>
-
-                        <div class="grid grid-cols-2">
-
-                            <span class="font-black text-slate-700">
-
-                                SPAYED/NEUTERED:
-
-                            </span>
-
-                            <span class="text-slate-600">
-
-                                {{ pet.spayed_neutered or 'N/A' }}
-
-                            </span>
-                        </div>
-
-                        <div class="grid grid-cols-2">
-
-                            <span class="font-black text-slate-700">
-
-                                VACCINATED:
-
-                            </span>
-
-                            <span class="text-slate-600">
-
-                                {{ pet.vaccinated or 'N/A' }}
-
-                            </span>
-                        </div>
-                    </div>
-
-                    <hr class="my-7 border-slate-300">
-
-                    <!-- TRAITS -->
-                    <div>
-
-                        <h3 class="text-3xl font-black text-teal-700 mb-5">
-
-                            Traits
-
-                        </h3>
-
-                        {% if traits_list %}
-
-                        <div class="flex flex-wrap gap-3">
-
-                            {% for trait in traits_list %}
-
-                            <span
-                                class="bg-teal-50 border border-teal-200 text-teal-700 px-5 py-2 rounded-2xl text-sm font-semibold">
-
-                                {{ trait }}
-
-                            </span>
-
-                            {% endfor %}
-                        </div>
-
-                        {% else %}
-
-                        <p class="text-slate-400">
-                            No traits provided.
-                        </p>
-
-                        {% endif %}
-                    </div>
-
-                    <!-- REASON -->
-                    {% if pet.reason_for_rehoming %}
-
-                    <div class="mt-8 bg-orange-50 border border-orange-100 rounded-2xl p-5">
-
-                        <h4 class="font-black text-orange-800 mb-2">
-
-                            Reason for Rehoming
-
-                        </h4>
-
-                        <p class="text-orange-700">
-
-                            {{ pet.reason_for_rehoming }}
-
-                        </p>
-                    </div>
-
-                    {% endif %}
-
-                    <!-- BUTTONS -->
-                    <div class="flex gap-4 mt-auto pt-10">
-
-                        <button onclick="openOwnerModal()"
-                            class="flex-1 border-2 border-teal-600 text-teal-600 hover:bg-teal-50 font-bold py-4 rounded-2xl transition">
-
-                            View Owner Information
-
-                        </button>
-
-                        {% if current_user.is_authenticated %}
-
-                        {% if pet.owner_id != current_user.user_id and pet.status == 'approved' %}
-
-                        <a href="/adopt/{{ pet.pet_id }}"
-                            class="flex-1 text-center bg-teal-600 hover:bg-teal-700 text-white font-black py-4 rounded-2xl transition">
-
-                            Adopt Me
-
-                        </a>
-
-                        {% elif pet.owner_id == current_user.user_id %}
-
-                        <div class="flex-1 bg-teal-50 text-teal-700 font-bold py-4 rounded-2xl text-center">
-
-                            This is your pet
-
-                        </div>
-
-                        {% endif %}
-
-                        {% else %}
-
-
-                        {% endif %}
-                    </div>
+                <!-- THUMBNAIL LIST -->
+                {% if image_urls|length > 1 %}
+                <div class="flex flex-wrap gap-3">
+                    {% for img_url in image_urls %}
+                    <img src="{{ img_url }}" onclick="changeMainImage('{{ img_url }}', {{ loop.index0 }})"
+                        class="h-20 w-20 object-cover rounded-xl cursor-pointer border-2 border-transparent hover:border-[#007d8e] transition duration-200">
+                    {% endfor %}
                 </div>
-            </div>
-        </div>
-    </main>
-
-    <script>
-
-        {% if pet.images %}
-
-        let petImages = [
-            {% for img in pet.images %}
-        "{{ img.image_path if img.image_path.startswith('http') else url_for('static', filename=img.image_path) }}"{% if not loop.last %}, {% endif %}
-        {% endfor %}
-    ];
-
-        let currentImageIndex = 0;
-
-        function updateMainImage() {
-
-            const mainImg = document.getElementById('main-image');
-
-            mainImg.style.opacity = '0.5';
-
-            setTimeout(() => {
-
-                mainImg.src = petImages[currentImageIndex];
-
-                document.getElementById('image-counter').innerText = currentImageIndex + 1;
-
-                mainImg.style.opacity = '1';
-
-            }, 150);
-        }
-
-        function nextMainImage() {
-
-            currentImageIndex = (currentImageIndex + 1) % petImages.length;
-
-            updateMainImage();
-        }
-
-        function prevMainImage() {
-
-            currentImageIndex = (currentImageIndex - 1 + petImages.length) % petImages.length;
-
-            updateMainImage();
-        }
-
-        function changeMainImage(src, index) {
-
-            currentImageIndex = index;
-
-            updateMainImage();
-        }
-
-        {% endif %}
-
-        // =========================
-        // OWNER MODAL
-        // =========================
-
-        function openOwnerModal() {
-
-            const ownerModal = document.getElementById('ownerModal');
-            const ownerModalContent = document.getElementById('ownerModalContent');
-
-            document.body.style.overflow = 'hidden';
-
-            ownerModal.classList.remove('hidden');
-
-            setTimeout(() => {
-
-                ownerModal.classList.remove('opacity-0');
-
-                ownerModalContent.classList.remove('scale-95');
-
-                ownerModalContent.classList.add('scale-100');
-
-            }, 10);
-        }
-
-        function closeOwnerModal() {
-
-            const ownerModal = document.getElementById('ownerModal');
-            const ownerModalContent = document.getElementById('ownerModalContent');
-
-            document.body.style.overflow = 'auto';
-
-            ownerModal.classList.add('opacity-0');
-
-            ownerModalContent.classList.remove('scale-100');
-
-            ownerModalContent.classList.add('scale-95');
-
-            setTimeout(() => {
-
-                ownerModal.classList.add('hidden');
-
-            }, 300);
-        }
-
-        // =========================
-        // VALID ID MODAL
-        // =========================
-
-        function openIdModal(url) {
-
-            const idModal = document.getElementById('idModal');
-            const idModalContent = document.getElementById('idModalContent');
-
-            document.getElementById('idModalImage').src = url;
-
-            idModal.classList.remove('hidden');
-
-            setTimeout(() => {
-
-                idModal.classList.remove('opacity-0');
-
-                idModalContent.classList.remove('scale-95');
-
-                idModalContent.classList.add('scale-100');
-
-            }, 10);
-        }
-
-        function closeIdModal() {
-
-            const idModal = document.getElementById('idModal');
-            const idModalContent = document.getElementById('idModalContent');
-
-            idModal.classList.add('opacity-0');
-
-            idModalContent.classList.remove('scale-100');
-
-            idModalContent.classList.add('scale-95');
-
-            setTimeout(() => {
-
-                idModal.classList.add('hidden');
-
-            }, 300);
-        }
-
-        // =========================
-        // MEDICAL CERTIFICATE MODAL
-        // =========================
-
-        function openMedModal(url) {
-
-            document.getElementById('medModalImage').src = url;
-
-            const medModal = document.getElementById('medModal');
-
-            medModal.classList.remove('hidden');
-
-            setTimeout(() => {
-
-                medModal.classList.remove('opacity-0');
-
-            }, 10);
-        }
-
-        function closeMedModal() {
-
-            const medModal = document.getElementById('medModal');
-
-            medModal.classList.add('opacity-0');
-
-            setTimeout(() => {
-
-                medModal.classList.add('hidden');
-
-            }, 300);
-        }
-
-        // =========================
-        // OUTSIDE CLICK CLOSE
-        // =========================
-
-        window.addEventListener('click', function (e) {
-
-            const ownerModal = document.getElementById('ownerModal');
-            const idModal = document.getElementById('idModal');
-            const medModal = document.getElementById('medModal');
-
-            if (e.target === ownerModal) {
-                closeOwnerModal();
-            }
-
-            if (e.target === idModal) {
-                closeIdModal();
-            }
-
-            if (e.target === medModal) {
-                closeMedModal();
-            }
-        });
-
-        // =========================
-        // ESC KEY CLOSE
-        // =========================
-
-        window.addEventListener('keydown', function (e) {
-
-            if (e.key === 'Escape') {
-
-                const ownerModal = document.getElementById('ownerModal');
-                const idModal = document.getElementById('idModal');
-                const medModal = document.getElementById('medModal');
-
-                if (ownerModal && !ownerModal.classList.contains('hidden')) {
-                    closeOwnerModal();
-                }
-
-                if (idModal && !idModal.classList.contains('hidden')) {
-                    closeIdModal();
-                }
-
-                if (medModal && !medModal.classList.contains('hidden')) {
-                    closeMedModal();
-                }
-            }
-        });
-
-    </script>
-
-    <!-- MEDICAL CERTIFICATE MODAL -->
-    <div id="medModal"
-        class="hidden fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 transition-opacity duration-300 opacity-0">
-
-        <div class="relative max-w-5xl w-full">
-
-            <button onclick="closeMedModal()"
-                class="absolute -top-14 right-0 bg-white/10 hover:bg-white/20 text-white rounded-full p-3 transition backdrop-blur-sm border border-white/20">
-
-                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
-                    </path>
-
-                </svg>
-            </button>
-
-            <img id="medModalImage" src="" alt="Medical Certificate"
-                class="w-full max-h-[85vh] object-contain rounded-3xl shadow-2xl border border-white/10">
-
-        </div>
-    </div>
-
-    <!-- OWNER INFO MODAL -->
-    <div id="ownerModal"
-        class="hidden fixed inset-0 z-[110] bg-black/60 backdrop-blur-md flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
-        <!-- Modal Content -->
-        <div id="ownerModalContent"
-            class="bg-white w-full max-w-2xl rounded-[32px] shadow-2xl overflow-hidden scale-95 transition-transform duration-300 max-h-[90vh] flex flex-col">
-
-            <!-- Header -->
-            <div class="flex justify-between items-center p-8 pb-5 border-b border-slate-100 flex-shrink-0">
-                <h3 class="text-3xl font-black text-teal-700">Contact Profile</h3>
-                <button onclick="closeOwnerModal()"
-                    class="text-slate-400 hover:text-red-500 bg-slate-100 hover:bg-red-50 p-3 rounded-full transition duration-300">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
-                        </path>
-                    </svg>
-                </button>
-            </div>
-
-            <!-- Body -->
-            <div class="p-8 space-y-8 overflow-y-auto">
-
-                <!-- Profile Section -->
-                <div class="flex flex-col sm:flex-row items-center sm:items-start gap-8">
-                    <!-- Avatar -->
-                    <div class="flex-shrink-0">
-                        {% set profile_img = pet.owner.profile_picture %}
-                        {% if profile_img %}
-                        {% set profile_url = profile_img if profile_img.startswith('http') else url_for('static',
-                        filename=profile_img) %}
-                        <img src="{{ profile_url }}" alt="Owner Profile"
-                            class="w-32 h-32 rounded-full object-cover shadow-lg border-4 border-teal-50">
-                        {% else %}
-                        <div
-                            class="w-32 h-32 rounded-full bg-teal-100 flex items-center justify-center text-teal-600 text-5xl font-black shadow-lg border-4 border-teal-50">
-                            {{ pet.owner.first_name[0] | upper }}
-                        </div>
-                        {% endif %}
-                    </div>
-
-                    <!-- Details -->
-                    <div class="text-center sm:text-left space-y-2">
-                        <h4 class="text-3xl font-black text-slate-800">{{ pet.owner.first_name }} {{ pet.owner.last_name
-                            }}</h4>
-                        <div class="space-y-3 mt-4 text-slate-600 text-lg">
-                            <p class="flex items-center justify-center sm:justify-start gap-3">
-                                <span class="bg-teal-50 text-teal-600 p-2 rounded-xl">📧</span>
-                                <a href="mailto:{{ pet.owner.email }}"
-                                    class="hover:text-teal-600 transition font-medium">{{ pet.owner.email }}</a>
-                            </p>
-                            <p class="flex items-center justify-center sm:justify-start gap-3">
-                                <span class="bg-teal-50 text-teal-600 p-2 rounded-xl">📞</span>
-                                <span class="font-medium">{{ pet.owner.phone_number or 'Not provided' }}</span>
-                            </p>
-                            <p class="flex items-center justify-center sm:justify-start gap-3">
-                                <span class="bg-teal-50 text-teal-600 p-2 rounded-xl">📍</span>
-                                <span class="font-medium">{{ pet.owner.address or 'Not provided' }}</span>
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Rehoming Reason -->
-                {% if pet.reason_for_rehoming %}
-                <div class="bg-teal-50/50 border border-teal-100 rounded-[28px] p-6 shadow-sm">
-                    <h5 class="text-lg font-black text-teal-800 mb-2">Why {{ pet.pet_name }} needs a new home?</h5>
-                    <p class="text-teal-900/80 leading-relaxed font-medium">
-                        {{ pet.reason_for_rehoming }}
-                    </p>
-                    <p class="text-sm text-teal-600 font-bold mt-4 text-right">— {{ pet.owner.first_name }}</p>
+                {% endif %}
+                {% else %}
+                <div
+                    class="w-full h-[400px] rounded-[2rem] bg-slate-50 flex flex-col items-center justify-center text-slate-400 border border-gray-100">
+                    <i data-lucide="image-off" class="w-12 h-12 mb-3"></i>
+                    <span class="font-bold">No Images Uploaded</span>
                 </div>
                 {% endif %}
 
-                <!-- Valid ID Section -->
-                <div>
-                    <h5 class="text-xl font-black text-slate-800 mb-4">Owner's Valid ID</h5>
-                    {% set owner_id_img = pet.owner_valid_id %}
-                    {% if not owner_id_img and pet.valid_ids and pet.valid_ids|length > 0 %}
-                    {% set owner_id_img = pet.valid_ids[0].image_path %}
-                    {% endif %}
+                <!-- MEDICAL CERTIFICATE DOC CARD -->
+                <div class="space-y-4 pt-6 border-t border-slate-100">
+                    <h4 class="text-lg font-black text-[#2A2A2A] flex items-center gap-2">
+                        <i data-lucide="shield-check" class="w-5 h-5 text-[#007d8e]"></i> Medical Certificate
+                    </h4>
 
-                    {% if owner_id_img %}
-                    {% set id_url = owner_id_img if owner_id_img.startswith('http') else url_for('static',
-                    filename=owner_id_img) %}
-                    <div class="group relative rounded-[28px] overflow-hidden cursor-pointer shadow-sm border border-slate-200 hover:shadow-xl transition duration-300 bg-slate-50"
-                        onclick="openIdModal('{{ id_url }}')">
-                        <img src="{{ id_url }}" alt="Owner Valid ID"
-                            class="w-full h-56 object-cover group-hover:scale-105 transition duration-500">
-                        <div
-                            class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition duration-300 flex items-center justify-center">
-                            <span
-                                class="bg-white/95 backdrop-blur shadow-lg text-slate-800 font-bold px-6 py-3 rounded-full opacity-0 group-hover:opacity-100 transition duration-300 transform translate-y-2 group-hover:translate-y-0 flex items-center gap-2">
-                                <svg class="w-5 h-5 text-teal-600" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7">
-                                    </path>
-                                </svg>
-                                Click to Enlarge
-                            </span>
+                    {% if pet.medical_record_file %}
+                    {% set med_url = pet.medical_record_file if pet.medical_record_file.startswith('http') else
+                    url_for('static', filename=pet.medical_record_file) %}
+                    {% set is_pdf = med_url.lower().endswith('.pdf') %}
+
+                    {% if is_pdf %}
+                    <a href="{{ med_url }}" target="_blank"
+                        class="group flex items-center justify-between bg-[#F2F5F7] border-2 border-slate-200/60 hover:border-[#007d8e] rounded-[2rem] p-6 transition duration-300 hover:shadow-lg">
+                        <div class="flex items-center gap-4">
+                            <div class="bg-red-50 text-red-500 p-3.5 rounded-2xl flex items-center justify-center shadow-inner group-hover:scale-105 transition-transform duration-200">
+                                <i data-lucide="file-text" class="w-6 h-6"></i>
+                            </div>
+                            <div>
+                                <p class="font-bold text-slate-800">PDF Medical File</p>
+                                <p class="text-xs text-slate-400 uppercase font-black tracking-wider">Click to review details</p>
+                            </div>
                         </div>
-                    </div>
+                        <div class="text-[#007d8e] group-hover:translate-x-1 transition duration-200">
+                            <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                        </div>
+                    </a>
+                    {% else %}
+                    <button onclick="openMedModal('{{ med_url }}')"
+                        class="group w-full flex items-center justify-between bg-[#F2F5F7] border-2 border-slate-200/60 hover:border-[#007d8e] rounded-[2rem] overflow-hidden transition duration-300 hover:shadow-lg cursor-pointer">
+                        <div class="flex items-center gap-5">
+                            <div class="p-1">
+                                <img src="{{ med_url }}" alt="Medical Certificate"
+                                    class="w-28 h-20 object-cover rounded-[1.5rem] border border-slate-150">
+                            </div>
+                            <div class="text-left">
+                                <p class="font-bold text-slate-800">Medical Certificate Image</p>
+                                <p class="text-xs text-slate-400 uppercase font-black tracking-wider">Click to enlarge preview</p>
+                            </div>
+                        </div>
+                        <div class="pr-6 text-[#007d8e] group-hover:translate-x-1 transition duration-200">
+                            <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                        </div>
+                    </button>
+                    {% endif %}
                     {% else %}
                     <div
-                        class="bg-slate-50 border border-slate-200 rounded-[28px] py-12 flex flex-col items-center justify-center text-slate-400">
-                        <svg class="w-12 h-12 mb-3 opacity-50 text-slate-300" fill="none" stroke="currentColor"
-                            viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2">
-                            </path>
-                        </svg>
-                        <span class="font-bold text-lg">No Valid ID Uploaded</span>
+                        class="bg-slate-50 border-2 border-dashed border-slate-200 rounded-[2rem] p-8 text-center text-slate-400 font-bold text-sm flex flex-col items-center justify-center gap-2">
+                        <i data-lucide="file-warning" class="w-8 h-8 opacity-65 text-slate-350"></i>
+                        <span>No Medical Certificate Uploaded</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- RIGHT SIDE: INFO OVERHAUL -->
+            <div class="p-8 flex flex-col justify-between space-y-8">
+
+                <!-- TITLE & HEART -->
+                <div class="space-y-4">
+                    <div class="flex items-start justify-between gap-4">
+                        <div class="space-y-2">
+                            <h1 class="text-4xl sm:text-5xl font-black text-[#2A2A2A] leading-tight">
+                                {{ pet.pet_name }}
+                            </h1>
+                            <div class="flex items-center gap-1.5 text-[#007d8e] text-sm font-bold">
+                                <i data-lucide="map-pin" class="w-4 h-4"></i>
+                                <span>Laguna, Philippines</span>
+                            </div>
+                        </div>
+
+                        <!-- FAVORITE HEART -->
+                        <button onclick="toggleFavorite({{ pet.pet_id }}, this)"
+                            class="hover:scale-110 transition duration-200 cursor-pointer flex items-center justify-center bg-[#F2F5F7] hover:bg-slate-100 p-3 rounded-full border border-gray-100 shadow-sm">
+
+                            {% if is_favorite %}
+
+                            <i data-lucide="heart" class="heart-icon w-6 h-6 fill-[#007d8e] text-[#007d8e]">
+                            </i>
+
+                            {% else %}
+
+                            <i data-lucide="heart" class="heart-icon w-6 h-6 text-slate-400">
+                            </i>
+
+                            {% endif %}
+
+                        </button>
+                    </div>
+
+                    <hr class="border-gray-100">
+                </div>
+
+                <!-- ATTRIBUTES GRID -->
+                <div
+                    class="grid grid-cols-2 gap-4 text-sm font-bold bg-[#F2F5F7] p-5 rounded-[2rem] border border-gray-100">
+                    <div class="space-y-1.5">
+                        <span class="text-[10px] text-slate-400 uppercase tracking-widest block font-black">Breed</span>
+                        <div class="flex items-center gap-1.5 text-slate-700">
+                            <i data-lucide="paw-print" class="w-4 h-4 text-[#007d8e]"></i>
+                            <span class="capitalize">{{ pet.breed or 'Unknown' }}</span>
+                        </div>
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <span class="text-[10px] text-slate-400 uppercase tracking-widest block font-black">Age</span>
+                        <div class="flex items-center gap-1.5 text-slate-700">
+                            <i data-lucide="calendar" class="w-4 h-4 text-[#007d8e]"></i>
+                            <span>{{ pet.age or '?' }} years old</span>
+                        </div>
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <span
+                            class="text-[10px] text-slate-400 uppercase tracking-widest block font-black">Gender</span>
+                        <div class="flex items-center gap-1.5 text-slate-700">
+                            <i data-lucide="venus-mars" class="w-4 h-4 text-[#ff5e1c]"></i>
+                            <span>{{ pet.gender or 'N/A' }}</span>
+                        </div>
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <span class="text-[10px] text-slate-400 uppercase tracking-widest block font-black">Color</span>
+                        <div class="flex items-center gap-1.5 text-slate-700">
+                            <i data-lucide="paint-brush" class="w-4 h-4 text-[#007d8e]"></i>
+                            <span>{{ pet.color or 'N/A' }}</span>
+                        </div>
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <span
+                            class="text-[10px] text-slate-400 uppercase tracking-widest block font-black">Spayed/Neutered</span>
+                        <div class="flex items-center gap-1.5 text-slate-700">
+                            <i data-lucide="check" class="w-4 h-4 text-emerald-500"></i>
+                            <span>{{ pet.spayed_neutered or 'N/A' }}</span>
+                        </div>
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <span
+                            class="text-[10px] text-slate-400 uppercase tracking-widest block font-black">Vaccinated</span>
+                        <div class="flex items-center gap-1.5 text-slate-700">
+                            <i data-lucide="shield-check" class="w-4 h-4 text-emerald-500"></i>
+                            <span>{{ pet.vaccinated or 'N/A' }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TRAITS -->
+                <div class="space-y-3">
+                    <h3 class="text-lg font-black text-[#2A2A2A] flex items-center gap-2">
+                        <i data-lucide="sparkles" class="w-5 h-5 text-[#ff5e1c]"></i> Personal Traits
+                    </h3>
+                    {% if traits_list %}
+                    <div class="flex flex-wrap gap-2">
+                        {% for trait in traits_list %}
+                        <span
+                            class="rounded-full px-4 py-1.5 bg-[#007d8e]/5 text-[#007d8e] border border-[#007d8e]/10 text-xs font-black uppercase tracking-wider">
+                            {{ trait }}
+                        </span>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-xs text-slate-400 italic font-semibold">No special traits declared.</p>
+                    {% endif %}
+                </div>
+
+                <!-- REASON CARD -->
+                {% if pet.reason_for_rehoming %}
+                <div class="bg-[#ff5e1c]/5 border border-[#ff5e1c]/10 rounded-[1.5rem] p-5 space-y-1.5">
+                    <h4 class="font-black text-[#ff5e1c] text-sm uppercase tracking-wider flex items-center gap-1.5">
+                        <i data-lucide="alert-circle" class="w-4 h-4"></i> Reason for Rehoming
+                    </h4>
+                    <p class="text-slate-600 text-sm font-medium leading-relaxed">
+                        {{ pet.reason_for_rehoming }}
+                    </p>
+                </div>
+                {% endif %}
+
+                <!-- BOTTOM ACTIONS -->
+                <div class="pt-4 border-t border-slate-100 flex flex-col gap-4">
+                    {% if current_user.is_authenticated %}
+                    {% if pet.owner_id == current_user.user_id %}
+                    <div
+                        class="bg-teal-50 border border-teal-100 text-[#007d8e] font-bold py-4 rounded-xl text-center text-sm flex items-center justify-center gap-1.5">
+                        <i data-lucide="info" class="w-4.5 h-4.5"></i> This is your pet listing
+                    </div>
+                    {% endif %}
+                    {% endif %}
+
+                    <button onclick="openOwnerModal()"
+                        class="w-full bg-[#007d8e] hover:bg-[#006674] text-white font-black py-4 rounded-2xl shadow-lg shadow-[#007d8e]/10 hover:shadow-xl hover:shadow-[#007d8e]/20 hover:-translate-y-0.5 transition-all duration-200 text-base cursor-pointer flex items-center justify-center gap-2">
+                        <i data-lucide="user" class="w-5 h-5"></i> VIEW OWNER INFORMATION
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</main>
+
+<!-- MEDICAL CERTIFICATE MODAL -->
+<div id="medModal"
+    class="hidden fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 transition-opacity duration-300 opacity-0">
+    <div class="relative max-w-5xl w-full">
+        <button onclick="closeMedModal()"
+            class="absolute -top-14 right-0 bg-white/10 hover:bg-white/20 text-white rounded-full p-3 transition backdrop-blur-sm border border-white/20 cursor-pointer flex items-center justify-center">
+            <i data-lucide="x" class="w-6 h-6"></i>
+        </button>
+        <img id="medModalImage" src="" alt="Medical Certificate"
+            class="w-full max-h-[85vh] object-contain rounded-[2rem] shadow-2xl border border-white/10">
+    </div>
+</div>
+
+<!-- OWNER INFO MODAL -->
+<div id="ownerModal"
+    class="hidden fixed inset-0 z-[110] bg-black/60 backdrop-blur-md flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
+    <!-- Modal Content -->
+    <div id="ownerModalContent"
+        class="bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden scale-95 transition-transform duration-300 max-h-[90vh] flex flex-col border border-gray-100">
+
+        <!-- Header -->
+        <div class="flex justify-between items-center p-8 pb-5 border-b border-gray-100 flex-shrink-0">
+            <div>
+                <h3 class="text-2xl font-black text-[#007d8e]">Contact Owner</h3>
+                <p class="text-xs text-slate-400 font-bold uppercase">Pet Rehomer Profile</p>
+            </div>
+            <button onclick="closeOwnerModal()"
+                class="text-slate-400 hover:text-red-500 bg-slate-50 hover:bg-red-50 p-2.5 rounded-full transition duration-200 cursor-pointer flex items-center justify-center border border-gray-200/50">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+        </div>
+
+        <!-- Body -->
+        <div class="p-8 space-y-6 overflow-y-auto">
+
+            <!-- Profile Section -->
+            <div class="flex flex-col sm:flex-row items-center sm:items-start gap-8">
+                <!-- Avatar -->
+                <div class="flex-shrink-0">
+                    {% set profile_img = pet.owner.profile_picture %}
+                    {% if profile_img %}
+                    {% set profile_url = profile_img if profile_img.startswith('http') else url_for('static',
+                    filename=profile_img) %}
+                    <img src="{{ profile_url }}" alt="Owner Profile"
+                        class="w-28 h-28 rounded-full object-cover shadow-lg border-4 border-teal-50">
+                    {% else %}
+                    <div
+                        class="w-28 h-28 rounded-full bg-[#007d8e]/10 flex items-center justify-center text-[#007d8e] text-4xl font-black shadow-lg border-4 border-teal-50 uppercase">
+                        {{ pet.owner.first_name[0] }}
                     </div>
                     {% endif %}
                 </div>
 
+                <!-- Details -->
+                <div class="text-center sm:text-left space-y-4 flex-grow">
+                    <h4
+                        class="text-2xl font-black text-slate-800 flex items-center justify-center sm:justify-start gap-2">
+                        {{ pet.owner.first_name }} {{ pet.owner.last_name }}
+                        <span
+                            class="bg-[#007d8e]/10 border border-[#007d8e]/20 text-[#007d8e] rounded-full p-1 flex items-center justify-center"
+                            title="Verified Rehomer">
+                            <i data-lucide="check-check" class="w-3.5 h-3.5"></i>
+                        </span>
+                    </h4>
+
+                    <div class="space-y-2 text-slate-600 text-sm font-semibold">
+                        <p class="flex items-center justify-center sm:justify-start gap-2.5">
+                            <span
+                                class="bg-[#007d8e]/5 text-[#007d8e] p-2 rounded-xl flex items-center justify-center border border-[#007d8e]/10">
+                                <i data-lucide="mail" class="w-4 h-4"></i>
+                            </span>
+                            <a href="mailto:{{ pet.owner.email }}" class="hover:text-[#007d8e] transition font-bold">{{
+                                pet.owner.email }}</a>
+                        </p>
+                        <p class="flex items-center justify-center sm:justify-start gap-2.5">
+                            <span
+                                class="bg-[#007d8e]/5 text-[#007d8e] p-2 rounded-xl flex items-center justify-center border border-[#007d8e]/10">
+                                <i data-lucide="phone" class="w-4 h-4"></i>
+                            </span>
+                            <span>{{ pet.owner.phone_number or 'Not provided' }}</span>
+                        </p>
+                        <p class="flex items-center justify-center sm:justify-start gap-2.5">
+                            <span
+                                class="bg-[#007d8e]/5 text-[#007d8e] p-2 rounded-xl flex items-center justify-center border border-[#007d8e]/10">
+                                <i data-lucide="map-pin" class="w-4 h-4"></i>
+                            </span>
+                            <span>{{ pet.owner.address or 'Not provided' }}</span>
+                        </p>
+                    </div>
+                </div>
             </div>
+
+            <!-- Rehoming Reason -->
+            {% if pet.reason_for_rehoming %}
+            <div class="bg-[#F2F5F7] border border-gray-100 rounded-[1.5rem] p-5">
+                <h5 class="text-sm font-black text-slate-700 mb-1 flex items-center gap-1.5">
+                    <i data-lucide="quote" class="w-4 h-4 text-[#ff5e1c]"></i> Why {{ pet.pet_name }} needs a new home?
+                </h5>
+                <p class="text-slate-600 leading-relaxed text-sm font-medium">
+                    "{{ pet.reason_for_rehoming }}"
+                </p>
+            </div>
+            {% endif %}
+
+            <!-- Valid ID Section -->
+            <div class="space-y-3">
+                <h5 class="text-base font-black text-slate-800 flex items-center gap-1.5">
+                    <i data-lucide="file-check" class="w-4 h-4 text-[#007d8e]"></i> Verified Rehomer ID
+                </h5>
+                {% set owner_id_img = pet.owner_valid_id %}
+                {% if not owner_id_img and pet.valid_ids and pet.valid_ids|length > 0 %}
+                {% set owner_id_img = pet.valid_ids[0].image_path %}
+                {% endif %}
+
+                {% if owner_id_img %}
+                {% set id_url = owner_id_img if owner_id_img.startswith('http') else url_for('static',
+                filename=owner_id_img) %}
+                <div class="group relative rounded-[2rem] overflow-hidden cursor-pointer shadow-sm border border-gray-200 hover:shadow-xl transition-all duration-300 bg-slate-50"
+                    onclick="openIdModal('{{ id_url }}')">
+                    <img src="{{ id_url }}" alt="Owner Valid ID"
+                        class="w-full h-44 object-cover group-hover:scale-103 transition duration-500">
+                    <div
+                        class="absolute inset-0 bg-black/0 group-hover:bg-black/25 transition duration-300 flex items-center justify-center">
+                        <span
+                            class="bg-white/95 backdrop-blur shadow-lg text-slate-800 font-bold px-5 py-2.5 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 flex items-center gap-2 text-xs">
+                            <i data-lucide="zoom-in" class="w-4 h-4 text-[#007d8e]"></i> Click to Enlarge
+                        </span>
+                    </div>
+                </div>
+                {% else %}
+                <div
+                    class="border border-dashed border-gray-200 rounded-[2rem] py-10 flex flex-col items-center justify-center text-slate-400 bg-slate-50/50">
+                    <i data-lucide="user-x" class="w-10 h-10 mb-2 opacity-60"></i>
+                    <span class="font-bold text-xs uppercase tracking-wider">No Verified ID File</span>
+                </div>
+                {% endif %}
+            </div>
+
         </div>
     </div>
+</div>
 
-    <!-- ID MODAL (For enlarging the Valid ID) -->
-    <div id="idModal"
-        class="hidden fixed inset-0 z-[120] bg-black/90 backdrop-blur-md flex items-center justify-center p-4 transition-opacity duration-300 opacity-0">
-        <div class="relative max-w-5xl w-full scale-95 transition-transform duration-300" id="idModalContent">
-            <button onclick="closeIdModal()"
-                class="absolute -top-14 right-0 bg-white/10 hover:bg-white/20 text-white rounded-full p-3 transition backdrop-blur-sm border border-white/20">
-                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
-                    </path>
-                </svg>
-            </button>
-            <img id="idModalImage" src="" alt="Valid ID Enlarged"
-                class="w-full max-h-[85vh] object-contain rounded-3xl shadow-2xl border border-white/10">
-        </div>
+<!-- ID MODAL (For enlarging the Valid ID) -->
+<div id="idModal"
+    class="hidden fixed inset-0 z-[120] bg-black/90 backdrop-blur-md flex items-center justify-center p-4 transition-opacity duration-300 opacity-0">
+    <div class="relative max-w-5xl w-full scale-95 transition-transform duration-300" id="idModalContent">
+        <button onclick="closeIdModal()"
+            class="absolute -top-14 right-0 bg-white/10 hover:bg-white/20 text-white rounded-full p-3 transition backdrop-blur-sm border border-white/20 cursor-pointer flex items-center justify-center">
+            <i data-lucide="x" class="w-6 h-6"></i>
+        </button>
+        <img id="idModalImage" src="" alt="Valid ID Enlarged"
+            class="w-full max-h-[85vh] object-contain rounded-[2rem] shadow-2xl border border-white/10">
     </div>
+</div>
+{% endblock %}
 
-</body>
+{% block extra_js %}
+<script>
+    {% if pet.images %}
+    let petImages = [
+        {% for img in pet.images %}
+    "{{ img.image_path if img.image_path.startswith('http') else url_for('static', filename=img.image_path) }}"{% if not loop.last %}, {% endif %}
+    {% endfor %}
+        ];
+    let currentImageIndex = 0;
 
-</html>
+    function updateMainImage() {
+        const mainImg = document.getElementById('main-image');
+        mainImg.style.opacity = '0.5';
+
+        setTimeout(() => {
+            mainImg.src = petImages[currentImageIndex];
+            document.getElementById('image-counter').innerText = currentImageIndex + 1;
+            mainImg.style.opacity = '1';
+        }, 150);
+    }
+
+    function nextMainImage() {
+        currentImageIndex = (currentImageIndex + 1) % petImages.length;
+        updateMainImage();
+    }
+
+    function prevMainImage() {
+        currentImageIndex = (currentImageIndex - 1 + petImages.length) % petImages.length;
+        updateMainImage();
+    }
+
+    function changeMainImage(src, index) {
+        currentImageIndex = index;
+        updateMainImage();
+    }
+    {% endif %}
+
+    // OWNER MODAL CONTROL
+    function openOwnerModal() {
+        const ownerModal = document.getElementById('ownerModal');
+        const ownerModalContent = document.getElementById('ownerModalContent');
+        document.body.style.overflow = 'hidden';
+        ownerModal.classList.remove('hidden');
+
+        setTimeout(() => {
+            ownerModal.classList.remove('opacity-0');
+            ownerModalContent.classList.remove('scale-95');
+            ownerModalContent.classList.add('scale-100');
+        }, 10);
+    }
+
+    function closeOwnerModal() {
+        const ownerModal = document.getElementById('ownerModal');
+        const ownerModalContent = document.getElementById('ownerModalContent');
+        document.body.style.overflow = 'auto';
+        ownerModal.classList.add('opacity-0');
+        ownerModalContent.classList.remove('scale-100');
+        ownerModalContent.classList.add('scale-95');
+
+        setTimeout(() => {
+            ownerModal.classList.add('hidden');
+        }, 300);
+    }
+
+    // VALID ID MODAL CONTROL
+    function openIdModal(url) {
+        const idModal = document.getElementById('idModal');
+        const idModalContent = document.getElementById('idModalContent');
+        document.getElementById('idModalImage').src = url;
+        idModal.classList.remove('hidden');
+
+        setTimeout(() => {
+            idModal.classList.remove('opacity-0');
+            idModalContent.classList.remove('scale-95');
+            idModalContent.classList.add('scale-100');
+        }, 10);
+    }
+
+    function closeIdModal() {
+        const idModal = document.getElementById('idModal');
+        const idModalContent = document.getElementById('idModalContent');
+        idModal.classList.add('opacity-0');
+        idModalContent.classList.remove('scale-100');
+        idModalContent.classList.add('scale-95');
+
+        setTimeout(() => {
+            idModal.classList.add('hidden');
+        }, 300);
+    }
+
+    // MEDICAL CERTIFICATE MODAL CONTROL
+    function openMedModal(url) {
+        document.getElementById('medModalImage').src = url;
+        const medModal = document.getElementById('medModal');
+        medModal.classList.remove('hidden');
+
+        setTimeout(() => {
+            medModal.classList.remove('opacity-0');
+        }, 10);
+    }
+
+    function closeMedModal() {
+        const medModal = document.getElementById('medModal');
+        medModal.classList.add('opacity-0');
+
+        setTimeout(() => {
+            medModal.classList.add('hidden');
+        }, 300);
+    }
+
+    // OUTSIDE MODAL CLICK CLOSES THEM
+    window.addEventListener('click', function (e) {
+        const ownerModal = document.getElementById('ownerModal');
+        const idModal = document.getElementById('idModal');
+        const medModal = document.getElementById('medModal');
+
+        if (e.target === ownerModal) {
+            closeOwnerModal();
+        }
+        if (e.target === idModal) {
+            closeIdModal();
+        }
+        if (e.target === medModal) {
+            closeMedModal();
+        }
+    });
+
+    // ESC KEY CLOSES MODALS
+    window.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+            const ownerModal = document.getElementById('ownerModal');
+            const idModal = document.getElementById('idModal');
+            const medModal = document.getElementById('medModal');
+
+            if (ownerModal && !ownerModal.classList.contains('hidden')) {
+                closeOwnerModal();
+            }
+            if (idModal && !idModal.classList.contains('hidden')) {
+                closeIdModal();
+            }
+            if (medModal && !medModal.classList.contains('hidden')) {
+                closeMedModal();
+            }
+        }
+    });
+</script>
+{% endblock %}

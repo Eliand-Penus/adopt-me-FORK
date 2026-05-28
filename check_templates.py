@@ -11,7 +11,7 @@ def check_templates():
     for root, dirs, files in os.walk('app/templates'):
         for file in files:
             if file.endswith('.html'):
-                rel_path = os.path.relpath(os.path.join(root, file), 'app/templates')
+                rel_path = os.path.relpath(os.path.join(root, file), 'app/templates').replace('\\', '/')
                 try:
                     env.parse(env.loader.get_source(env, rel_path)[0])
                     # print(f"OK: {rel_path}")
