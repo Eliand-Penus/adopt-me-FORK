@@ -104,9 +104,41 @@
 </div>
 {% endblock %}
 
-{% block content %}
-<!-- MAIN CONTAINER -->
-<main class="max-w-7xl mx-auto px-6 sm:px-[55px] py-12 flex flex-col lg:flex-row gap-10">
+            <!-- NAV LINKS -->
+            <div class="hidden md:flex items-center space-x-10">
+
+                <a href="/" class="nav-link text-gray-600 hover:text-teal-500 font-semibold transition">
+                    Home
+                </a>
+
+                <a href="/choose-category" class="nav-link text-gray-600 hover:text-teal-500 font-semibold transition">
+                    Adopt
+                </a>
+
+                <a href="/about" class="nav-link text-gray-600 hover:text-teal-500 font-semibold transition">
+                    About
+                </a>
+
+                {% if current_user.is_authenticated %}
+
+                <a href="/favorites" class="nav-link text-gray-600 hover:text-teal-500 font-semibold transition">
+                    Favorites
+                </a>
+
+                <a href="/dashboard" class="nav-link text-gray-600 hover:text-teal-500 font-semibold transition">
+                    Dashboard
+                </a>
+
+                <a href="/my-pets" class="nav-link text-gray-600 hover:text-teal-500 font-semibold transition">
+                    My Pets
+                </a>
+
+                <a href="/logout"
+                    class="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-2xl transition shadow-sm">
+                    Logout
+                </a>
+
+                {% else %}
 
     <!-- FILTER SIDEBAR -->
     <aside id="filter-sidebar"
