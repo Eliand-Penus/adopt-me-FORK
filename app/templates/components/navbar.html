@@ -42,14 +42,13 @@
 <nav class="fixed top-0 left-0 w-full bg-white/90 backdrop-blur-md border-b border-gray-100 z-50 flex items-center px-4 sm:px-[55px] justify-between shadow-sm"
     style="height: 76px;">
 
-    <!-- Clickable Logo -->
-    <a href="{{ url_for('main.home') }}" class="hover:scale-105 transition duration-300 flex items-center"
-        style="height: 67px;">
-        <img src="{{ url_for('static', filename='images/adoptme-logo.png') }}" alt="Adopt Me Logo"
-            class="w-auto object-contain" style="height: 67px; max-height: 67px;"
+    <!-- Non-Clickable Logo -->
+    <div class="flex items-center select-none" style="height: 67px;" aria-hidden="true"> <img
+            src="{{ url_for('static', filename='images/adoptme-logo.png') }}" alt="Adopt Me Logo"
+            class="w-auto object-contain" style="height: 67px; max-height: 67px;" draggable="false"
             onerror="this.style.display='none'; document.getElementById('logo-fallback-text').style.display='inline-block';">
-        <span id="logo-fallback-text" class="hidden text-2xl font-black text-[#007d8e] tracking-wider">ADOPT ME</span>
-    </a>
+        <span id="logo-fallback-text" class="hidden text-2xl font-black text-[#007d8e] tracking-wider"> ADOPT ME </span>
+    </div>
 
     <!-- Dynamic Navigation Buttons -->
     <div class="flex items-center gap-3 sm:gap-6">

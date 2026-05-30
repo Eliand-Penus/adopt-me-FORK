@@ -1,0 +1,83 @@
+================================================================================
+AI VOICE NAVIGATION SYSTEM - USER GUIDE
+================================================================================
+
+1. INTRODUCTION
+---------------
+Welcome to the AI Voice Navigation System for the Adopt Me pet adoption platform!
+This feature allows you to browse, search, and interact with the website completely
+hands-free using your voice. The assistant uses advanced speech recognition to
+understand natural language commands and navigate the site intelligently.
+
+2. SUPPORTED BROWSERS
+---------------------
+The voice assistant relies on the Web Speech API. For the best experience, please use:
+- Google Chrome (Recommended)
+- Microsoft Edge
+- Safari (macOS/iOS)
+
+Note: Firefox and some mobile browsers may have limited or no built-in support for speech recognition. If your browser does not support it, the microphone button will gracefully hide itself.
+
+3. HOW TO ACTIVATE VOICE ASSISTANT
+----------------------------------
+1. Locate the floating microphone button in the bottom-right corner of the screen.
+2. Click the button (or focus it and press Enter/Space).
+3. If this is your first time, your browser will ask for permission to use your microphone. Click "Allow".
+4. The button will begin to pulse, and an "AI Assistant: Listening..." popup will appear.
+5. Speak your command clearly into your microphone.
+6. The assistant will process your command, speak back to confirm, and perform the action.
+
+4. AVAILABLE COMMANDS
+---------------------
+The assistant understands a variety of natural phrases. You don't have to speak like a robot! It understands variations like "Go to...", "Open...", "Show...", and "Take me to...".
+
+5. NAVIGATION COMMANDS
+----------------------
+Use these commands to move around the website:
+- "Go home" or "Take me home" -> Goes to the Home page
+- "Open pets" or "Show pet catalog" -> Goes to the Pets Catalog
+- "Open dashboard" -> Goes to your User Dashboard
+- "Show favorites" -> Opens your saved Favorite pets
+- "Open applications" -> Views your adoption applications
+- "Open about" -> Goes to the About Us page
+- "Login" or "Sign in" -> Goes to the Login page
+- "Register" or "Sign up" -> Goes to the Registration page
+- "Go back" or "Return" -> Returns to the previous page
+
+6. FILTERING COMMANDS
+---------------------
+Use these commands to search for specific animals. If you are not on the pets page, the assistant will automatically take you there and apply the filters!
+- "Search dogs" or "Show dogs"
+- "Search cats" or "Show cats"
+- "Show male dogs"
+- "Show female dogs"
+- "Show male cats"
+- "Show female cats"
+- "Clear filters" or "Reset filters" -> Removes all current search filters
+
+7. SCROLLING COMMANDS
+---------------------
+Use these to navigate long pages without touching your mouse:
+- "Scroll down" or "Go down"
+- "Scroll up" or "Go up"
+- "Go to top"
+- "Go to bottom"
+
+8. UTILITY & SETTINGS COMMANDS
+------------------------------
+- "Mute" or "Quiet" -> Stops the assistant from speaking its responses out loud.
+- "Unmute" or "Speak" -> Re-enables voice feedback.
+- "Hello" or "Hi" -> Greets the AI assistant.
+
+9. TROUBLESHOOTING
+------------------
+- "It keeps saying 'Sorry, I didn't understand that'": Try speaking a bit clearer and ensure you are using one of the supported keywords (like "open", "show", "search").
+- "The microphone icon turned red": An error occurred or microphone access was denied. Ensure your browser isn't blocking microphone permissions in the URL bar.
+- "The assistant keeps repeating itself": The assistant is designed to pause listening while it speaks to prevent hearing its own voice. If issues persist, try saying "Mute".
+- "It doesn't hear me": Check your system microphone settings and ensure the correct input device is selected.
+
+10. ACCESSIBILITY NOTES
+-----------------------
+- The microphone button is fully accessible via keyboard (`Tab` to focus, `Enter` to activate).
+- State changes (listening, processing, error) are visually distinguishable.
+- Voice feedback can be completely disabled by saying "Mute" if you prefer a silent experience.
