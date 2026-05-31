@@ -1,529 +1,380 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends 'layout/base.html' %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Available Pets - Adopt Me</title>
+{% block title %}Available Pets - Adopt Me{% endblock %}
 
-    <script src="https://cdn.tailwindcss.com"></script>
+{% block extra_head %}
+<script>
+    async function toggleFavorite(petId, btn) {
+        const isAuthenticated = {{ current_user.is_authenticated | tojson
+    }};
+    if (!isAuthenticated) {
+        window.location.href = '/login';
+        return;
+    }
 
-    <script>
-        async function toggleFavorite(petId, btn) {
+    try {
+        const response = await fetch(`/toggle-favorite/${petId}`, {
+            method: 'POST'
+        });
+        const result = await response.json();
 
-            const isAuthenticated = {{ current_user.is_authenticated | tojson
-        }};
-
-        if (!isAuthenticated) {
-            window.location.href = '/login';
-            return;
-        }
-
-        try {
-
-            const response = await fetch(`/toggle-favorite/${petId}`, {
-                method: 'POST'
-            });
-
-            const result = await response.json();
-
-            if (result.status === 'success') {
-
-                const icon = btn.querySelector('svg');
-
-                if (result.action === 'added') {
-
-                    icon.classList.add('text-teal-600', 'fill-current');
-                    icon.classList.remove('text-gray-400');
-
-                } else {
-
-                    icon.classList.remove('text-teal-600', 'fill-current');
-                    icon.classList.add('text-gray-400');
-                }
+        if (result.status === 'success') {
+            const icon = btn.querySelector('.heart-icon');
+            if (result.action === 'added') {
+                icon.classList.add('text-[#007d8e]', 'fill-current');
+                icon.classList.remove('text-slate-400');
+            } else {
+                icon.classList.remove('text-[#007d8e]', 'fill-current');
+                icon.classList.add('text-slate-400');
             }
-
-        } catch (error) {
-
-            console.error("Error toggling favorite", error);
         }
-        }
-
-        function nextImage(e, btn) {
-
-            e.preventDefault();
-            e.stopPropagation();
-
-            const container = btn.closest('.group');
-            const img = container.querySelector('.pet-carousel-img');
-            const counter = container.querySelector('.carousel-counter');
-
-            const images = img.getAttribute('data-images').split(',');
-
-            let current = parseInt(img.getAttribute('data-current'));
-
-            current = (current + 1) % images.length;
-
-            img.style.opacity = '0.7';
-
-            setTimeout(() => {
-
-                img.src = images[current];
-
-                img.setAttribute('data-current', current);
-
-                if (counter) counter.innerText = current + 1;
-
-                img.style.opacity = '1';
-
-            }, 150);
+    } catch (error) {
+        console.error("Error toggling favorite", error);
+    }
         }
 
-        function prevImage(e, btn) {
+    function nextImage(e, btn) {
+        e.preventDefault();
+        e.stopPropagation();
 
-            e.preventDefault();
-            e.stopPropagation();
+        const container = btn.closest('.group-carousel');
+        const img = container.querySelector('.pet-carousel-img');
+        const counter = container.querySelector('.carousel-counter');
+        const images = img.getAttribute('data-images').split(',');
+        let current = parseInt(img.getAttribute('data-current'));
 
-            const container = btn.closest('.group');
-            const img = container.querySelector('.pet-carousel-img');
-            const counter = container.querySelector('.carousel-counter');
+        current = (current + 1) % images.length;
+        img.style.opacity = '0.7';
 
-            const images = img.getAttribute('data-images').split(',');
+        setTimeout(() => {
+            img.src = images[current];
+            img.setAttribute('data-current', current);
+            if (counter) counter.innerText = current + 1;
+            img.style.opacity = '1';
+        }, 150);
+    }
 
-            let current = parseInt(img.getAttribute('data-current'));
+    function prevImage(e, btn) {
+        e.preventDefault();
+        e.stopPropagation();
 
-            current = (current - 1 + images.length) % images.length;
+        const container = btn.closest('.group-carousel');
+        const img = container.querySelector('.pet-carousel-img');
+        const counter = container.querySelector('.carousel-counter');
+        const images = img.getAttribute('data-images').split(',');
+        let current = parseInt(img.getAttribute('data-current'));
 
-            img.style.opacity = '0.7';
+        current = (current - 1 + images.length) % images.length;
+        img.style.opacity = '0.7';
 
-            setTimeout(() => {
+        setTimeout(() => {
+            img.src = images[current];
+            img.setAttribute('data-current', current);
+            if (counter) counter.innerText = current + 1;
+            img.style.opacity = '1';
+        }, 150);
+    }
+</script>
+{% endblock %}
 
-                img.src = images[current];
+{% block body_class %}bg-[#F8FAFB] min-h-screen text-slate-800 font-sans pt-[76px]{% endblock %}
 
-                img.setAttribute('data-current', current);
-
-                if (counter) counter.innerText = current + 1;
-
-                img.style.opacity = '1';
-
-            }, 150);
-        }
-    </script>
-</head>
-
-<body class="bg-[#f4f6f8] min-h-screen text-slate-700 font-sans">
-
-    <!-- NAVBAR -->
-    <nav
-        class="fixed top-0 left-0 w-full h-24 bg-white/90 backdrop-blur-md border-b border-gray-100 z-50 flex items-center">
-
-        <div class="max-w-7xl w-full mx-auto px-6 flex justify-between items-center">
-
-            <!-- Logo -->
-            <a href="/" class="hover:scale-105 transition duration-300">
-
-                <img src="{{ url_for('static', filename='images/ADOPT_ME_LOGO.png') }}" alt="Adopt Me Logo"
-                    class="h-28 w-auto object-contain">
-
+{% block page_actions %}
+<!-- Sticky Redesigned Action Bar -->
+<div class="bg-[#F2F5F7]/80 backdrop-blur-md border-b border-gray-100 py-3 sticky top-[76px] z-40">
+    <div class="max-w-7xl mx-auto px-6 sm:px-[55px] flex justify-between sm:justify-end items-center gap-4">
+        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5 sm:hidden">
+            <i data-lucide="sparkles" class="w-4 h-4 text-[#ff5e1c]"></i> Catalog Actions
+        </span>
+        <div class="flex items-center gap-4">
+            <button onclick="document.getElementById('filter-sidebar').scrollIntoView({behavior: 'smooth'})"
+                class="lg:hidden bg-[#007d8e] hover:bg-[#006674] text-white font-bold py-2 px-4 rounded-xl shadow-sm transition-all duration-200 text-xs flex items-center gap-1.5">
+                <i data-lucide="filter" class="w-3.5 h-3.5"></i> Filters
+            </button>
+            <a href="/favorites"
+                class="bg-white hover:bg-slate-50 text-[#007d8e] border border-gray-200 font-bold py-2 px-4 rounded-xl shadow-sm hover:shadow transition-all duration-200 text-xs flex items-center gap-1.5">
+                <i data-lucide="heart" class="w-3.5 h-3.5"></i> Favorites
             </a>
+            <a href="/notifications"
+                class="text-slate-600 hover:text-[#007d8e] font-bold text-xs transition-colors duration-200 flex items-center gap-1.5">
+                <i data-lucide="mail" class="w-3.5 h-3.5"></i> My Applications
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
 
-            <!-- NAV LINKS -->
-            <div class="hidden md:flex items-center space-x-10">
+{% block content %}
+<!-- MAIN CONTAINER -->
+<main class="max-w-7xl mx-auto px-6 sm:px-[55px] py-12 flex flex-col lg:flex-row gap-10">
 
-                <a href="/" class="nav-link text-gray-600 hover:text-teal-500 font-semibold transition">
-                    Home
-                </a>
+    <!-- FILTER SIDEBAR -->
+    <aside id="filter-sidebar"
+        class="w-full lg:w-[320px] bg-white border-2 border-slate-200/60 rounded-[2.5rem] p-8 shadow-xl hover:shadow-2xl transition-all duration-300 h-fit space-y-6">
 
-                <a href="/pets" class="nav-link text-gray-600 hover:text-teal-500 font-semibold transition">
-                    Adopt
-                </a>
-
-                <a href="/about" class="nav-link text-gray-600 hover:text-teal-500 font-semibold transition">
-                    About
-                </a>
-
-                {% if current_user.is_authenticated %}
-
-                <a href="/favorites" class="nav-link text-gray-600 hover:text-teal-500 font-semibold transition">
-                    Favorites
-                </a>
-
-                <a href="/dashboard" class="nav-link text-gray-600 hover:text-teal-500 font-semibold transition">
-                    Dashboard
-                </a>
-
-                <a href="/my-pets" class="nav-link text-gray-600 hover:text-teal-500 font-semibold transition">
-                    My Pets
-                </a>
-
-                <a href="/logout"
-                    class="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-2xl transition shadow-sm">
-                    Logout
-                </a>
-
-                {% else %}
-
-                <a href="/login"
-                    class="bg-teal-600 hover:bg-teal-700 text-white px-6 py-2 rounded-2xl transition shadow-sm">
-                    Login
-                </a>
-
-                {% endif %}
+        <div class="flex items-center gap-3 border-b border-slate-100 pb-4">
+            <div class="w-10 h-10 bg-[#007d8e]/10 rounded-xl flex items-center justify-center text-[#007d8e]">
+                <i data-lucide="filter" class="w-5 h-5"></i>
+            </div>
+            <div>
+                <h3 class="text-xl font-black text-[#2A2A2A]">Filter Pets</h3>
+                <p class="text-xs text-slate-400 font-bold uppercase">Refine catalog search</p>
             </div>
         </div>
-    </nav>
 
-    <!-- MAIN -->
-    <main class="max-w-7xl mx-auto px-6 pt-36 pb-10 flex flex-col lg:flex-row gap-10">
+        <form action="/pets" method="GET" class="space-y-5">
 
-        <!-- FILTER SIDEBAR -->
-        <aside class="w-full lg:w-[300px] bg-white border border-slate-200 rounded-[30px] p-7 shadow-sm h-fit">
+            <!-- TYPE -->
+            <div class="space-y-2">
+                <label class="block text-sm font-bold text-slate-700 flex items-center gap-2">
+                    <i data-lucide="paw-print" class="w-4 h-4 text-[#007d8e]"></i> Type
+                </label>
+                <select name="type"
+                    class="w-full px-4 py-3.5 border border-slate-200 rounded-xl bg-slate-50 focus:ring-2 focus:ring-[#007d8e] focus:border-[#007d8e] focus:bg-white outline-none transition-all text-sm font-semibold text-slate-600 cursor-pointer">
+                    <option value="">Any Pet</option>
+                    <option value="dog" {% if request.args.get('type')=='dog' %}selected{% endif %}>Dog</option>
+                    <option value="cat" {% if request.args.get('type')=='cat' %}selected{% endif %}>Cat</option>
+                </select>
+            </div>
 
-            <h3 class="text-2xl font-black text-teal-700 mb-6">
-                Filter Pets
-            </h3>
+            <!-- GENDER -->
+            <div class="space-y-2">
+                <label class="block text-sm font-bold text-slate-700 flex items-center gap-2">
+                    <i data-lucide="venus-mars" class="w-4 h-4 text-[#ff5e1c]"></i> Gender
+                </label>
+                <select name="gender"
+                    class="w-full px-4 py-3.5 border border-slate-200 rounded-xl bg-slate-50 focus:ring-2 focus:ring-[#007d8e] focus:border-[#007d8e] focus:bg-white outline-none transition-all text-sm font-semibold text-slate-600 cursor-pointer">
+                    <option value="">Any Gender</option>
+                    <option value="Male" {% if request.args.get('gender')=='Male' %}selected{% endif %}>Male</option>
+                    <option value="Female" {% if request.args.get('gender')=='Female' %}selected{% endif %}>Female
+                    </option>
+                </select>
+            </div>
 
-            <form action="/pets" method="GET" class="space-y-5">
+            <!-- BREED -->
+            <div class="space-y-2">
+                <label class="block text-sm font-bold text-slate-700 flex items-center gap-2">
+                    <i data-lucide="info" class="w-4 h-4 text-[#007d8e]"></i> Preferred Breed
+                </label>
+                <input type="text" name="breed" value="{{ request.args.get('breed', '') }}"
+                    placeholder="e.g. Golden Retriever"
+                    class="w-full px-4 py-3 border border-slate-200 rounded-xl bg-slate-50 focus:ring-2 focus:ring-[#007d8e] focus:border-[#007d8e] focus:bg-white outline-none transition-all text-sm font-semibold text-slate-600">
+            </div>
 
-                <!-- TYPE -->
-                <div>
-
-                    <label class="block text-sm font-semibold mb-2">
-                        Type
-                    </label>
-
-                    <select name="type"
-                        class="w-full px-4 py-3 border border-slate-200 rounded-2xl bg-slate-50 focus:ring-2 focus:ring-teal-500 outline-none">
-
-                        <option value="">Any</option>
-
-                        <option value="dog" {% if request.args.get('type')=='dog' %}selected{% endif %}>
-                            Dog
-                        </option>
-
-                        <option value="cat" {% if request.args.get('type')=='cat' %}selected{% endif %}>
-                            Cat
-                        </option>
-
-                    </select>
-                </div>
-
-                <!-- GENDER -->
-                <div>
-
-                    <label class="block text-sm font-semibold mb-2">
-                        Gender
-                    </label>
-
-                    <select name="gender"
-                        class="w-full px-4 py-3 border border-slate-200 rounded-2xl bg-slate-50 focus:ring-2 focus:ring-teal-500 outline-none">
-
-                        <option value="">Any</option>
-
-                        <option value="Male" {% if request.args.get('gender')=='Male' %}selected{% endif %}>
-                            Male
-                        </option>
-
-                        <option value="Female" {% if request.args.get('gender')=='Female' %}selected{% endif %}>
-                            Female
-                        </option>
-
-                    </select>
-                </div>
-
-                <!-- BREED -->
-                <div>
-
-                    <label class="block text-sm font-semibold mb-2">
-                        Preferred Breed
-                    </label>
-
-                    <input type="text" name="breed" value="{{ request.args.get('breed', '') }}"
-                        placeholder="e.g. Golden Retriever"
-                        class="w-full px-4 py-3 border border-slate-200 rounded-2xl bg-slate-50 focus:ring-2 focus:ring-teal-500 outline-none">
-
-                </div>
-
-                <!-- AGE -->
+            <!-- AGE RANGE -->
+            <div class="space-y-2">
+                <label class="block text-sm font-bold text-slate-700 flex items-center gap-2">
+                    <i data-lucide="calendar" class="w-4 h-4 text-[#ff5e1c]"></i> Age Range (years)
+                </label>
                 <div class="grid grid-cols-2 gap-3">
-
-                    <div>
-
-                        <label class="block text-sm font-semibold mb-2">
-                            Min Age
-                        </label>
-
-                        <input type="number" name="min_age" value="{{ request.args.get('min_age', '') }}" min="0"
-                            placeholder="0"
-                            class="w-full px-4 py-3 border border-slate-200 rounded-2xl bg-slate-50 focus:ring-2 focus:ring-teal-500 outline-none">
-
-                    </div>
-
-                    <div>
-
-                        <label class="block text-sm font-semibold mb-2">
-                            Max Age
-                        </label>
-
-                        <input type="number" name="max_age" value="{{ request.args.get('max_age', '') }}" min="0"
-                            placeholder="20"
-                            class="w-full px-4 py-3 border border-slate-200 rounded-2xl bg-slate-50 focus:ring-2 focus:ring-teal-500 outline-none">
-
-                    </div>
-                </div>
-
-                <!-- BUTTON -->
-                <div class="pt-3">
-
-                    <button type="submit"
-                        class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 rounded-2xl transition">
-
-                        Apply Filters
-
-                    </button>
-                </div>
-
-                <div class="text-center">
-
-                    <a href="/pets" class="text-sm text-slate-500 hover:text-teal-600">
-
-                        Clear All
-
-                    </a>
-                </div>
-            </form>
-        </aside>
-
-        <!-- PETS -->
-        <section class="flex-1">
-
-            <!-- HEADER -->
-            <div class="flex items-center justify-between mb-8">
-
-                <div>
-
-                    <h2 class="text-5xl font-black text-teal-700">
-                        Find Your Companion
-                    </h2>
-
-                    <p class="text-slate-500 mt-2">
-                        Browse loving cats and dogs waiting for adoption.
-                    </p>
-
-                </div>
-
-                <div class="bg-white border border-slate-200 rounded-2xl px-5 py-3 shadow-sm">
-
-                    <span class="text-sm text-slate-500">
-                        {{ pets|length }} pets available
-                    </span>
-
+                    <input type="number" name="min_age" value="{{ request.args.get('min_age', '') }}" min="0"
+                        placeholder="Min"
+                        class="w-full px-3 py-3 border border-slate-200 rounded-xl bg-slate-50 focus:ring-2 focus:ring-[#007d8e] focus:border-[#007d8e] focus:bg-white outline-none transition-all text-sm font-semibold text-slate-600 text-center">
+                    <input type="number" name="max_age" value="{{ request.args.get('max_age', '') }}" min="0"
+                        placeholder="Max"
+                        class="w-full px-3 py-3 border border-slate-200 rounded-xl bg-slate-50 focus:ring-2 focus:ring-[#007d8e] focus:border-[#007d8e] focus:bg-white outline-none transition-all text-sm font-semibold text-slate-600 text-center">
                 </div>
             </div>
 
-            {% if pets %}
+            <!-- APPLY BUTTON -->
+            <div class="pt-4 space-y-3">
+                <button type="submit"
+                    class="w-full bg-[#007d8e] hover:bg-[#006674] text-white font-bold py-3.5 rounded-xl shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2 text-sm cursor-pointer">
+                    <i data-lucide="check" class="w-4 h-4"></i> Apply Filters
+                </button>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+                <a href="/pets"
+                    class="block w-full text-center text-xs font-bold text-slate-400 hover:text-[#007d8e] transition-colors py-2 uppercase tracking-wider">
+                    Clear Filters
+                </a>
+            </div>
+        </form>
+    </aside>
 
-                {% for pet in pets %}
+    <!-- PETS CATALOG LIST -->
+    <section class="flex-1 space-y-8">
 
-                <div
-                    class="bg-white border border-slate-200 rounded-[30px] overflow-hidden shadow-sm hover:shadow-xl transition duration-300 flex flex-col relative">
+        <!-- HEADER -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-100 pb-6">
+            <div>
+                <h2 class="text-3xl sm:text-4xl font-black text-[#2A2A2A] tracking-tight">
+                    Find Your Companion
+                </h2>
+                <p class="text-slate-500 font-medium mt-1">
+                    Browse verified, vaccinated cats and dogs looking for a safe home.
+                </p>
+            </div>
+            <div class="bg-white border border-gray-200 rounded-xl px-4 py-2.5 shadow-sm h-fit w-fit">
+                <span class="text-sm font-bold text-slate-500 flex items-center gap-1.5">
+                    <i data-lucide="paw-print" class="w-4 h-4 text-[#007d8e]"></i> {{ pets|length }} Companions
+                </span>
+            </div>
+        </div>
 
-                    <!-- FAVORITE BUTTON -->
-                    <button onclick="toggleFavorite({{ pet.pet_id }}, this)"
-                        class="absolute top-4 right-4 bg-white/90 backdrop-blur p-3 rounded-full shadow-md z-20">
+        {% if pets %}
+        <!-- CARDS GRID -->
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+            {% for pet in pets %}
+            <div
+                class="bg-white border-2 border-slate-200/60 rounded-[2.5rem] overflow-hidden shadow-md hover:shadow-2xl hover:shadow-[#007d8e]/10 transition-all duration-300 flex flex-col relative group transform hover:-translate-y-1.5">
 
-                        {% if pet.pet_id in favorite_ids %}
+                <!-- FAVORITE HEART BUTTON -->
+                <button onclick="toggleFavorite({{ pet.pet_id }}, this)"
+                    class="absolute top-6 right-6 bg-white/95 backdrop-blur border border-slate-200/60 p-3 rounded-full shadow-md z-20 hover:scale-110 transition-transform duration-200 cursor-pointer flex items-center justify-center">
+                    {% if pet.pet_id in favorite_ids %}
+                    <i data-lucide="heart" class="heart-icon w-5 h-5 text-[#007d8e] fill-current"></i>
+                    {% else %}
+                    <i data-lucide="heart"
+                        class="heart-icon w-5 h-5 text-slate-400 hover:text-[#007d8e] transition-colors"></i>
+                    {% endif %}
+                </button>
 
-                        <svg class="w-5 h-5 text-teal-600 fill-current" viewBox="0 0 24 24">
+                <!-- IMAGE CAROUSEL (Framed and Rounded) -->
+                {% if pet.images and pet.images|length > 0 %}
+                {% set images_list = [] %}
+                {% for img in pet.images %}
+                {% set _url = img.image_path if img.image_path.startswith('http') else url_for('static',
+                filename=img.image_path) %}
+                {% set _ = images_list.append(_url) %}
+                {% endfor %}
 
-                            <path
-                                d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-
-                        </svg>
-
-                        {% else %}
-
-                        <svg class="w-5 h-5 text-gray-400 hover:text-teal-600" fill="none" stroke="currentColor"
-                            stroke-width="2" viewBox="0 0 24 24">
-
-                            <path
-                                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z">
-                            </path>
-
-                        </svg>
-
-                        {% endif %}
-                    </button>
-
-                    <!-- IMAGE -->
-                    {% if pet.images and pet.images|length > 0 %}
-
-                    {% set images_list = [] %}
-
-                    {% for img in pet.images %}
-
-                    {% set _url = img.image_path if img.image_path.startswith('http') else url_for('static',
-                    filename=img.image_path) %}
-
-                    {% set _ = images_list.append(_url) %}
-
-                    {% endfor %}
-
-                    <div class="relative w-full h-64 group overflow-hidden bg-slate-100">
-
+                <div class="p-3 pb-0">
+                    <div
+                        class="relative w-full h-60 group-carousel overflow-hidden bg-slate-50 rounded-[2rem] border border-slate-100">
                         <img src="{{ images_list[0] }}" alt="{{ pet.pet_name }}"
-                            class="w-full h-64 object-cover pet-carousel-img transition-opacity duration-300"
+                            class="w-full h-60 object-cover pet-carousel-img transition-all duration-300 group-hover:scale-105"
                             data-images="{{ images_list|join(',') }}" data-current="0">
 
                         {% if images_list|length > 1 %}
-
                         <!-- PREV -->
                         <button type="button" onclick="prevImage(event, this)"
-                            class="absolute left-3 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-full p-2 transition">
-
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M15 19l-7-7 7-7">
-                                </path>
-
-                            </svg>
+                            class="absolute left-3 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-full p-2 hover:scale-105 transition cursor-pointer flex items-center justify-center">
+                            <i data-lucide="chevron-left" class="w-4 h-4"></i>
                         </button>
-
                         <!-- NEXT -->
                         <button type="button" onclick="nextImage(event, this)"
-                            class="absolute right-3 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-full p-2 transition">
-
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7">
-                                </path>
-
-                            </svg>
+                            class="absolute right-3 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-full p-2 hover:scale-105 transition cursor-pointer flex items-center justify-center">
+                            <i data-lucide="chevron-right" class="w-4 h-4"></i>
                         </button>
-
-                        <!-- COUNTER -->
-                        <div class="absolute bottom-3 right-3 bg-black/60 text-white text-xs px-3 py-1 rounded-full">
-
-                            <span class="carousel-counter">
-                                1
-                            </span>
-
-                            / {{ images_list|length }}
+                        <!-- COUNTER BADGE -->
+                        <div
+                            class="absolute bottom-3 right-3 bg-black/60 text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
+                            <span class="carousel-counter">1</span> / {{ images_list|length }}
                         </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% elif pet.pet_image %}
+                {% set img_url = pet.pet_image if pet.pet_image.startswith('http') else url_for('static',
+                filename=pet.pet_image) %}
+                <div class="p-3 pb-0">
+                    <div
+                        class="relative w-full h-60 overflow-hidden bg-slate-50 rounded-[2rem] border border-slate-100">
+                        <img src="{{ img_url }}" alt="{{ pet.pet_name }}"
+                            class="w-full h-60 object-cover group-hover:scale-105 transition-transform duration-300">
+                    </div>
+                </div>
+                {% else %}
+                <div class="p-3 pb-0">
+                    <div
+                        class="w-full h-60 bg-slate-50 rounded-[2rem] border border-slate-100 flex flex-col items-center justify-center text-slate-400">
+                        <i data-lucide="image-off" class="w-10 h-10 mb-2 text-slate-300"></i>
+                        <span class="text-xs font-semibold">No Image Available</span>
+                    </div>
+                </div>
+                {% endif %}
 
+                <!-- CONTENT DETAILS -->
+                <div class="p-6 pt-4 flex flex-col flex-grow space-y-4">
+
+                    <!-- NAME & STATUS -->
+                    <div class="flex justify-between items-start gap-2">
+                        <h3 class="text-2xl font-black text-[#2A2A2A] leading-tight">
+                            <a href="/pet/{{ pet.pet_id }}" class="hover:text-[#007d8e] transition-colors">
+                                {{ pet.pet_name }}
+                            </a>
+                        </h3>
+                        <span
+                            class="bg-[#007d8e]/10 text-[#007d8e] border border-[#007d8e]/20 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider whitespace-nowrap">
+                            Available
+                        </span>
+                    </div>
+
+                    <!-- ATTRIBUTES row of icons -->
+                    <div class="grid grid-cols-2 gap-3 text-xs font-bold text-slate-500 bg-[#F2F5F7] p-3 rounded-2xl">
+                        <div class="flex items-center gap-1.5">
+                            <i data-lucide="paw-print" class="w-3.5 h-3.5 text-[#007d8e]"></i>
+                            <span class="truncate capitalize">{{ pet.breed or 'Unknown Breed' }}</span>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <i data-lucide="venus-mars" class="w-3.5 h-3.5 text-[#ff5e1c]"></i>
+                            <span>{{ pet.gender }}</span>
+                        </div>
+                        <div class="flex items-center gap-1.5 col-span-2">
+                            <i data-lucide="calendar" class="w-3.5 h-3.5 text-[#007d8e]"></i>
+                            <span>{{ pet.age or '?' }} years old</span>
+                        </div>
+                    </div>
+
+                    <!-- TRAITS -->
+                    <div class="flex flex-wrap gap-1.5 min-h-[26px]">
+                        {% if pet.traits_list %}
+                        {% for trait in pet.traits_list[:3] %}
+                        <span
+                            class="bg-[#007d8e]/5 text-[#007d8e] border border-[#007d8e]/10 px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider">
+                            {{ trait }}
+                        </span>
+                        {% endfor %}
+                        {% else %}
+                        <span class="text-[11px] text-slate-400 italic font-semibold">No traits declared</span>
                         {% endif %}
                     </div>
 
-                    {% elif pet.pet_image %}
-
-                    {% set img_url = pet.pet_image if pet.pet_image.startswith('http') else url_for('static',
-                    filename=pet.pet_image) %}
-
-                    <img src="{{ img_url }}" alt="{{ pet.pet_name }}" class="w-full h-64 object-cover">
-
-                    {% else %}
-
-                    <div class="w-full h-64 bg-slate-100 flex items-center justify-center text-slate-400">
-                        No Image Available
-                    </div>
-
-                    {% endif %}
-
-                    <!-- CONTENT -->
-                    <div class="p-6 flex flex-col flex-grow">
-
-                        <div class="flex justify-between items-start mb-3">
-
-                            <h3 class="text-3xl font-black text-teal-700 leading-none">
-
-                                <a href="/pet/{{ pet.pet_id }}" class="hover:text-teal-800 transition">
-
-                                    {{ pet.pet_name }}
-
-                                </a>
-
-                            </h3>
-
-                            <span class="bg-teal-100 text-teal-700 rounded-full px-4 py-1 text-xs font-bold uppercase">
-
-                                Available
-
-                            </span>
-                        </div>
-
-                        <p class="text-slate-500 mb-5 capitalize">
-
-                            {{ pet.animal_type }}
-                            •
-                            {{ pet.breed or 'Unknown Breed' }}
-                            •
-                            {{ pet.age or '?' }} yrs
-
-                        </p>
-
-                        <!-- TRAITS -->
-                        <div class="flex flex-wrap gap-2 mb-6">
-
-                            {% if pet.traits_list %}
-
-                            {% for trait in pet.traits_list[:4] %}
-
-                            <span
-                                class="bg-teal-50 text-teal-700 border border-teal-200 px-3 py-1 rounded-xl text-xs font-semibold">
-
-                                {{ trait }}
-
-                            </span>
-
-                            {% endfor %}
-
-                            {% else %}
-
-                            <span class="text-sm text-slate-400">
-                                No traits listed
-                            </span>
-
-                            {% endif %}
-                        </div>
-
-                        <!-- BUTTON -->
-                        <a href="/pet/{{ pet.pet_id }}"
-                            class="block w-full text-center bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 rounded-2xl transition mt-auto">
-
-                            View Details
-
-                        </a>
-                    </div>
+                    <!-- ACTION BUTTON -->
+                    <a href="/pet/{{ pet.pet_id }}"
+                        class="block w-full text-center bg-[#007d8e] hover:bg-[#006674] text-white font-bold py-3.5 rounded-xl transition shadow-md hover:shadow-lg hover:-translate-y-0.5 duration-200 mt-auto text-sm">
+                        View Details
+                    </a>
                 </div>
-
-                {% endfor %}
             </div>
-
-            {% else %}
-
-            <div class="bg-white border border-slate-200 rounded-[30px] p-16 text-center shadow-sm">
-
-                <h3 class="text-3xl font-black text-teal-700 mb-3">
-                    No Pets Found
-                </h3>
-
-                <p class="text-slate-500 mb-6">
-                    Try adjusting your filters.
+            {% endfor %}
+        </div>
+        {% else %}
+        <!-- NO PETS FOUND STATE -->
+        <div class="bg-white border border-gray-100 rounded-[2.5rem] p-16 text-center shadow-md space-y-6">
+            <div
+                class="w-16 h-16 bg-[#ff5e1c]/10 text-[#ff5e1c] rounded-full flex items-center justify-center mx-auto shadow-sm">
+                <i data-lucide="frown" class="w-8 h-8"></i>
+            </div>
+            <div class="space-y-2">
+                <h3 class="text-2xl font-black text-[#2A2A2A]">No Companions Found</h3>
+                <p class="text-slate-500 font-medium max-w-md mx-auto">
+                    We couldn't find any pets matching your active filter choices. Try clearing filters or tweaking
+                    age/gender.
                 </p>
-
-                <a href="/pets" class="bg-teal-600 hover:bg-teal-700 text-white px-6 py-3 rounded-2xl transition">
-
-                    Clear Filters
-
-                </a>
             </div>
+            <a href="/pets"
+                class="inline-flex items-center gap-2 bg-[#007d8e] hover:bg-[#006674] text-white px-6 py-3 rounded-xl font-bold shadow transition-all duration-200 text-sm">
+                <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Clear All Filters
+            </a>
+        </div>
+        {% endif %}
+    </section>
+</main>
 
-            {% endif %}
-        </section>
-    </main>
-</body>
-
-</html>
+<!-- FOOTER -->
+<footer class="bg-white border-t border-gray-100 py-12 text-center text-slate-400 mt-auto px-6">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-6">
+        <span class="text-xs font-black text-[#007d8e] tracking-wider uppercase">ADOPT ME PLATFORM</span>
+        <p class="text-sm font-semibold text-slate-400">&copy; 2026 Adopt Me Platform. All rights reserved.</p>
+        <div class="flex gap-4">
+            <a href="#" class="text-slate-400 hover:text-[#007d8e] transition-colors"><i data-lucide="instagram"
+                    class="w-4 h-4"></i></a>
+            <a href="#" class="text-slate-400 hover:text-[#007d8e] transition-colors"><i data-lucide="twitter"
+                    class="w-4 h-4"></i></a>
+            <a href="#" class="text-slate-400 hover:text-[#007d8e] transition-colors"><i data-lucide="facebook"
+                    class="w-4 h-4"></i></a>
+        </div>
+    </div>
+</footer>
+{% endblock %}

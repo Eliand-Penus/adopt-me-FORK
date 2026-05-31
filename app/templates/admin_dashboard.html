@@ -1,63 +1,85 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends 'layout/base.html' %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Adopt Me</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+{% block title %}Admin Dashboard - Adopt Me{% endblock %}
+
+{% block extra_head %}
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
+    <style>
+        /* Smooth transitions */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .animate-fade-in-up {
+            animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+    </style>
+{% endblock %}
 
-<body class="bg-gray-100 min-h-screen text-gray-800 font-sans">
+{% block body_class %}bg-brand-bg min-h-screen text-brand-text font-sans flex flex-col{% endblock %}
 
-    <!-- Admin Navigation -->
-    <nav class="bg-gray-900 shadow px-6 py-4 mb-8 text-white">
-        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
-            <h1 class="text-2xl font-bold">Adopt Me <span class="text-indigo-400">Admin</span></h1>
-            <div class="space-x-2 sm:space-x-4 flex flex-wrap justify-center">
-                <a href="/admin" class="text-indigo-400 font-bold transition">Dashboard</a>
-                <a href="/admin/users" class="hover:text-indigo-400 font-medium transition">Manage Users</a>
-                <a href="/admin/export/xml" class="hover:text-indigo-400 font-medium transition">Export XML</a>
-                <a href="/admin/logout" class="text-red-400 hover:text-red-300 font-medium transition">Logout</a>
+{% block page_actions %}{% endblock %}
+
+{% block content %}
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 py-12 w-full animate-fade-in-up">
+        
+        <!-- Header -->
+        <div class="mb-10 text-left">
+            <div class="inline-flex items-center gap-2 bg-brand-primary/10 text-brand-primary px-3.5 py-1.5 rounded-full text-xs font-extrabold uppercase tracking-wider mb-3">
+                <i data-lucide="shield" class="w-3.5 h-3.5"></i>
+                Administrative Portal
             </div>
+            <h2 class="text-3xl sm:text-4xl font-extrabold text-brand-text tracking-tight">Platform Management</h2>
+            <p class="text-slate-500 font-semibold text-sm sm:text-base mt-1.5">
+                Review and approve listed pet profiles and monitor platform performance.
+            </p>
         </div>
-    </nav>
-
-    <main class="max-w-7xl mx-auto px-6 mb-12">
-        <h2 class="text-3xl font-extrabold text-gray-900 mb-8">Pet Management</h2>
 
         <!-- Analytics Section -->
         <section class="mb-12">
-            <h3 class="text-xl font-bold text-gray-800 border-b pb-2 mb-6">Platform Analytics</h3>
-            <div
-                class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 flex flex-col md:flex-row items-center gap-8">
+            <div class="flex items-center gap-2 mb-6">
+                <div class="w-1.5 h-6 bg-brand-primary rounded-full"></div>
+                <h3 class="text-xl font-extrabold text-brand-text">Platform Analytics</h3>
+            </div>
+            
+            <div class="bg-white p-6 sm:p-8 rounded-[2rem] border border-brand-border shadow-sm flex flex-col lg:flex-row items-center gap-8">
                 <!-- Statistic Cards -->
-                <div class="grid grid-cols-2 md:grid-cols-3 gap-4 w-full md:w-2/3">
-                    <div class="bg-indigo-50 p-4 rounded-lg border border-indigo-100 text-center">
-                        <p class="text-sm font-semibold text-indigo-600 uppercase">Pending</p>
-                        <p class="text-3xl font-bold text-gray-900">{{ stats.pending }}</p>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 w-full lg:w-2/3">
+                    <div class="bg-brand-primary/10 p-5 rounded-2xl border border-brand-primary/20 text-center col-span-2 sm:col-span-1 md:col-span-2 shadow-sm flex flex-col justify-center">
+                        <p class="text-xs font-bold text-brand-primary uppercase tracking-wider mb-1">Total Pets</p>
+                        <p class="text-4xl font-black text-brand-primary">{{ stats.total_pets | default(0) }}</p>
                     </div>
-                    <div class="bg-green-50 p-4 rounded-lg border border-green-100 text-center">
-                        <p class="text-sm font-semibold text-green-600 uppercase">Approved</p>
-                        <p class="text-3xl font-bold text-gray-900">{{ stats.approved }}</p>
+                    <div class="bg-brand-secondary p-5 rounded-2xl border border-brand-border text-center col-span-2 sm:col-span-1 md:col-span-2 shadow-sm flex flex-col justify-center">
+                        <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Total Users</p>
+                        <p class="text-4xl font-black text-slate-700">{{ stats.total_users | default(0) }}</p>
                     </div>
-                    <div class="bg-red-50 p-4 rounded-lg border border-red-100 text-center">
-                        <p class="text-sm font-semibold text-red-600 uppercase">Rejected</p>
-                        <p class="text-3xl font-bold text-gray-900">{{ stats.rejected }}</p>
+
+                    <div class="bg-amber-50 p-4 rounded-xl border border-amber-100 text-center shadow-sm">
+                        <p class="text-[10px] font-extrabold text-amber-700 uppercase tracking-wider">Pending</p>
+                        <p class="text-2xl font-black text-amber-800">{{ stats.pending | default(0) }}</p>
                     </div>
-                    <div class="bg-teal-50 p-4 rounded-lg border border-teal-100 text-center">
-                        <p class="text-sm font-semibold text-teal-600 uppercase">Adopted</p>
-                        <p class="text-3xl font-bold text-gray-900">{{ stats.adopted }}</p>
+                    <div class="bg-green-50 p-4 rounded-xl border border-green-150 text-center shadow-sm">
+                        <p class="text-[10px] font-extrabold text-green-700 uppercase tracking-wider">Approved</p>
+                        <p class="text-2xl font-black text-green-800">{{ stats.approved | default(0) }}</p>
                     </div>
-                    <div class="bg-gray-100 p-4 rounded-lg border border-gray-200 text-center">
-                        <p class="text-sm font-semibold text-gray-600 uppercase">Cancelled</p>
-                        <p class="text-3xl font-bold text-gray-900">{{ stats.cancelled }}</p>
+                    <div class="bg-red-50 p-4 rounded-xl border border-red-150 text-center shadow-sm">
+                        <p class="text-[10px] font-extrabold text-red-700 uppercase tracking-wider">Rejected</p>
+                        <p class="text-2xl font-black text-red-800">{{ stats.rejected | default(0) }}</p>
+                    </div>
+                    <div class="bg-brand-primary/5 p-4 rounded-xl border border-brand-primary/15 text-center shadow-sm">
+                        <p class="text-[10px] font-extrabold text-brand-primary uppercase tracking-wider">Adopted</p>
+                        <p class="text-2xl font-black text-brand-primary">{{ stats.adopted | default(0) }}</p>
                     </div>
                 </div>
 
-                <!-- Chart -->
-                <div class="w-full md:w-1/3 h-64 flex justify-center">
+                <!-- Chart container -->
+                <div class="w-full lg:w-1/3 h-56 flex justify-center relative items-center">
                     <canvas id="petStatusChart"></canvas>
                 </div>
             </div>
@@ -65,366 +87,375 @@
 
         <!-- Pending Pets -->
         <section class="mb-12">
-            <h3 class="text-xl font-bold text-gray-800 border-b pb-2 mb-6">Pending Submissions</h3>
+            <div class="flex items-center gap-2 mb-6">
+                <div class="w-1.5 h-6 bg-brand-accent rounded-full"></div>
+                <h3 class="text-xl font-extrabold text-brand-text">Pending Submissions</h3>
+            </div>
 
             {% if pending_pets %}
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                 {% for pet in pending_pets %}
-                <div class="bg-white rounded-lg shadow border border-gray-200 overflow-hidden flex flex-col">
-                    {% if pet.images %}
-                    {% set first_img = pet.images[0].image_path %}
-                    {% set main_url = first_img if first_img.startswith('http') else url_for('static',
-                    filename=first_img) %}
-                    <img src="{{ main_url }}" alt="{{ pet.pet_name }}" class="w-full h-40 object-cover">
-                    {% if pet.images|length > 1 %}
-                    <div class="bg-gray-100 text-xs text-center py-1 text-gray-500 font-medium">
-                        +{{ pet.images|length - 1 }} more image(s)
+                <div class="bg-white rounded-[2rem] border border-brand-border overflow-hidden flex flex-col shadow-sm hover:shadow-lg transition duration-300">
+                    
+                    <!-- Cover Image -->
+                    <div class="relative w-full h-44 overflow-hidden bg-slate-50 border-b border-brand-border/40">
+                        {% if pet.images %}
+                            {% set first_img = pet.images[0].image_path %}
+                            {% set main_url = first_img if first_img.startswith('http') else url_for('static', filename=first_img) %}
+                            <img src="{{ main_url }}" alt="{{ pet.pet_name }}" class="w-full h-44 object-cover">
+                            {% if pet.images|length > 1 %}
+                                <div class="absolute bottom-2.5 right-2.5 bg-black/60 text-white text-[10px] font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wider z-10">
+                                    +{{ pet.images|length - 1 }} More Photos
+                                </div>
+                            {% endif %}
+                        {% elif pet.pet_image %}
+                            {% set main_url = pet.pet_image if pet.pet_image.startswith('http') else url_for('static', filename=pet.pet_image) %}
+                            <img src="{{ main_url }}" alt="{{ pet.pet_name }}" class="w-full h-44 object-cover">
+                        {% else %}
+                            <div class="w-full h-44 flex flex-col items-center justify-center text-slate-400">
+                                <i data-lucide="image-off" class="w-8 h-8 mb-1 text-slate-300"></i>
+                                <span class="text-xs font-semibold">No Image</span>
+                            </div>
+                        {% endif %}
                     </div>
-                    {% endif %}
-                    {% elif pet.pet_image %}
-                    {% set main_url = pet.pet_image if pet.pet_image.startswith('http') else url_for('static',
-                    filename=pet.pet_image) %}
-                    <img src="{{ main_url }}" alt="{{ pet.pet_name }}" class="w-full h-40 object-cover">
-                    {% else %}
-                    <div class="w-full h-40 bg-gray-200 flex items-center justify-center text-gray-400">No Image</div>
-                    {% endif %}
 
-                    <div class="p-5 flex-grow">
-                        <h4 class="text-lg font-bold text-gray-900 mb-1">{{ pet.pet_name }}</h4>
-                        <p class="text-sm text-gray-600 capitalize mb-4">{{ pet.animal_type }} • {{ pet.breed or
-                            'Unknown' }} • {{ pet.age or '?' }} yrs</p>
+                    <!-- Card Body -->
+                    <div class="p-6 flex-grow flex flex-col justify-between">
+                        <div class="space-y-1">
+                            <h4 class="text-xl font-bold text-brand-text">{{ pet.pet_name }}</h4>
+                            <div class="flex flex-wrap gap-1.5 text-xs text-slate-500 font-bold capitalize">
+                                <span class="bg-brand-secondary px-2.5 py-1 rounded-lg">{{ pet.animal_type }}</span>
+                                <span class="bg-brand-secondary px-2.5 py-1 rounded-lg">{{ pet.breed or 'Unknown' }}</span>
+                                <span class="bg-brand-secondary px-2.5 py-1 rounded-lg">{{ pet.age or '?' }} yrs</span>
+                            </div>
+                        </div>
 
                         <button onclick="openPetModal('{{ pet.pet_id }}')"
-                            class="w-full bg-indigo-50 text-indigo-700 font-bold py-2 px-4 rounded hover:bg-indigo-100 transition mb-4">
-                            Review Details & Documents
+                                class="w-full mt-6 bg-brand-primary/10 hover:bg-brand-primary text-brand-primary hover:text-white font-bold py-3 px-4 rounded-xl text-xs transition flex items-center justify-center gap-1.5 cursor-pointer border border-brand-primary/10">
+                            <i data-lucide="file-search" class="w-4 h-4"></i>
+                            <span>Review Documents</span>
                         </button>
                     </div>
 
-                    <div class="bg-gray-50 p-4 border-t flex flex-col gap-2">
-                        <div class="flex justify-between gap-3">
-                            <a href="/admin/approve-pet/{{ pet.pet_id }}"
-                                class="flex-1 bg-green-600 text-white text-center font-bold py-2 px-4 rounded hover:bg-green-700 transition">Approve</a>
-                            <a href="/admin/reject-pet/{{ pet.pet_id }}"
-                                class="flex-1 bg-red-600 text-white text-center font-bold py-2 px-4 rounded hover:bg-red-700 transition">Reject</a>
-                        </div>
+                    <!-- Action buttons -->
+                    <div class="bg-slate-50/50 p-4 border-t border-brand-border flex gap-3">
+                        <a href="/admin/approve-pet/{{ pet.pet_id }}"
+                           class="flex-1 bg-green-600 hover:bg-green-700 text-white text-center font-bold py-2.5 px-4 rounded-xl text-sm transition shadow-md shadow-green-600/10 flex items-center justify-center gap-1">
+                            <i data-lucide="check" class="w-4 h-4"></i>
+                            <span>Approve</span>
+                        </a>
+                        <a href="/admin/reject-pet/{{ pet.pet_id }}"
+                           class="flex-1 bg-red-600 hover:bg-red-700 text-white text-center font-bold py-2.5 px-4 rounded-xl text-sm transition shadow-md shadow-red-600/10 flex items-center justify-center gap-1">
+                            <i data-lucide="x" class="w-4 h-4"></i>
+                            <span>Reject</span>
+                        </a>
                     </div>
                 </div>
 
-                <!-- Pet Modal -->
-                <div id="pet-modal-{{ pet.pet_id }}" class="fixed inset-0 z-50 hidden flex items-center justify-center">
+                <!-- Pet Modal Overlay -->
+                <div id="pet-modal-{{ pet.pet_id }}" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
                     <!-- Backdrop -->
-                    <div class="absolute inset-0 bg-black bg-opacity-40 backdrop-blur-sm"
-                        onclick="closePetModal('{{ pet.pet_id }}')"></div>
+                    <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+                         onclick="closePetModal('{{ pet.pet_id }}')"></div>
 
-                    <!-- Modal Content -->
-                    <div
-                        class="bg-white rounded-xl shadow-2xl w-11/12 max-w-2xl mx-auto z-10 overflow-hidden flex flex-col max-h-[90vh]">
-                        <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
-                            <h3 class="text-xl font-extrabold text-gray-900">Review: {{ pet.pet_name }}</h3>
+                    <!-- Modal Container -->
+                    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-2xl mx-auto z-10 overflow-hidden flex flex-col max-h-[85vh] border border-brand-border animate-fade-in-up">
+                        <div class="px-6 py-4 border-b border-brand-border/60 flex justify-between items-center bg-slate-50">
+                            <h3 class="text-lg font-black text-brand-text flex items-center gap-2">
+                                <i data-lucide="file-text" class="w-5 h-5 text-brand-primary"></i>
+                                <span>Review Profile: {{ pet.pet_name }}</span>
+                            </h3>
                             <button onclick="closePetModal('{{ pet.pet_id }}')"
-                                class="text-gray-400 hover:text-gray-600 focus:outline-none transition">
-                                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M6 18L18 6M6 6l12 12"></path>
-                                </svg>
+                                    class="text-slate-400 hover:text-slate-650 transition p-1 bg-white border border-slate-200 rounded-full hover:shadow-sm">
+                                <i data-lucide="x" class="w-4 h-4"></i>
                             </button>
                         </div>
 
-                        <div class="p-6 overflow-y-auto">
+                        <!-- Modal Scrollable Content -->
+                        <div class="p-6 overflow-y-auto space-y-6">
+                            
+                            <!-- Slider Images -->
                             {% if pet.images and pet.images|length > 1 %}
-                            <div class="mb-6">
-                                <h4 class="text-sm font-bold text-gray-500 uppercase mb-2">Pet Images</h4>
-                                <div class="relative group h-64 bg-gray-100 rounded border border-gray-300 overflow-hidden">
+                            <div class="space-y-2">
+                                <h4 class="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Pet Photos</h4>
+                                <div class="relative group h-64 bg-slate-950 rounded-2xl overflow-hidden border border-slate-800">
                                     {% for img in pet.images %}
                                     {% set img_url = img.image_path if img.image_path.startswith('http') else url_for('static', filename=img.image_path) %}
                                     <div class="absolute inset-0 transition-opacity duration-300 pet-image-slide-{{ pet.pet_id }} {% if loop.first %}opacity-100 z-10{% else %}opacity-0 z-0{% endif %} flex items-center justify-center">
-                                        <a href="{{ img_url }}" target="_blank" class="w-full h-full flex items-center justify-center">
+                                        <a href="{{ img_url }}" target="_blank" class="w-full h-full flex items-center justify-center bg-slate-900/40">
                                             <img src="{{ img_url }}" class="max-w-full max-h-full object-contain" alt="Pet Image">
                                         </a>
                                     </div>
                                     {% endfor %}
                                     
-                                    <button onclick="prevAdminSlide('pet-image-slide-{{ pet.pet_id }}')" class="absolute left-2 top-1/2 -translate-y-1/2 z-20 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition opacity-0 group-hover:opacity-100 focus:outline-none">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                                    <button onclick="prevAdminSlide('pet-image-slide-{{ pet.pet_id }}')" 
+                                            class="absolute left-3 top-1/2 -translate-y-1/2 z-20 bg-black/40 hover:bg-black/60 text-white p-2.5 rounded-full hover:scale-105 transition focus:outline-none flex items-center justify-center cursor-pointer">
+                                        <i data-lucide="chevron-left" class="w-5 h-5"></i>
                                     </button>
-                                    <button onclick="nextAdminSlide('pet-image-slide-{{ pet.pet_id }}')" class="absolute right-2 top-1/2 -translate-y-1/2 z-20 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition opacity-0 group-hover:opacity-100 focus:outline-none">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                                    <button onclick="nextAdminSlide('pet-image-slide-{{ pet.pet_id }}')" 
+                                            class="absolute right-3 top-1/2 -translate-y-1/2 z-20 bg-black/40 hover:bg-black/60 text-white p-2.5 rounded-full hover:scale-105 transition focus:outline-none flex items-center justify-center cursor-pointer">
+                                        <i data-lucide="chevron-right" class="w-5 h-5"></i>
                                     </button>
                                 </div>
                             </div>
                             {% endif %}
 
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                                <div>
-                                    <h4 class="text-sm font-bold text-gray-500 uppercase mb-2">Pet Details</h4>
-                                    <ul class="text-sm space-y-1">
-                                        <li><strong>Type:</strong> <span class="capitalize">{{ pet.animal_type }}</span>
-                                        </li>
-                                        <li><strong>Breed:</strong> {{ pet.breed or 'Unknown' }}</li>
-                                        <li><strong>Age:</strong> {{ pet.age or '?' }}</li>
-                                        <li><strong>Gender:</strong> {{ pet.gender or 'N/A' }}</li>
-                                        <li><strong>Color:</strong> {{ pet.color or 'N/A' }}</li>
-                                    </ul>
+                            <!-- Details Table Grid -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="space-y-2">
+                                    <h4 class="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Specifications</h4>
+                                    <div class="bg-brand-secondary/60 rounded-2xl p-4 border border-brand-border text-sm font-semibold space-y-2 text-slate-600">
+                                        <div class="flex justify-between"><span class="text-slate-400">Type:</span> <span class="capitalize text-brand-text font-bold">{{ pet.animal_type }}</span></div>
+                                        <div class="flex justify-between"><span class="text-slate-400">Breed:</span> <span class="text-brand-text font-bold">{{ pet.breed or 'Unknown' }}</span></div>
+                                        <div class="flex justify-between"><span class="text-slate-400">Age:</span> <span class="text-brand-text font-bold">{{ pet.age or '?' }} yrs</span></div>
+                                        <div class="flex justify-between"><span class="text-slate-400">Gender:</span> <span class="text-brand-text font-bold">{{ pet.gender or 'N/A' }}</span></div>
+                                        <div class="flex justify-between"><span class="text-slate-400">Color:</span> <span class="text-brand-text font-bold">{{ pet.color or 'N/A' }}</span></div>
+                                    </div>
                                 </div>
 
                                 {% if pet.reason_for_rehoming %}
-                                <div>
-                                    <h4 class="text-sm font-bold text-gray-500 uppercase mb-2">Reason for Rehoming</h4>
-                                    <p class="text-sm text-gray-800 bg-orange-50 p-3 rounded border border-orange-100">
-                                        "{{ pet.reason_for_rehoming }}"</p>
+                                <div class="space-y-2">
+                                    <h4 class="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Reason for Rehoming</h4>
+                                    <div class="bg-brand-accent/5 p-4 rounded-2xl border border-brand-accent/15 text-sm font-semibold text-brand-accent italic leading-relaxed">
+                                        "{{ pet.reason_for_rehoming }}"
+                                    </div>
                                 </div>
                                 {% endif %}
                             </div>
 
-                            <h4 class="text-sm font-bold text-gray-500 uppercase mb-3 border-b pb-2">Submitted Documents
-                            </h4>
-                            <ul class="text-sm space-y-3">
-                                <li class="bg-gray-50 p-3 rounded border border-gray-200">
-                                    <p class="font-bold text-gray-800 mb-2 flex items-center gap-2">
-                                        <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2">
-                                            </path>
-                                        </svg>
-                                        Valid ID(s)
-                                    </p>
-                                    {% if pet.valid_ids %}
-                                    <div class="relative group h-48 bg-gray-100 rounded border border-gray-300 overflow-hidden">
-                                        {% for vid in pet.valid_ids %}
-                                        {% set vid_url = vid.image_path if vid.image_path.startswith('http') else url_for('static', filename=vid.image_path) %}
-                                        <div class="absolute inset-0 transition-opacity duration-300 valid-id-slide-{{ pet.pet_id }} {% if loop.first %}opacity-100 z-10{% else %}opacity-0 z-0{% endif %} flex items-center justify-center">
-                                            <a href="{{ vid_url }}" target="_blank" class="w-full h-full flex items-center justify-center">
-                                                <img src="{{ vid_url }}" class="max-w-full max-h-full object-contain" alt="Valid ID">
-                                            </a>
+                            <!-- Verification files -->
+                            <div class="space-y-3">
+                                <h4 class="text-xs font-extrabold text-slate-400 uppercase tracking-wider border-b border-slate-100 pb-2">Submitted Verification Documents</h4>
+                                
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <!-- Valid ID -->
+                                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3">
+                                        <p class="font-bold text-sm text-brand-text flex items-center gap-1.5">
+                                            <i data-lucide="credit-card" class="w-4.5 h-4.5 text-brand-primary"></i>
+                                            <span>Valid ID Document(s)</span>
+                                        </p>
+                                        {% if pet.valid_ids %}
+                                        <div class="relative group h-36 bg-slate-950 rounded-xl overflow-hidden border border-slate-800">
+                                            {% for vid in pet.valid_ids %}
+                                            {% set vid_url = vid.image_path if vid.image_path.startswith('http') else url_for('static', filename=vid.image_path) %}
+                                            <div class="absolute inset-0 transition-opacity duration-300 valid-id-slide-{{ pet.pet_id }} {% if loop.first %}opacity-100 z-10{% else %}opacity-0 z-0{% endif %} flex items-center justify-center">
+                                                <a href="{{ vid_url }}" target="_blank" class="w-full h-full flex items-center justify-center">
+                                                    <img src="{{ vid_url }}" class="max-w-full max-h-full object-contain" alt="Valid ID">
+                                                </a>
+                                            </div>
+                                            {% endfor %}
+                                            
+                                            {% if pet.valid_ids|length > 1 %}
+                                            <button onclick="prevAdminSlide('valid-id-slide-{{ pet.pet_id }}')" 
+                                                    class="absolute left-2.5 top-1/2 -translate-y-1/2 z-20 bg-black/40 hover:bg-black/60 text-white p-1.5 rounded-full hover:scale-105 transition focus:outline-none flex items-center justify-center cursor-pointer">
+                                                <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                                            </button>
+                                            <button onclick="nextAdminSlide('valid-id-slide-{{ pet.pet_id }}')" 
+                                                    class="absolute right-2.5 top-1/2 -translate-y-1/2 z-20 bg-black/40 hover:bg-black/60 text-white p-1.5 rounded-full hover:scale-105 transition focus:outline-none flex items-center justify-center cursor-pointer">
+                                                <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                                            </button>
+                                            {% endif %}
                                         </div>
-                                        {% endfor %}
-                                        
-                                        {% if pet.valid_ids|length > 1 %}
-                                        <button onclick="prevAdminSlide('valid-id-slide-{{ pet.pet_id }}')" class="absolute left-2 top-1/2 -translate-y-1/2 z-20 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition opacity-0 group-hover:opacity-100 focus:outline-none">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
-                                        </button>
-                                        <button onclick="nextAdminSlide('valid-id-slide-{{ pet.pet_id }}')" class="absolute right-2 top-1/2 -translate-y-1/2 z-20 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition opacity-0 group-hover:opacity-100 focus:outline-none">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                                        </button>
+                                        {% elif pet.owner_valid_id %}
+                                        {% set owner_vid_url = pet.owner_valid_id if pet.owner_valid_id.startswith('http') else url_for('static', filename=pet.owner_valid_id) %}
+                                        <a href="{{ owner_vid_url }}" target="_blank" class="block w-fit">
+                                            <img src="{{ owner_vid_url }}" class="h-16 w-16 object-cover rounded-xl border border-slate-350 hover:opacity-85 transition" alt="Valid ID">
+                                        </a>
+                                        {% else %}
+                                        <span class="text-red-500 font-extrabold text-xs flex items-center gap-1">
+                                            <i data-lucide="alert-circle" class="w-4 h-4"></i> No ID Provided
+                                        </span>
                                         {% endif %}
                                     </div>
-                                    {% elif pet.owner_valid_id %}
-                                    {% set owner_vid_url = pet.owner_valid_id if pet.owner_valid_id.startswith('http')
-                                    else url_for('static', filename=pet.owner_valid_id) %}
-                                    <a href="{{ owner_vid_url }}" target="_blank">
-                                        <img src="{{ owner_vid_url }}"
-                                            class="h-20 w-20 object-cover rounded border border-gray-300 hover:opacity-80 transition"
-                                            alt="Valid ID">
-                                    </a>
-                                    {% else %}
-                                    <span class="text-red-500 font-medium">No Valid ID provided.</span>
-                                    {% endif %}
-                                </li>
-                                <li class="bg-gray-50 p-3 rounded border border-gray-200">
-                                    <p class="font-bold text-gray-800 mb-2 flex items-center gap-2">
-                                        <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
-                                            </path>
-                                        </svg>
-                                        Medical Record
-                                    </p>
-                                    {% if pet.medical_record_file %}
-                                    {% set medical_url = pet.medical_record_file if
-                                    pet.medical_record_file.startswith('http') else url_for('static',
-                                    filename=pet.medical_record_file) %}
-                                    {% if medical_url.lower().endswith('.pdf') or 'raw' in medical_url %}
-                                    <a href="{{ medical_url }}" target="_blank"
-                                        class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded hover:bg-indigo-200 transition">View
-                                        PDF Document</a>
-                                    {% else %}
-                                    <a href="{{ medical_url }}" target="_blank">
-                                        <img src="{{ medical_url }}"
-                                            class="mt-2 w-full max-h-48 object-contain rounded border border-gray-300 hover:opacity-90">
-                                    </a>
-                                    {% endif %}
-                                    {% else %}
-                                    <span class="text-gray-500 font-medium">No Medical Record provided.</span>
-                                    {% endif %}
-                                </li>
-                            </ul>
+
+                                    <!-- Medical Certificate -->
+                                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3">
+                                        <p class="font-bold text-sm text-brand-text flex items-center gap-1.5">
+                                            <i data-lucide="file-check-2" class="w-4.5 h-4.5 text-brand-primary"></i>
+                                            <span>Medical Records</span>
+                                        </p>
+                                        {% if pet.medical_record_file %}
+                                            {% set medical_url = pet.medical_record_file if pet.medical_record_file.startswith('http') else url_for('static', filename=pet.medical_record_file) %}
+                                            {% if medical_url.lower().endswith('.pdf') or 'raw' in medical_url %}
+                                                <a href="{{ medical_url }}" target="_blank"
+                                                   class="inline-flex items-center gap-1.5 bg-brand-primary/10 text-brand-primary hover:bg-brand-primary hover:text-white px-4 py-2.5 rounded-xl font-bold text-xs transition border border-brand-primary/10">
+                                                    <i data-lucide="file-text" class="w-4 h-4"></i>
+                                                    <span>View PDF Certificate</span>
+                                                </a>
+                                            {% else %}
+                                                <a href="{{ medical_url }}" target="_blank" class="block">
+                                                    <img src="{{ medical_url }}" class="w-full max-h-36 object-contain rounded-xl border border-slate-300 hover:opacity-85 transition">
+                                                </a>
+                                            {% endif %}
+                                        {% else %}
+                                            <span class="text-slate-400 font-bold text-xs flex items-center gap-1">
+                                                <i data-lucide="info" class="w-4 h-4"></i> No Records Listed
+                                            </span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="px-6 py-4 border-t border-gray-200 bg-gray-50 flex justify-end gap-3">
+                        <!-- Modal footer -->
+                        <div class="px-6 py-4 border-t border-brand-border/60 bg-slate-50 flex justify-end gap-3 shrink-0">
                             <button onclick="closePetModal('{{ pet.pet_id }}')"
-                                class="bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded hover:bg-gray-300 transition">Close</button>
+                                    class="bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold py-2.5 px-5 rounded-xl text-xs transition cursor-pointer">Close</button>
                         </div>
                     </div>
                 </div>
-            </div>
-            {% endfor %}
+                {% endfor %}
             </div>
             {% else %}
-            <p class="text-gray-500 italic bg-white p-6 rounded shadow-sm">No pending pet submissions.</p>
+            <div class="bg-white border border-brand-border rounded-[2.5rem] p-12 text-center text-slate-500 shadow-sm">
+                <i data-lucide="folder-check" class="w-12 h-12 mx-auto mb-3 text-slate-300"></i>
+                <p class="font-bold text-sm">No pending pet submissions for review.</p>
+            </div>
             {% endif %}
         </section>
 
         <!-- Approved / Rejected / Cancelled lists -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Approved -->
             <section>
-                <h3 class="text-xl font-bold text-gray-800 border-b pb-2 mb-4">Approved Pets</h3>
-                <ul class="bg-white rounded shadow-sm divide-y">
+                <div class="flex items-center gap-2 mb-4 border-b border-slate-100 pb-2">
+                    <i data-lucide="check" class="w-4.5 h-4.5 text-green-500"></i>
+                    <h3 class="text-lg font-extrabold text-brand-text">Approved Pets</h3>
+                </div>
+                <ul class="bg-white border border-brand-border rounded-2xl shadow-sm divide-y divide-slate-100 overflow-hidden">
                     {% for pet in accepted_pets %}
-                    <li class="p-4 flex justify-between items-center hover:bg-gray-50">
-                        <div>
-                            <span class="font-semibold text-gray-900">{{ pet.pet_name }}</span>
-                            <span class="text-sm text-gray-500 ml-2">({{ pet.animal_type }})</span>
+                    <li class="p-4 flex justify-between items-center hover:bg-slate-50/50 transition">
+                        <div class="truncate pr-2">
+                            <span class="font-bold text-brand-text text-sm">{{ pet.pet_name }}</span>
+                            <span class="text-xs text-slate-400 font-semibold capitalize ml-1">({{ pet.animal_type }})</span>
                         </div>
-                        <div class="flex items-center gap-3">
-                            <a href="/admin/edit-pet/{{ pet.pet_id }}" class="text-indigo-600 hover:text-indigo-800"
-                                title="Edit">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
-                                    </path>
-                                </svg>
+                        <div class="flex items-center gap-2 shrink-0">
+                            <a href="/admin/edit-pet/{{ pet.pet_id }}" class="text-slate-400 hover:text-brand-primary p-1 transition" title="Edit Profile">
+                                <i data-lucide="edit" class="w-4 h-4"></i>
                             </a>
-                            <a href="/admin/delete-pet/{{ pet.pet_id }}" onclick="return confirm('Delete this pet?')"
-                                class="text-red-600 hover:text-red-800" title="Delete">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
-                                    </path>
-                                </svg>
+                            <a href="/admin/delete-pet/{{ pet.pet_id }}" onclick="return confirm('Delete this pet?')" class="text-slate-400 hover:text-red-500 p-1 transition" title="Delete Profile">
+                                <i data-lucide="trash" class="w-4 h-4"></i>
                             </a>
-                            <span
-                                class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full ml-1">Approved</span>
+                            <span class="bg-green-50 text-green-700 border border-green-150 text-[10px] px-2 py-0.5 rounded-full font-black uppercase tracking-wider">Active</span>
                         </div>
                     </li>
                     {% else %}
-                    <li class="p-4 text-gray-500 italic">No approved pets.</li>
+                    <li class="p-5 text-slate-400 font-bold text-xs italic text-center">No approved pets.</li>
                     {% endfor %}
                 </ul>
             </section>
 
+            <!-- Rejected -->
             <section>
-                <h3 class="text-xl font-bold text-gray-800 border-b pb-2 mb-4">Rejected Pets</h3>
-                <ul class="bg-white rounded shadow-sm divide-y">
+                <div class="flex items-center gap-2 mb-4 border-b border-slate-100 pb-2">
+                    <i data-lucide="x" class="w-4.5 h-4.5 text-red-500"></i>
+                    <h3 class="text-lg font-extrabold text-brand-text">Rejected Pets</h3>
+                </div>
+                <ul class="bg-white border border-brand-border rounded-2xl shadow-sm divide-y divide-slate-100 overflow-hidden">
                     {% for pet in rejected_pets %}
-                    <li class="p-4 flex justify-between items-center hover:bg-gray-50">
-                        <div>
-                            <span class="font-semibold text-gray-900">{{ pet.pet_name }}</span>
-                            <span class="text-sm text-gray-500 ml-2">({{ pet.animal_type }})</span>
+                    <li class="p-4 flex justify-between items-center hover:bg-slate-50/50 transition">
+                        <div class="truncate pr-2">
+                            <span class="font-bold text-brand-text text-sm">{{ pet.pet_name }}</span>
+                            <span class="text-xs text-slate-400 font-semibold capitalize ml-1">({{ pet.animal_type }})</span>
                         </div>
-                        <div class="flex items-center gap-3">
-                            <a href="/admin/edit-pet/{{ pet.pet_id }}" class="text-indigo-600 hover:text-indigo-800"
-                                title="Edit">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
-                                    </path>
-                                </svg>
+                        <div class="flex items-center gap-2 shrink-0">
+                            <a href="/admin/edit-pet/{{ pet.pet_id }}" class="text-slate-400 hover:text-brand-primary p-1 transition" title="Edit Profile">
+                                <i data-lucide="edit" class="w-4 h-4"></i>
                             </a>
-                            <a href="/admin/delete-pet/{{ pet.pet_id }}" onclick="return confirm('Delete this pet?')"
-                                class="text-red-600 hover:text-red-800" title="Delete">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
-                                    </path>
-                                </svg>
+                            <a href="/admin/delete-pet/{{ pet.pet_id }}" onclick="return confirm('Delete this pet?')" class="text-slate-400 hover:text-red-500 p-1 transition" title="Delete Profile">
+                                <i data-lucide="trash" class="w-4 h-4"></i>
                             </a>
-                            <span class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full ml-1">Rejected</span>
+                            <span class="bg-red-50 text-red-700 border border-red-150 text-[10px] px-2 py-0.5 rounded-full font-black uppercase tracking-wider">Rejected</span>
                         </div>
                     </li>
                     {% else %}
-                    <li class="p-4 text-gray-500 italic">No rejected pets.</li>
+                    <li class="p-5 text-slate-400 font-bold text-xs italic text-center">No rejected pets.</li>
                     {% endfor %}
                 </ul>
             </section>
 
+            <!-- Cancelled -->
             <section>
-                <h3 class="text-xl font-bold text-gray-800 border-b pb-2 mb-4">Cancelled Pets</h3>
-                <ul class="bg-white rounded shadow-sm divide-y">
+                <div class="flex items-center gap-2 mb-4 border-b border-slate-100 pb-2">
+                    <i data-lucide="slash" class="w-4.5 h-4.5 text-slate-400"></i>
+                    <h3 class="text-lg font-extrabold text-brand-text">Cancelled Pets</h3>
+                </div>
+                <ul class="bg-white border border-brand-border rounded-2xl shadow-sm divide-y divide-slate-100 overflow-hidden">
                     {% for pet in cancelled_pets %}
-                    <li class="p-4 flex justify-between items-center hover:bg-gray-50">
-                        <div>
-                            <span class="font-semibold text-gray-900">{{ pet.pet_name }}</span>
-                            <span class="text-sm text-gray-500 ml-2">({{ pet.animal_type }})</span>
+                    <li class="p-4 flex justify-between items-center hover:bg-slate-50/50 transition">
+                        <div class="truncate pr-2">
+                            <span class="font-bold text-brand-text text-sm">{{ pet.pet_name }}</span>
+                            <span class="text-xs text-slate-400 font-semibold capitalize ml-1">({{ pet.animal_type }})</span>
                         </div>
-                        <div class="flex items-center gap-3">
-                            <a href="/admin/edit-pet/{{ pet.pet_id }}" class="text-indigo-600 hover:text-indigo-800"
-                                title="Edit">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
-                                    </path>
-                                </svg>
+                        <div class="flex items-center gap-2 shrink-0">
+                            <a href="/admin/edit-pet/{{ pet.pet_id }}" class="text-slate-400 hover:text-brand-primary p-1 transition" title="Edit Profile">
+                                <i data-lucide="edit" class="w-4 h-4"></i>
                             </a>
-                            <a href="/admin/delete-pet/{{ pet.pet_id }}" onclick="return confirm('Delete this pet?')"
-                                class="text-red-600 hover:text-red-800" title="Delete">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
-                                    </path>
-                                </svg>
+                            <a href="/admin/delete-pet/{{ pet.pet_id }}" onclick="return confirm('Delete this pet?')" class="text-slate-400 hover:text-red-500 p-1 transition" title="Delete Profile">
+                                <i data-lucide="trash" class="w-4 h-4"></i>
                             </a>
-                            <span class="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded-full ml-1">Cancelled</span>
+                            <span class="bg-slate-100 text-slate-600 border border-slate-200 text-[10px] px-2 py-0.5 rounded-full font-black uppercase tracking-wider">Cancelled</span>
                         </div>
                     </li>
                     {% else %}
-                    <li class="p-4 text-gray-500 italic">No cancelled pets.</li>
+                    <li class="p-5 text-slate-400 font-bold text-xs italic text-center">No cancelled pets.</li>
                     {% endfor %}
                 </ul>
             </section>
         </div>
-
     </main>
+{% endblock %}
 
+{% block extra_js %}
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            // Chart.js initialization
+            // Chart.js initialization with brand tokens
             const ctx = document.getElementById('petStatusChart').getContext('2d');
             const data = {
                 labels: ['Pending', 'Approved', 'Rejected', 'Adopted', 'Cancelled'],
                 datasets: [{
                     data: [
-                        {{ stats.pending |default(0) }},
-                {{ stats.approved |default(0) }},
-                {{ stats.rejected|default (0)
-        }},
-            {{ stats.adopted |default(0) }},
-            {{ stats.cancelled |default(0) }}
+                        {{ stats.pending | default(0) }},
+                        {{ stats.approved | default(0) }},
+                        {{ stats.rejected | default(0) }},
+                        {{ stats.adopted | default(0) }},
+                        {{ stats.cancelled | default(0) }}
                     ],
-            backgroundColor: [
-            '#6366f1', // indigo-500
-            '#22c55e', // green-500
-            '#ef4444', // red-500
-            '#14b8a6', // teal-500
-            '#9ca3af'  // gray-400
-        ],
-            borderWidth: 0
+                    backgroundColor: [
+                        '#F59E0B', // warning (amber)
+                        '#22C55E', // success (green)
+                        '#EF4444', // danger (red)
+                        '#007d8e', // brand-primary (teal)
+                        '#94A3B8'  // gray-450 (slate)
+                    ],
+                    borderWidth: 0
                 }]
             };
 
-        const config = {
-            type: 'doughnut',
-            data: data,
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'right',
-                        labels: {
-                            boxWidth: 12,
-                            font: {
-                                size: 11
+            const config = {
+                type: 'doughnut',
+                data: data,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                boxWidth: 10,
+                                font: {
+                                    size: 10,
+                                    weight: 'bold',
+                                    family: 'Nunito'
+                                }
                             }
                         }
-                    }
-                },
-                cutout: '65%'
-            }
-        };
+                    },
+                    cutout: '70%'
+                }
+            };
 
-        new Chart(ctx, config);
+            new Chart(ctx, config);
         });
 
         function openPetModal(petId) {
@@ -474,6 +505,4 @@
             slides[nextIndex].classList.add('opacity-100', 'z-10');
         }
     </script>
-</body>
-
-</html>
+{% endblock %}

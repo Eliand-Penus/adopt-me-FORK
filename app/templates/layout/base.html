@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Adopt Me{% endblock %}</title>
+    
+    <!-- Google Fonts Nunito -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Shared Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            primary: '#007d8e',
+                            accent: '#ff5e1c',
+                            text: '#2A2A2A',
+                            bg: '#F8FAFB',
+                            secondary: '#F2F5F7',
+                            border: '#E5E7EB',
+                            success: '#22C55E',
+                            danger: '#EF4444',
+                            warning: '#F59E0B'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Nunito', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Custom CSS Resets -->
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            color: #2A2A2A;
+            background-color: #F8FAFB;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #F8FAFB;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #007d8e;
+        }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="{% block body_class %}{% endblock %} min-h-screen flex flex-col antialiased relative">
+
+    <!-- Global Low-Opacity Background Decor (5% Opacity) -->
+    <div class="fixed inset-0 pointer-events-none overflow-hidden z-0 select-none opacity-[0.05]">
+        <!-- Top Left Blob -->
+        <div class="absolute -top-40 -left-40 w-96 h-96 rounded-full bg-[#007d8e] blur-3xl"></div>
+        <!-- Bottom Right Blob -->
+        <div class="absolute -bottom-40 -right-40 w-96 h-96 rounded-full bg-[#ff5e1c] blur-3xl"></div>
+        <!-- Left Middle Faint Gray Blob -->
+        <div class="absolute top-1/2 -left-20 w-80 h-80 rounded-full bg-slate-300 blur-3xl"></div>
+        
+        <!-- Faint Paw print SVGs distributed organically -->
+        <svg class="absolute top-24 left-10 w-16 h-16 text-[#007d8e] rotate-12" viewBox="0 0 24 24" fill="currentColor">
+            <circle cx="12" cy="14" r="4"/><circle cx="6.5" cy="8.5" r="2"/><circle cx="10.5" cy="5" r="2"/><circle cx="17.5" cy="8.5" r="2"/><circle cx="13.5" cy="5" r="2"/>
+        </svg>
+        <svg class="absolute bottom-24 right-12 w-20 h-20 text-[#ff5e1c] -rotate-12" viewBox="0 0 24 24" fill="currentColor">
+            <circle cx="12" cy="14" r="4"/><circle cx="6.5" cy="8.5" r="2"/><circle cx="10.5" cy="5" r="2"/><circle cx="17.5" cy="8.5" r="2"/><circle cx="13.5" cy="5" r="2"/>
+        </svg>
+        <svg class="absolute top-1/3 right-1/4 w-12 h-12 text-slate-300 rotate-[45deg]" viewBox="0 0 24 24" fill="currentColor">
+            <circle cx="12" cy="14" r="4"/><circle cx="6.5" cy="8.5" r="2"/><circle cx="10.5" cy="5" r="2"/><circle cx="17.5" cy="8.5" r="2"/><circle cx="13.5" cy="5" r="2"/>
+        </svg>
+        <svg class="absolute bottom-1/3 left-1/4 w-14 h-14 text-[#007d8e] -rotate-[30deg]" viewBox="0 0 24 24" fill="currentColor">
+            <circle cx="12" cy="14" r="4"/><circle cx="6.5" cy="8.5" r="2"/><circle cx="10.5" cy="5" r="2"/><circle cx="17.5" cy="8.5" r="2"/><circle cx="13.5" cy="5" r="2"/>
+        </svg>
+    </div>
+
+    <!-- Automatic Navbar inclusion -->
+    {% include 'components/navbar.html' %}
+
+    <!-- Page Specific Actions -->
+    {% block page_actions %}{% endblock %}
+
+    <!-- Main Content -->
+    {% block content %}{% endblock %}
+
+    <!-- Extra Page Specific JS -->
+    {% block extra_js %}{% endblock %}
+    
+    <!-- AI Voice Assistant UI -->
+    <div id="ai-voice-assistant-container" class="fixed bottom-6 right-6 z-50 flex flex-col items-end pointer-events-none">
+        
+        <!-- Status Popup -->
+        <div id="ai-voice-status" class="mb-4 transform translate-y-4 opacity-0 transition-all duration-300 pointer-events-none max-w-xs">
+            <div class="bg-white/80 backdrop-blur-md border border-brand-border shadow-lg rounded-2xl p-4 flex items-start gap-3">
+                <div id="ai-voice-icon-container" class="mt-0.5 text-brand-primary">
+                    <i data-lucide="bot" class="w-5 h-5"></i>
+                </div>
+                <div class="flex-1">
+                    <p id="ai-voice-title" class="text-xs font-bold text-brand-text mb-1 uppercase tracking-wider">AI Assistant</p>
+                    <p id="ai-voice-text" class="text-sm text-gray-600 leading-tight">Ready to help.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Floating Button -->
+        <button id="ai-voice-btn" aria-label="Toggle Voice Assistant" class="pointer-events-auto relative group flex items-center justify-center w-14 h-14 bg-brand-primary text-white rounded-full shadow-lg hover:bg-[#006a78] hover:shadow-xl hover:-translate-y-1 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-brand-primary/30">
+            <!-- Ripple/Pulse effect layers -->
+            <div id="ai-voice-pulse" class="absolute inset-0 rounded-full bg-brand-primary opacity-0 group-hover:opacity-20 transition-opacity"></div>
+            
+            <!-- Icon -->
+            <div id="ai-voice-btn-icon" class="relative z-10">
+                <i data-lucide="mic" class="w-6 h-6"></i>
+            </div>
+        </button>
+    </div>
+
+    <!-- Initialize Lucide Icons Globally -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        });
+    </script>
+
+    <!-- AI Voice Assistant Logic -->
+    <script src="{{ url_for('static', filename='js/voice-assistant.js') }}" defer></script>
+</body>
+</html>

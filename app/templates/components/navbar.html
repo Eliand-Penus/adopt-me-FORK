@@ -1,0 +1,530 @@
+{% if request.path.startswith('/admin') %}
+<!-- Admin Navigation -->
+<nav class="bg-gray-900 border-b border-gray-800 px-6 py-4 text-white z-50 relative">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+        <h1 class="text-2xl font-bold flex items-center gap-2">
+            <i data-lucide="shield" class="text-[#007d8e] w-6 h-6"></i>
+            Adopt Me <span class="text-[#007d8e]">Admin</span>
+        </h1>
+        <div class="space-x-2 sm:space-x-4 flex flex-wrap justify-center items-center">
+            <a href="/admin"
+                class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors {% if request.path == '/admin' %}text-[#007d8e] font-bold bg-[#007d8e]/10{% else %}hover:text-[#007d8e] hover:bg-gray-800 text-gray-300 font-medium{% endif %}">
+                <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+                Dashboard
+            </a>
+            <a href="/admin/users"
+                class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors {% if request.path == '/admin/users' %}text-[#007d8e] font-bold bg-[#007d8e]/10{% else %}hover:text-[#007d8e] hover:bg-gray-800 text-gray-300 font-medium{% endif %}">
+                <i data-lucide="users" class="w-4 h-4"></i>
+                Manage Users
+            </a>
+            <a href="/admin/export/xml"
+                class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:text-[#007d8e] hover:bg-gray-800 text-gray-300 font-medium transition-colors">
+                <i data-lucide="download" class="w-4 h-4"></i>
+                Export XML
+            </a>
+            {% if request.path == '/admin/users' or request.path.startswith('/admin/edit-pet/') %}
+            <a href="/"
+                class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:text-[#007d8e] hover:bg-gray-800 text-gray-300 font-medium transition-colors">
+                <i data-lucide="home" class="w-4 h-4"></i>
+                Home
+            </a>
+            {% endif %}
+            <a href="/admin/logout"
+                class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-red-400 hover:text-red-300 hover:bg-red-500/10 font-medium transition-colors">
+                <i data-lucide="log-out" class="w-4 h-4"></i>
+                Logout
+            </a>
+        </div>
+    </div>
+</nav>
+{% else %}
+<!-- Centralized Premium Navbar -->
+<nav class="fixed top-0 left-0 w-full bg-white/90 backdrop-blur-md border-b border-gray-100 z-50 flex items-center px-4 sm:px-[55px] justify-between shadow-sm"
+    style="height: 76px;">
+
+    <!-- Non-Clickable Logo -->
+    <div class="flex items-center select-none" style="height: 67px;" aria-hidden="true"> <img
+            src="{{ url_for('static', filename='images/adoptme-logo.png') }}" alt="Adopt Me Logo"
+            class="w-auto object-contain" style="height: 67px; max-height: 67px;" draggable="false"
+            onerror="this.style.display='none'; document.getElementById('logo-fallback-text').style.display='inline-block';">
+        <span id="logo-fallback-text" class="hidden text-2xl font-black text-[#007d8e] tracking-wider"> ADOPT ME </span>
+    </div>
+
+    <!-- Dynamic Navigation Buttons -->
+    <div class="flex items-center gap-3 sm:gap-6">
+        {% if not current_user.is_authenticated %}
+        <!-- GUEST USER NAVIGATIONS -->
+        {% if request.path == '/' or request.endpoint == 'main.home' %}
+        <a href="{{ url_for('main.pets') }}"
+            class="nav-link-item text-slate-600 hover:text-[#007d8e] font-semibold text-sm flex items-center gap-1.5 py-2 px-1 transition-all duration-200">
+            <i data-lucide="search" class="w-4 h-4"></i>Browse Pets
+        </a>
+        <a href="{{ url_for('main.about') }}"
+            class="nav-link-item text-slate-600 hover:text-[#007d8e] font-semibold text-sm flex items-center gap-1.5 py-2 px-1 transition-all duration-200">
+            <i data-lucide="info" class="w-4 h-4"></i>About
+        </a>
+        <a href="{{ url_for('auth.login') }}"
+            class="nav-link-item text-slate-600 hover:text-[#007d8e] font-semibold text-sm flex items-center gap-1.5 py-2 px-1 transition-all duration-200">
+            <i data-lucide="log-in" class="w-4 h-4"></i>Login
+        </a>
+        <a href="{{ url_for('auth.register') }}"
+            class="bg-[#007d8e] hover:bg-[#006674] text-white px-4 py-2 rounded-xl font-bold shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 text-sm flex items-center gap-1.5">
+            <i data-lucide="user-plus" class="w-4 h-4"></i>Sign Up
+        </a>
+
+        {% elif request.path == '/login' or request.endpoint == 'auth.login' %}
+        <a href="{{ url_for('main.home') }}"
+            class="nav-link-item text-slate-600 hover:text-[#007d8e] font-semibold text-sm flex items-center gap-1.5 py-2 px-1 transition-all duration-200">
+            <i data-lucide="home" class="w-4 h-4"></i>Home
+        </a>
+        <a href="{{ url_for('main.about') }}"
+            class="nav-link-item text-slate-600 hover:text-[#007d8e] font-semibold text-sm flex items-center gap-1.5 py-2 px-1 transition-all duration-200">
+            <i data-lucide="info" class="w-4 h-4"></i>About
+        </a>
+        <a href="{{ url_for('auth.register') }}"
+            class="bg-[#ff5e1c] hover:bg-[#e04f14] text-white px-4 py-2 rounded-xl font-bold shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 text-sm flex items-center gap-1.5">
+            <i data-lucide="user-plus" class="w-4 h-4"></i>Sign Up
+        </a>
+
+        {% elif request.path == '/register' or request.endpoint == 'auth.register' %}
+        <a href="{{ url_for('main.home') }}"
+            class="nav-link-item text-slate-600 hover:text-[#007d8e] font-semibold text-sm flex items-center gap-1.5 py-2 px-1 transition-all duration-200">
+            <i data-lucide="home" class="w-4 h-4"></i>Home
+        </a>
+        <a href="{{ url_for('main.about') }}"
+            class="nav-link-item text-slate-600 hover:text-[#007d8e] font-semibold text-sm flex items-center gap-1.5 py-2 px-1 transition-all duration-200">
+            <i data-lucide="info" class="w-4 h-4"></i>About
+        </a>
+        <a href="{{ url_for('auth.login') }}"
+            class="bg-[#007d8e] hover:bg-[#006674] text-white px-4 py-2 rounded-xl font-bold shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 text-sm flex items-center gap-1.5">
+            <i data-lucide="log-in" class="w-4 h-4"></i>Login
+        </a>
+
+        {% elif request.path == '/about' or request.endpoint == 'main.about' %}
+        <a href="{{ url_for('main.home') }}"
+            class="nav-link-item text-slate-600 hover:text-[#007d8e] font-semibold text-sm flex items-center gap-1.5 py-2 px-1 transition-all duration-200">
+            <i data-lucide="home" class="w-4 h-4"></i>Home
+        </a>
+        <a href="{{ url_for('main.pets') }}"
+            class="nav-link-item text-slate-600 hover:text-[#007d8e] font-semibold text-sm flex items-center gap-1.5 py-2 px-1 transition-all duration-200">
+            <i data-lucide="search" class="w-4 h-4"></i>Browse Pets
+        </a>
+        <a href="{{ url_for('auth.register') }}"
+            class="nav-link-item text-slate-600 hover:text-[#007d8e] font-semibold text-sm flex items-center gap-1.5 py-2 px-1 transition-all duration-200">
+            <i data-lucide="user-plus" class="w-4 h-4"></i>Sign Up
+        </a>
+        <a href="{{ url_for('auth.login') }}"
+            class="bg-[#007d8e] hover:bg-[#006674] text-white px-4 py-2 rounded-xl font-bold shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 text-sm flex items-center gap-1.5">
+            <i data-lucide="log-in" class="w-4 h-4"></i>Login
+        </a>
+
+        {% elif request.path == '/choose-category' or request.endpoint == 'main.choose_category' %}
+        <a href="{{ url_for('main.home') }}"
+            class="nav-link-item text-slate-600 hover:text-[#007d8e] font-semibold text-sm flex items-center gap-1.5 py-2 px-1 transition-all duration-200">
+            <i data-lucide="home" class="w-4 h-4"></i>Home
+        </a>
+        <a href="{{ url_for('main.about') }}"
+            class="nav-link-item text-slate-600 hover:text-[#007d8e] font-semibold text-sm flex items-center gap-1.5 py-2 px-1 transition-all duration-200">
+            <i data-lucide="info" class="w-4 h-4"></i>About
+        </a>
+        <a href="{{ url_for('auth.login') }}"
+            class="bg-[#007d8e] hover:bg-[#006674] text-white px-4 py-2 rounded-xl font-bold shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 text-sm flex items-center gap-1.5">
+            <i data-lucide="log-in" class="w-4 h-4"></i>Login
+        </a>
+
+        {% elif request.path == '/pets' or request.endpoint == 'main.pets' %}
+        <a href="{{ url_for('main.home') }}"
+            class="nav-link-item text-slate-600 hover:text-[#007d8e] font-semibold text-sm flex items-center gap-1.5 py-2 px-1 transition-all duration-200">
+            <i data-lucide="home" class="w-4 h-4"></i>Home
+        </a>
+        <a href="{{ url_for('main.about') }}"
+            class="nav-link-item text-slate-600 hover:text-[#007d8e] font-semibold text-sm flex items-center gap-1.5 py-2 px-1 transition-all duration-200">
+            <i data-lucide="info" class="w-4 h-4"></i>About
+        </a>
+        <a href="{{ url_for('auth.login') }}"
+            class="bg-[#007d8e] hover:bg-[#006674] text-white px-4 py-2 rounded-xl font-bold shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 text-sm flex items-center gap-1.5">
+            <i data-lucide="log-in" class="w-4 h-4"></i>Login
+        </a>
+
+        {% elif request.path.startswith('/pet/') or request.endpoint == 'main.pet_details' %}
+        <a href="{{ url_for('main.pets') }}"
+            class="nav-link-item text-slate-600 hover:text-[#007d8e] font-semibold text-sm flex items-center gap-1.5 py-2 px-1 transition-all duration-200">
+            <i data-lucide="chevron-left" class="w-4 h-4"></i>Back to Pets
+        </a>
+        <a href="{{ url_for('auth.login') }}"
+            class="bg-[#007d8e] hover:bg-[#006674] text-white px-4 py-2 rounded-xl font-bold shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 text-sm flex items-center gap-1.5">
+            <i data-lucide="log-in" class="w-4 h-4"></i>Login
+        </a>
+        {% endif %}
+        {% else %}
+        <!-- LOGGED IN USER NAVIGATIONS -->
+        {% if request.path == '/' or request.endpoint == 'main.home' %}
+        <!-- HOME LOGGED IN -->
+        <a href="{{ url_for('main.dashboard') }}"
+            class="nav-link-item text-slate-600 hover:text-[#007d8e] font-semibold text-sm flex items-center gap-1.5 py-2 px-1 transition-all duration-200">
+            <i data-lucide="layout-dashboard" class="w-4 h-4"></i>Dashboard
+        </a>
+        <a href="{{ url_for('main.pets') }}"
+            class="nav-link-item text-slate-600 hover:text-[#007d8e] font-semibold text-sm flex items-center gap-1.5 py-2 px-1 transition-all duration-200">
+            <i data-lucide="search" class="w-4 h-4"></i>Browse Pets
+        </a>
+        <a href="{{ url_for('main.profile') }}"
+            class="nav-link-item text-slate-600 hover:text-[#007d8e] font-semibold text-sm flex items-center gap-1.5 py-2 px-1 transition-all duration-200">
+            <i data-lucide="user" class="w-4 h-4"></i>Profile
+        </a>
+        <a href="{{ url_for('main.notifications') }}"
+            class="nav-link-item text-slate-600 hover:text-[#007d8e] font-semibold text-sm flex items-center gap-1.5 py-2 px-1 transition-all duration-200">
+            <i data-lucide="bell" class="w-4 h-4"></i>Requests
+        </a>
+        <a href="{{ url_for('auth.logout') }}"
+            class="bg-[#ff5e1c]/10 text-[#ff5e1c] hover:bg-[#ff5e1c] hover:text-white px-4 py-2 rounded-xl font-bold transition-all duration-200 text-sm flex items-center gap-1.5">
+            <i data-lucide="log-out" class="w-4 h-4"></i>
+            Logout
+        </a>
+
+        {% elif request.path == '/dashboard' or request.endpoint == 'main.dashboard' %}
+        <a href="{{ url_for('main.pets') }}"
+            class="nav-link-item text-slate-600 hover:text-[#007d8e] font-semibold text-sm flex items-center gap-1.5 py-2 px-1 transition-all duration-200">
+            <i data-lucide="search" class="w-4 h-4"></i>Browse Pets
+        </a>
+        <a href="{{ url_for('main.favorites') }}"
+            class="nav-link-item text-slate-600 hover:text-[#007d8e] font-semibold text-sm flex items-center gap-1.5 py-2 px-1 transition-all duration-200">
+            <i data-lucide="heart" class="w-4 h-4"></i>Favorites
+        </a>
+        <a href="{{ url_for('main.profile') }}"
+            class="nav-link-item text-slate-600 hover:text-[#007d8e] font-semibold text-sm flex items-center gap-1.5 py-2 px-1 transition-all duration-200">
+            <i data-lucide="user" class="w-4 h-4"></i>Profile
+        </a>
+        <a href="{{ url_for('main.notifications') }}"
+            class="nav-link-item text-slate-600 hover:text-[#007d8e] font-semibold text-sm flex items-center gap-1.5 py-2 px-1 transition-all duration-200">
+            <i data-lucide="bell" class="w-4 h-4"></i>Requests
+        </a>
+        <a href="{{ url_for('main.home') }}"
+            class="nav-link-item text-slate-600 hover:text-[#007d8e] font-semibold text-sm flex items-center gap-1.5 py-2 px-1 transition-all duration-200">
+            <i data-lucide="home" class="w-4 h-4"></i>Home
+        </a>
+        <a href="{{ url_for('auth.logout') }}"
+            class="bg-[#EF4444]/10 text-[#EF4444] hover:bg-[#EF4444] hover:text-white px-4 py-2 rounded-xl font-bold transition-all duration-200 text-sm flex items-center gap-1.5">
+            <i data-lucide="log-out" class="w-4 h-4"></i>Logout
+        </a>
+
+        {% elif request.path == '/owner-dashboard' or request.endpoint == 'main.owner_dashboard' %}
+        <a href="{{ url_for('main.dashboard') }}"
+            class="nav-link-item text-slate-600 hover:text-[#007d8e] font-semibold text-sm flex items-center gap-1.5 py-2 px-1 transition-all duration-200">
+            <i data-lucide="layout-dashboard" class="w-4 h-4"></i>Dashboard
+        </a>
+        <a href="{{ url_for('main.my_pets') }}"
+            class="nav-link-item text-slate-600 hover:text-[#007d8e] font-semibold text-sm flex items-center gap-1.5 py-2 px-1 transition-all duration-200">
+            <i data-lucide="paw-print" class="w-4 h-4"></i>My Pets
+        </a>
+        <a href="{{ url_for('main.profile') }}"
+            class="nav-link-item text-slate-600 hover:text-[#007d8e] font-semibold text-sm flex items-center gap-1.5 py-2 px-1 transition-all duration-200">
+            <i data-lucide="user" class="w-4 h-4"></i>Profile
+        </a>
+        <a href="{{ url_for('main.notifications') }}"
+            class="nav-link-item text-slate-600 hover:text-[#007d8e] font-semibold text-sm flex items-center gap-1.5 py-2 px-1 transition-all duration-200">
+            <i data-lucide="bell" class="w-4 h-4"></i>Requests
+        </a>
+        <a href="{{ url_for('main.home') }}"
+            class="nav-link-item text-slate-600 hover:text-[#007d8e] font-semibold text-sm flex items-center gap-1.5 py-2 px-1 transition-all duration-200">
+            <i data-lucide="home" class="w-4 h-4"></i>Home
+        </a>
+        <a href="{{ url_for('auth.logout') }}"
+            class="bg-[#EF4444]/10 text-[#EF4444] hover:bg-[#EF4444] hover:text-white px-4 py-2 rounded-xl font-bold transition-all duration-200 text-sm flex items-center gap-1.5">
+            <i data-lucide="log-out" class="w-4 h-4"></i>Logout
+        </a>
+
+        {% elif request.path == '/choose-category' or request.endpoint == 'main.choose_category' %}
+        <a href="{{ url_for('main.dashboard') }}"
+            class="nav-link-item text-slate-600 hover:text-[#007d8e] font-semibold text-sm flex items-center gap-1.5 py-2 px-1 transition-all duration-200">
+            <i data-lucide="layout-dashboard" class="w-4 h-4"></i>Dashboard
+        </a>
+        <a href="{{ url_for('main.pets') }}"
+            class="nav-link-item text-slate-600 hover:text-[#007d8e] font-semibold text-sm flex items-center gap-1.5 py-2 px-1 transition-all duration-200">
+            <i data-lucide="search" class="w-4 h-4"></i>Browse Pets
+        </a>
+        <a href="{{ url_for('main.profile') }}"
+            class="nav-link-item text-slate-600 hover:text-[#007d8e] font-semibold text-sm flex items-center gap-1.5 py-2 px-1 transition-all duration-200">
+            <i data-lucide="user" class="w-4 h-4"></i>Profile
+        </a>
+        <a href="{{ url_for('main.notifications') }}"
+            class="nav-link-item text-slate-600 hover:text-[#007d8e] font-semibold text-sm flex items-center gap-1.5 py-2 px-1 transition-all duration-200">
+            <i data-lucide="bell" class="w-4 h-4"></i>Requests
+        </a>
+        <a href="{{ url_for('main.home') }}"
+            class="nav-link-item text-slate-600 hover:text-[#007d8e] font-semibold text-sm flex items-center gap-1.5 py-2 px-1 transition-all duration-200">
+            <i data-lucide="home" class="w-4 h-4"></i>Home
+        </a>
+        <a href="{{ url_for('auth.logout') }}"
+            class="bg-[#EF4444]/10 text-[#EF4444] hover:bg-[#EF4444] hover:text-white px-4 py-2 rounded-xl font-bold transition-all duration-200 text-sm flex items-center gap-1.5">
+            <i data-lucide="log-out" class="w-4 h-4"></i>Logout
+        </a>
+
+        {% elif request.path == '/pets' or request.endpoint == 'main.pets' %}
+        <a href="{{ url_for('main.dashboard') }}"
+            class="nav-link-item text-slate-600 hover:text-[#007d8e] font-semibold text-sm flex items-center gap-1.5 py-2 px-1 transition-all duration-200">
+            <i data-lucide="layout-dashboard" class="w-4 h-4"></i>Dashboard
+        </a>
+        <a href="{{ url_for('main.favorites') }}"
+            class="nav-link-item text-slate-600 hover:text-[#007d8e] font-semibold text-sm flex items-center gap-1.5 py-2 px-1 transition-all duration-200">
+            <i data-lucide="heart" class="w-4 h-4"></i>Favorites
+        </a>
+        <a href="{{ url_for('main.my_pets') }}"
+            class="nav-link-item text-slate-600 hover:text-[#007d8e] font-semibold text-sm flex items-center gap-1.5 py-2 px-1 transition-all duration-200">
+            <i data-lucide="paw-print" class="w-4 h-4"></i>My Pets
+        </a>
+        <a href="{{ url_for('main.profile') }}"
+            class="nav-link-item text-slate-600 hover:text-[#007d8e] font-semibold text-sm flex items-center gap-1.5 py-2 px-1 transition-all duration-200">
+            <i data-lucide="user" class="w-4 h-4"></i>Profile
+        </a>
+        <a href="{{ url_for('main.notifications') }}"
+            class="nav-link-item text-slate-600 hover:text-[#007d8e] font-semibold text-sm flex items-center gap-1.5 py-2 px-1 transition-all duration-200">
+            <i data-lucide="bell" class="w-4 h-4"></i>Requests
+        </a>
+        <a href="{{ url_for('main.home') }}"
+            class="nav-link-item text-slate-600 hover:text-[#007d8e] font-semibold text-sm flex items-center gap-1.5 py-2 px-1 transition-all duration-200">
+            <i data-lucide="home" class="w-4 h-4"></i>Home
+        </a>
+        <a href="{{ url_for('auth.logout') }}"
+            class="bg-[#EF4444]/10 text-[#EF4444] hover:bg-[#EF4444] hover:text-white px-4 py-2 rounded-xl font-bold transition-all duration-200 text-sm flex items-center gap-1.5">
+            <i data-lucide="log-out" class="w-4 h-4"></i>Logout
+        </a>
+
+        {% elif request.path.startswith('/pet/') or request.endpoint == 'main.pet_details' %}
+        <a href="{{ url_for('main.pets') }}"
+            class="nav-link-item text-slate-600 hover:text-[#007d8e] font-semibold text-sm flex items-center gap-1.5 py-2 px-1 transition-all duration-200">
+            <i data-lucide="chevron-left" class="w-4 h-4"></i>Back to Pets
+        </a>
+        <a href="{{ url_for('main.profile') }}"
+            class="nav-link-item text-slate-600 hover:text-[#007d8e] font-semibold text-sm flex items-center gap-1.5 py-2 px-1 transition-all duration-200">
+            <i data-lucide="user" class="w-4 h-4"></i>Profile
+        </a>
+        <a href="{{ url_for('main.notifications') }}"
+            class="nav-link-item text-slate-600 hover:text-[#007d8e] font-semibold text-sm flex items-center gap-1.5 py-2 px-1 transition-all duration-200">
+            <i data-lucide="bell" class="w-4 h-4"></i>Requests
+        </a>
+        <a href="{{ url_for('auth.logout') }}"
+            class="bg-[#EF4444]/10 text-[#EF4444] hover:bg-[#EF4444] hover:text-white px-4 py-2 rounded-xl font-bold transition-all duration-200 text-sm flex items-center gap-1.5">
+            <i data-lucide="log-out" class="w-4 h-4"></i>Logout
+        </a>
+
+        {% elif request.path == '/profile' or request.endpoint == 'main.profile' %}
+        <a href="{{ url_for('main.dashboard') }}"
+            class="nav-link-item text-slate-600 hover:text-[#007d8e] font-semibold text-sm flex items-center gap-1.5 py-2 px-1 transition-all duration-200">
+            <i data-lucide="layout-dashboard" class="w-4 h-4"></i>Dashboard
+        </a>
+        <a href="{{ url_for('main.pets') }}"
+            class="nav-link-item text-slate-600 hover:text-[#007d8e] font-semibold text-sm flex items-center gap-1.5 py-2 px-1 transition-all duration-200">
+            <i data-lucide="search" class="w-4 h-4"></i>Browse Pets
+        </a>
+        <a href="{{ url_for('main.notifications') }}"
+            class="nav-link-item text-slate-600 hover:text-[#007d8e] font-semibold text-sm flex items-center gap-1.5 py-2 px-1 transition-all duration-200">
+            <i data-lucide="bell" class="w-4 h-4"></i>Requests
+        </a>
+        <a href="{{ url_for('auth.logout') }}"
+            class="bg-[#EF4444]/10 text-[#EF4444] hover:bg-[#EF4444] hover:text-white px-4 py-2 rounded-xl font-bold transition-all duration-200 text-sm flex items-center gap-1.5">
+            <i data-lucide="log-out" class="w-4 h-4"></i>Logout
+        </a>
+
+        {% elif request.path == '/my-pets' or request.endpoint == 'main.my_pets' %}
+        <a href="{{ url_for('main.dashboard') }}"
+            class="nav-link-item text-slate-600 hover:text-[#007d8e] font-semibold text-sm flex items-center gap-1.5 py-2 px-1 transition-all duration-200">
+            <i data-lucide="layout-dashboard" class="w-4 h-4"></i>Dashboard
+        </a>
+        <a href="{{ url_for('main.notifications') }}"
+            class="nav-link-item text-slate-600 hover:text-[#007d8e] font-semibold text-sm flex items-center gap-1.5 py-2 px-1 transition-all duration-200">
+            <i data-lucide="bell" class="w-4 h-4"></i>Requests
+        </a>
+        <a href="{{ url_for('main.home') }}"
+            class="nav-link-item text-slate-600 hover:text-[#007d8e] font-semibold text-sm flex items-center gap-1.5 py-2 px-1 transition-all duration-200">
+            <i data-lucide="home" class="w-4 h-4"></i>Home
+        </a>
+        <a href="{{ url_for('main.add_pet') }}"
+            class="bg-[#007d8e] hover:bg-[#006674] text-white px-4 py-2 rounded-xl font-bold shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 text-sm flex items-center gap-1.5">
+            <i data-lucide="plus" class="w-4 h-4"></i>Add New Pet
+        </a>
+        <a href="{{ url_for('auth.logout') }}"
+            class="bg-[#EF4444]/10 text-[#EF4444] hover:bg-[#EF4444] hover:text-white px-4 py-2 rounded-xl font-bold transition-all duration-200 text-sm flex items-center gap-1.5">
+            <i data-lucide="log-out" class="w-4 h-4"></i>Logout
+        </a>
+
+        {% elif request.path == '/add-pet' or request.endpoint == 'main.add_pet' %}
+        <a href="{{ url_for('main.dashboard') }}"
+            class="nav-link-item text-slate-600 hover:text-[#007d8e] font-semibold text-sm flex items-center gap-1.5 py-2 px-1 transition-all duration-200">
+            <i data-lucide="layout-dashboard" class="w-4 h-4"></i>Dashboard
+        </a>
+        <a href="{{ url_for('main.my_pets') }}"
+            class="nav-link-item text-slate-600 hover:text-[#007d8e] font-semibold text-sm flex items-center gap-1.5 py-2 px-1 transition-all duration-200">
+            <i data-lucide="paw-print" class="w-4 h-4"></i>My Pets
+        </a>
+        <a href="{{ url_for('main.profile') }}"
+            class="nav-link-item text-slate-600 hover:text-[#007d8e] font-semibold text-sm flex items-center gap-1.5 py-2 px-1 transition-all duration-200">
+            <i data-lucide="user" class="w-4 h-4"></i>Profile
+        </a>
+        <a href="{{ url_for('main.notifications') }}"
+            class="nav-link-item text-slate-600 hover:text-[#007d8e] font-semibold text-sm flex items-center gap-1.5 py-2 px-1 transition-all duration-200">
+            <i data-lucide="bell" class="w-4 h-4"></i>Requests
+        </a>
+        <a href="{{ url_for('auth.logout') }}"
+            class="bg-[#EF4444]/10 text-[#EF4444] hover:bg-[#EF4444] hover:text-white px-4 py-2 rounded-xl font-bold transition-all duration-200 text-sm flex items-center gap-1.5">
+            <i data-lucide="log-out" class="w-4 h-4"></i>Logout
+        </a>
+
+        {% elif request.path == '/notifications' or request.endpoint == 'main.notifications' %}
+        <a href="{{ url_for('main.dashboard') }}"
+            class="nav-link-item text-slate-600 hover:text-[#007d8e] font-semibold text-sm flex items-center gap-1.5 py-2 px-1 transition-all duration-200">
+            <i data-lucide="chevron-left" class="w-4 h-4"></i>Back Dashboard
+        </a>
+        <a href="{{ url_for('auth.logout') }}"
+            class="bg-[#EF4444]/10 text-[#EF4444] hover:bg-[#EF4444] hover:text-white px-4 py-2 rounded-xl font-bold transition-all duration-200 text-sm flex items-center gap-1.5">
+            <i data-lucide="log-out" class="w-4 h-4"></i>Logout
+        </a>
+        {% else %}
+        <!-- FALLBACK FOR ANY OTHER AUTHENTICATED PAGES -->
+        <a href="{{ url_for('main.dashboard') }}"
+            class="nav-link-item text-slate-600 hover:text-[#007d8e] font-semibold text-sm flex items-center gap-1.5 py-2 px-1 transition-all duration-200">
+            <i data-lucide="layout-dashboard" class="w-4 h-4"></i>Dashboard
+        </a>
+        <a href="{{ url_for('main.my_pets') }}"
+            class="nav-link-item text-slate-600 hover:text-[#007d8e] font-semibold text-sm flex items-center gap-1.5 py-2 px-1 transition-all duration-200">
+            <i data-lucide="paw-print" class="w-4 h-4"></i>My Pets
+        </a>
+        <a href="{{ url_for('main.profile') }}"
+            class="nav-link-item text-slate-600 hover:text-[#007d8e] font-semibold text-sm flex items-center gap-1.5 py-2 px-1 transition-all duration-200">
+            <i data-lucide="user" class="w-4 h-4"></i>Profile
+        </a>
+        <a href="{{ url_for('main.notifications') }}"
+            class="nav-link-item text-slate-600 hover:text-[#007d8e] font-semibold text-sm flex items-center gap-1.5 py-2 px-1 transition-all duration-200">
+            <i data-lucide="bell" class="w-4 h-4"></i>Requests
+        </a>
+        <a href="{{ url_for('auth.logout') }}"
+            class="bg-[#EF4444]/10 text-[#EF4444] hover:bg-[#EF4444] hover:text-white px-4 py-2 rounded-xl font-bold transition-all duration-200 text-sm flex items-center gap-1.5">
+            <i data-lucide="log-out" class="w-4 h-4"></i>Logout
+        </a>
+        {% endif %}
+        {% endif %}
+    </div>
+</nav>
+
+<!-- Active link styling helper: dynamically inject active styles -->
+<style>
+    .nav-link-item {
+        position: relative;
+        transition:
+            color .25s ease,
+            transform .25s ease;
+    }
+
+    .nav-link-item::after {
+        content: '';
+
+        position: absolute;
+
+        left: 50%;
+        bottom: -2px;
+
+        width: 0;
+        height: 2px;
+
+        background: #007d8e;
+
+        border-radius: 999px;
+
+        transform: translateX(-50%);
+
+        transition:
+            width .30s ease,
+            opacity .30s ease;
+
+        opacity: 0;
+    }
+
+    .nav-link-item:hover {
+        color: #007d8e;
+        transform: translateY(-1px);
+    }
+
+    .nav-link-item:hover::after {
+        width: 100%;
+        opacity: 1;
+    }
+
+    /* Active page = text only */
+
+        {
+        % if request.path=='/' or request.endpoint=='main.home' %
+    }
+
+    .nav-link-item[href="/"] {
+        color: #007d8e !important;
+        font-weight: 800 !important;
+    }
+
+        {
+        % elif request.path=='/about' or request.endpoint=='main.about' %
+    }
+
+    .nav-link-item[href="/about"] {
+        color: #007d8e !important;
+        font-weight: 800 !important;
+    }
+
+        {
+        % elif request.path=='/pets' or request.endpoint=='main.pets' %
+    }
+
+    .nav-link-item[href="/pets"] {
+        color: #007d8e !important;
+        font-weight: 800 !important;
+    }
+
+        {
+        % elif request.path=='/dashboard' or request.endpoint=='main.dashboard' %
+    }
+
+    .nav-link-item[href="/dashboard"] {
+        color: #007d8e !important;
+        font-weight: 800 !important;
+    }
+
+        {
+        % elif request.path=='/favorites' or request.endpoint=='main.favorites' %
+    }
+
+    .nav-link-item[href="/favorites"] {
+        color: #007d8e !important;
+        font-weight: 800 !important;
+    }
+
+        {
+        % elif request.path=='/my-pets' or request.endpoint=='main.my_pets' %
+    }
+
+    .nav-link-item[href="/my-pets"] {
+        color: #007d8e !important;
+        font-weight: 800 !important;
+    }
+
+        {
+        % elif request.path=='/profile' or request.endpoint=='main.profile' %
+    }
+
+    .nav-link-item[href="/profile"] {
+        color: #007d8e !important;
+        font-weight: 800 !important;
+    }
+
+        {
+        % elif request.path=='/notifications' or request.endpoint=='main.notifications' %
+    }
+
+    .nav-link-item[href="/notifications"] {
+        color: #007d8e !important;
+        font-weight: 800 !important;
+    }
+
+        {
+        % endif %
+    }
+</style>
+{% endif %}

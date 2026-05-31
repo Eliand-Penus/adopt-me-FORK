@@ -1,87 +1,223 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About Us - Adopt Me</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-50 min-h-screen text-gray-800 font-sans flex flex-col">
+{% extends 'layout/base.html' %}
 
-    <!-- Navigation -->
-    <nav class="bg-white shadow px-6 py-4 mb-8">
-        <div class="max-w-6xl mx-auto flex justify-between items-center">
-            <h1 class="text-2xl font-bold text-indigo-600">Adopt Me</h1>
-            <div class="space-x-4">
-                <a href="/" class="text-gray-600 hover:text-indigo-600 font-medium">Home</a>
-                <a href="/pets" class="text-gray-600 hover:text-indigo-600 font-medium">Browse</a>
-                <a href="/about" class="text-indigo-600 font-bold">About</a>
-                {% if current_user.is_authenticated %}
-                    <a href="/dashboard" class="text-gray-600 hover:text-indigo-600 font-medium">Dashboard</a>
-                {% else %}
-                    <a href="/login" class="text-gray-600 hover:text-indigo-600 font-medium">Login</a>
-                {% endif %}
-            </div>
+{% block title %}About Us - Adopt Me{% endblock %}
+
+{% block extra_head %}
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
+</style>
+{% endblock %}
+
+{% block body_class %}bg-[#F8FAFB] min-h-screen overflow-x-hidden text-slate-800 flex flex-col pt-[76px]{% endblock %}
+
+{% block page_actions %}{% endblock %}
+
+{% block content %}
+<!-- MAIN -->
+<main
+    class="flex-grow py-16 sm:py-24 px-6 sm:px-[55px] relative overflow-hidden bg-gradient-to-b from-[#F2F5F7] to-white">
+
+    <!-- Decorative Floating SVGs (Paws) -->
+    <div class="absolute top-12 left-10 opacity-30 animate-pulse pointer-events-none">
+        <svg class="w-12 h-12 text-[#007d8e]/10 rotate-12" viewBox="0 0 24 24" fill="currentColor">
+            <circle cx="12" cy="14" r="4" />
+            <circle cx="6.5" cy="8.5" r="2" />
+            <circle cx="10.5" cy="5" r="2" />
+            <circle cx="17.5" cy="8.5" r="2" />
+            <circle cx="13.5" cy="5" r="2" />
+        </svg>
+    </div>
+    <div class="absolute bottom-20 right-16 opacity-30 animate-pulse pointer-events-none" style="animation-delay: 2s;">
+        <svg class="w-16 h-16 text-[#ff5e1c]/10 -rotate-12" viewBox="0 0 24 24" fill="currentColor">
+            <circle cx="12" cy="14" r="4" />
+            <circle cx="6.5" cy="8.5" r="2" />
+            <circle cx="10.5" cy="5" r="2" />
+            <circle cx="17.5" cy="8.5" r="2" />
+            <circle cx="13.5" cy="5" r="2" />
+        </svg>
+    </div>
+
+    <div class="max-w-6xl mx-auto relative z-10 space-y-16">
+
+        <!-- HERO -->
+        <div class="text-center space-y-6 animate-fade-in-up">
+
+            <span
+                class="inline-flex items-center gap-2 bg-[#ff5e1c]/10 border border-[#ff5e1c]/20 text-[#ff5e1c] px-4 py-1.5 rounded-full font-bold text-xs uppercase tracking-wider">
+                <i data-lucide="info" class="w-4 h-4 text-[#ff5e1c]"></i> About Our Platform
+            </span>
+
+            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black text-[#2A2A2A] leading-tight">
+                Connecting Pets With <span class="text-[#007d8e] relative">Loving Families<span
+                        class="absolute bottom-0 left-0 w-full h-1 bg-[#ff5e1c]/60 rounded-full"></span></span>
+            </h1>
+
+            <p class="max-w-3xl mx-auto text-lg sm:text-xl text-slate-500 font-medium leading-relaxed">
+                Adopt Me helps dogs and cats find safe, caring, and permanent homes through a modern, trusted, and fully
+                digitized adoption experience.
+            </p>
+
         </div>
-    </nav>
 
-    <main class="max-w-4xl mx-auto px-6 mb-12 flex-grow w-full">
-        <div class="bg-white rounded-xl shadow-md overflow-hidden">
-            <div class="px-8 py-10 bg-indigo-600 text-white text-center">
-                <h2 class="text-4xl font-extrabold mb-4">About Adopt Me</h2>
-                <p class="text-indigo-100 max-w-2xl mx-auto text-lg">Connecting loving families with pets in need of a forever home.</p>
+        <!-- MAIN REDESIGNED SAAS CARD -->
+        <div
+            class="bg-white border border-gray-100 rounded-[3rem] shadow-2xl overflow-hidden transform hover:scale-[1.005] transition-all duration-300">
+
+            <!-- TOP DECORATIVE SECTION -->
+            <div
+                class="px-6 sm:px-12 py-16 bg-gradient-to-r from-[#007d8e] to-[#006674] text-white text-center relative overflow-hidden">
+
+                <div class="absolute -top-20 -right-20 w-60 h-60 bg-white/5 rounded-full pointer-events-none"></div>
+                <div class="absolute -bottom-20 -left-20 w-60 h-60 bg-white/5 rounded-full pointer-events-none"></div>
+
+                <!-- Automatic Clickable Logo -->
+                <a href="/" class="inline-block mx-auto mb-6 hover:scale-105 transition-transform duration-300">
+                    <img src="{{ url_for('static', filename='images/adopt-me-icon.png') }}"
+                        class="h-28 sm:h-32 w-auto object-contain"
+                        onerror="this.style.display='none'; document.getElementById('about-logo-fallback').style.display='block';">
+                    <span id="about-logo-fallback" class="hidden text-3xl font-black tracking-wider text-white">ADOPT
+                        ME</span>
+                </a>
+
+                <h2 class="text-4xl sm:text-5xl font-black mb-4">
+                    About Adopt Me
+                </h2>
+
+                <p class="text-teal-100 text-lg sm:text-xl max-w-2xl mx-auto leading-relaxed">
+                    Making pet adoption easier, safer, and more accessible for everyone<br>
+                    across the country.
+                </p>
+
             </div>
-            
-            <div class="p-8 space-y-8">
-                <section>
-                    <h3 class="text-2xl font-bold text-gray-900 mb-3 border-b pb-2">Our Mission</h3>
-                    <p class="text-gray-600 leading-relaxed">
-                        We believe every pet deserves a loving and safe environment. Adopt Me was created to streamline the adoption process, making it easier for shelters and individuals to find responsible adopters for dogs and cats. By centralizing listings and verifying users, we aim to reduce the number of homeless animals and build a community of caring pet owners.
-                    </p>
-                </section>
-                
-                <section>
-                    <h3 class="text-2xl font-bold text-gray-900 mb-3 border-b pb-2">How It Works</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
-                        <div class="bg-gray-50 p-5 rounded-lg border border-gray-100 text-center">
-                            <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                            </div>
-                            <h4 class="font-bold text-gray-900 mb-2">1. Browse Pets</h4>
-                            <p class="text-sm text-gray-600">Search through our database of available dogs and cats using advanced filters to find your perfect match.</p>
-                        </div>
-                        <div class="bg-gray-50 p-5 rounded-lg border border-gray-100 text-center">
-                            <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-                            </div>
-                            <h4 class="font-bold text-gray-900 mb-2">2. Apply to Adopt</h4>
-                            <p class="text-sm text-gray-600">Submit an application. Pet owners and shelters will review your profile and request to ensure a safe home.</p>
-                        </div>
-                        <div class="bg-gray-50 p-5 rounded-lg border border-gray-100 text-center">
-                            <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                            </div>
-                            <h4 class="font-bold text-gray-900 mb-2">3. Meet Your Match</h4>
-                            <p class="text-sm text-gray-600">Once approved, arrange a meet-up and welcome your new furry family member to their forever home!</p>
+
+            <!-- CONTENT SPACING SYSTEM -->
+            <div class="p-8 sm:p-12 space-y-16">
+
+                <!-- MISSION GRID -->
+                <section class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+
+                    <div class="lg:col-span-4 flex justify-center">
+                        <div
+                            class="w-32 h-32 bg-[#007d8e]/10 text-[#007d8e] rounded-[2rem] flex items-center justify-center shadow-inner">
+                            <i data-lucide="heart" class="w-16 h-16 animate-pulse" style="animation-duration: 3s;"></i>
                         </div>
                     </div>
+
+                    <div class="lg:col-span-8 space-y-4 text-center lg:text-left">
+                        <h3 class="text-3xl font-black text-[#2A2A2A]">Our Mission</h3>
+                        <p class="text-slate-500 text-sm font-bold uppercase tracking-wider">Why we built the Adopt Me
+                            platform</p>
+                        <div
+                            class="bg-[#F2F5F7] rounded-[2rem] p-6 sm:p-8 border border-gray-100 text-slate-600 text-base leading-relaxed">
+                            We believe every pet deserves a loving, healthy, and safe environment. Adopt Me was created
+                            to streamline and simplify the rehoming and adoption processes, making it easier for
+                            responsible pet parents to connect and support dogs and cats.
+                            <br><br>
+                            By centralizing pet records, verifying owner IDs, and facilitating secure direct messaging,
+                            we aim to eliminate shelter backlogs and build a global community of pet enthusiasts based
+                            on mutual trust.
+                        </div>
+                    </div>
+
+                </section>
+
+                <!-- HOW IT WORKS STEP OVERHAUL -->
+                <section class="space-y-10 border-t border-gray-100 pt-16">
+
+                    <div class="flex items-center gap-4 mb-4 justify-center lg:justify-start">
+                        <div
+                            class="w-14 h-14 rounded-2xl bg-[#ff5e1c]/10 text-[#ff5e1c] flex items-center justify-center shadow-sm">
+                            <i data-lucide="sparkles" class="w-6 h-6"></i>
+                        </div>
+                        <div class="text-center lg:text-left">
+                            <h3 class="text-3xl font-black text-[#2A2A2A]">How It Works</h3>
+                            <p class="text-slate-500 text-sm font-medium">Three simple steps to adopt your companion</p>
+                        </div>
+                    </div>
+
+                    <!-- STEPS -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+                        <!-- STEP 1 -->
+                        <div
+                            class="bg-white border border-gray-200 rounded-[2rem] p-8 shadow-sm hover:shadow-xl hover:shadow-[#007d8e]/5 hover:-translate-y-1.5 transition-all duration-300 text-center group">
+                            <div
+                                class="w-16 h-16 bg-[#007d8e]/10 text-[#007d8e] rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm group-hover:scale-110 transition-transform duration-300">
+                                <i data-lucide="search" class="w-8 h-8"></i>
+                            </div>
+                            <h4 class="text-2xl font-black text-[#2A2A2A] mb-3">Browse Pets</h4>
+                            <p class="text-slate-500 text-sm leading-relaxed font-medium">
+                                Search through available dogs and cats using smart filter metrics to find your perfect
+                                household companion.
+                            </p>
+                        </div>
+
+                        <!-- STEP 2 -->
+                        <div class="bg-white border border-gray-200 rounded-[2rem] p-8 shadow-sm hover:shadow-xl hover:shadow-[#ff5e1c]/5 hover:-translate-y-1.5 transition-all duration-300 text-center group"
+                            style="animation-delay: 0.1s;">
+                            <div
+                                class="w-16 h-16 bg-[#ff5e1c]/10 text-[#ff5e1c] rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm group-hover:scale-110 transition-transform duration-300">
+                                <i data-lucide="file-text" class="w-8 h-8"></i>
+                            </div>
+                            <h4 class="text-2xl font-black text-[#2A2A2A] mb-3">Apply to Adopt</h4>
+                            <p class="text-slate-500 text-sm leading-relaxed font-medium">
+                                Submit formal adoption requests online and let owners review your verified profile to
+                                ensure a safe transition.
+                            </p>
+                        </div>
+
+                        <!-- STEP 3 -->
+                        <div class="bg-white border border-gray-200 rounded-[2rem] p-8 shadow-sm hover:shadow-xl hover:shadow-[#007d8e]/5 hover:-translate-y-1.5 transition-all duration-300 text-center group"
+                            style="animation-delay: 0.2s;">
+                            <div
+                                class="w-16 h-16 bg-[#007d8e]/10 text-[#007d8e] rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm group-hover:scale-110 transition-transform duration-300">
+                                <i data-lucide="smile" class="w-8 h-8"></i>
+                            </div>
+                            <h4 class="text-2xl font-black text-[#2A2A2A] mb-3">Bring Them Home</h4>
+                            <p class="text-slate-500 text-sm leading-relaxed font-medium">
+                                Arrange physically secure meetups, finalize health transfers, and welcome your new
+                                companion home!
+                            </p>
+                        </div>
+
+                    </div>
+
                 </section>
 
             </div>
-            
-            <div class="p-8 bg-indigo-50 border-t border-indigo-100 text-center flex flex-col items-center justify-center relative z-10">
-                <h3 class="text-2xl font-bold text-indigo-900 mb-4">Ready to find your new best friend?</h3>
-                <a href="/pets" class="inline-block relative z-20 bg-indigo-600 text-white font-extrabold py-3 px-8 rounded-lg shadow-lg hover:bg-indigo-700 hover:shadow-xl transition-all transform hover:-translate-y-1">
-                    Browse Available Pets
+
+            <!-- PREMIUM FOOTER CALL-TO-ACTION -->
+            <div
+                class="px-6 sm:px-12 py-16 bg-gradient-to-b from-white to-[#F2F5F7] border-t border-gray-100 text-center space-y-6">
+                <h3 class="text-3xl sm:text-4xl font-black text-[#2A2A2A]">Ready to Find Your New Best Friend?</h3>
+                <p class="text-slate-500 text-base sm:text-lg max-w-xl mx-auto font-medium">
+                    Explore lovely pets waiting for their forever homes and start your adoption journey today.
+                </p>
+                <a href="/choose-category"
+                    class="inline-flex items-center gap-2 bg-[#007d8e] hover:bg-[#006674] text-white px-8 py-4 rounded-2xl font-black text-lg shadow-lg hover:shadow-xl hover:shadow-[#007d8e]/20 hover:-translate-y-0.5 transition-all duration-200">
+                    Find Your Companion <i data-lucide="arrow-right" class="w-5 h-5"></i>
                 </a>
             </div>
+
         </div>
-    </main>
 
-    <!-- Footer -->
-    <footer class="bg-white border-t py-8 text-center text-gray-500 mt-auto">
-        <p>&copy; 2026 Adopt Me Platform. All rights reserved.</p>
-    </footer>
+    </div>
 
-</body>
-</html>
+</main>
+
+<!-- FOOTER -->
+<footer class="bg-white border-t border-gray-100 py-12 text-center text-slate-400 mt-auto px-6">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-6">
+        <span class="text-xs font-black text-[#007d8e] tracking-wider uppercase">ADOPT ME PLATFORM</span>
+        <p class="text-sm font-semibold text-slate-400">&copy; 2026 Adopt Me Platform. All rights reserved.</p>
+        <div class="flex gap-4">
+            <a href="#" class="text-slate-400 hover:text-[#007d8e] transition-colors"><i data-lucide="instagram"
+                    class="w-4 h-4"></i></a>
+            <a href="#" class="text-slate-400 hover:text-[#007d8e] transition-colors"><i data-lucide="twitter"
+                    class="w-4 h-4"></i></a>
+            <a href="#" class="text-slate-400 hover:text-[#007d8e] transition-colors"><i data-lucide="facebook"
+                    class="w-4 h-4"></i></a>
+        </div>
+    </div>
+</footer>
+{% endblock %}

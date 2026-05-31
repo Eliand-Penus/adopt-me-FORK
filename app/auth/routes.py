@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, current_app, flash
 from flask_login import login_user, logout_user, login_required
 import string, random
+from sqlalchemy.exc import IntegrityError
 
 from app import db, bcrypt, oauth
 from app.models.user import User
@@ -68,6 +69,18 @@ def register():
         phone_number = request.form.get("phone_number")
         address = request.form.get("address")
 
+        if User.query.filter_by(email=email).first():
+            flash("Email already exists. Please use another email.", "error")
+            return redirect(url_for('auth.register'))
+            
+        if User.query.filter_by(username=username).first():
+            flash("Username already taken.", "error")
+            return redirect(url_for('auth.register'))
+            
+        if phone_number and User.query.filter_by(phone_number=phone_number).first():
+            flash("Phone number already registered.", "error")
+            return redirect(url_for('auth.register'))
+
         hashed_password = bcrypt.generate_password_hash(password).decode("utf-8")
 
         new_user = User(
@@ -81,8 +94,13 @@ def register():
         )
 
         db.session.add(new_user)
-        db.session.commit()
-        return redirect("/login")
+        try:
+            db.session.commit()
+            return redirect("/login")
+        except IntegrityError:
+            db.session.rollback()
+            flash("An error occurred during registration. Please try again.", "error")
+            return redirect(url_for('auth.register'))
 
     return render_template("register.html")
 

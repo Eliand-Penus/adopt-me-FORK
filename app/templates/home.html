@@ -1,65 +1,376 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends 'layout/base.html' %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Adopt Me - Find Your New Best Friend</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
+{% block title %}Adopt Me - Premium Pet Adoption Platform{% endblock %}
 
-<body class="bg-gray-50 min-h-screen text-gray-800 font-sans flex flex-col">
+{% block extra_head %}
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+        /* Custom Keyframes for Animations */
+        @keyframes float-gentle {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(2deg); }
+        }
+        @keyframes float-slow {
+            0%, 100% { transform: translateY(0px) rotate(12deg); }
+            50% { transform: translateY(-15px) rotate(6deg); }
+        }
+        .animate-float-gentle {
+            animation: float-gentle 6s ease-in-out infinite;
+        }
+        .animate-float-slow {
+            animation: float-slow 8s ease-in-out infinite;
+        }
+    </style>
+{% endblock %}
 
-    <!-- Navigation -->
-    <nav class="bg-white shadow px-6 py-4">
-        <div class="max-w-6xl mx-auto flex justify-between items-center">
-            <h1 class="text-2xl font-bold text-indigo-600">Adopt Me</h1>
-            <div class="space-x-4">
-                {% if current_user.is_authenticated %}
-                <a href="/dashboard" class="text-gray-600 hover:text-indigo-600 font-medium">Dashboard</a>
-                <a href="/profile" class="text-gray-600 hover:text-indigo-600 font-medium">Profile</a>
-                <a href="/about" class="text-gray-600 hover:text-indigo-600 font-medium">About</a>
-                <a href="/logout" class="text-red-600 hover:text-red-800 font-medium">Logout</a>
-                {% else %}
-                <a href="/login" class="text-gray-600 hover:text-indigo-600 font-medium">Login</a>
-                <a href="/register"
-                    class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition font-medium">Sign
-                    Up</a>
-                <a href="/about" class="text-gray-600 hover:text-indigo-600 font-medium">About</a>
-                {% endif %}
-            </div>
+{% block body_class %}bg-[#F8FAFB] min-h-screen text-slate-800 font-sans flex flex-col pt-[76px]{% endblock %}
+
+{% block page_actions %}
+<!-- Page Actions Block Overridden to remain empty to eliminate sticky action bar redirects -->
+{% endblock %}
+
+{% block content %}
+    <!-- MAIN HERO (SECTION 1) -->
+    <main class="relative overflow-hidden bg-gradient-to-b from-[#F2F5F7] to-white py-20 lg:py-28 px-6 sm:px-[55px]">
+        
+        <!-- Decorative Floating SVGs (Paws) -->
+        <div class="absolute top-12 left-10 opacity-30 pointer-events-none">
+            <svg class="w-12 h-12 text-[#007d8e]/10 rotate-12" viewBox="0 0 24 24" fill="currentColor">
+                <circle cx="12" cy="14" r="4"/>
+                <circle cx="6.5" cy="8.5" r="2"/>
+                <circle cx="10.5" cy="5" r="2"/>
+                <circle cx="17.5" cy="8.5" r="2"/>
+                <circle cx="13.5" cy="5" r="2"/>
+            </svg>
         </div>
-    </nav>
+        <div class="absolute bottom-20 right-16 opacity-30 pointer-events-none" style="animation-delay: 2s;">
+            <svg class="w-16 h-16 text-[#ff5e1c]/10 -rotate-12" viewBox="0 0 24 24" fill="currentColor">
+                <circle cx="12" cy="14" r="4"/>
+                <circle cx="6.5" cy="8.5" r="2"/>
+                <circle cx="10.5" cy="5" r="2"/>
+                <circle cx="17.5" cy="8.5" r="2"/>
+                <circle cx="13.5" cy="5" r="2"/>
+            </svg>
+        </div>
 
-    <!-- Hero Section -->
-    <main class="flex-grow flex items-center justify-center bg-gradient-to-b from-indigo-50 to-white px-6 py-20">
-        <div class="max-w-4xl mx-auto text-center">
-            <h2 class="text-5xl md:text-6xl font-extrabold text-gray-900 mb-6 tracking-tight">
-                Find Your New <span class="text-indigo-600">Best Friend</span>
-            </h2>
-            <p class="text-xl text-gray-600 mb-10 max-w-2xl mx-auto">
-                Discover adorable pets looking for a loving home. Whether you want to adopt a new family member or need
-                to put a pet up for adoption, we're here to help.
-            </p>
+        <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center relative z-10">
+            
+            <!-- Hero Left: Content -->
+            <div class="lg:col-span-7 space-y-8 text-center lg:text-left">
+                
+                <!-- Accent Label -->
+                <div class="inline-flex items-center gap-2 bg-[#ff5e1c]/10 border border-[#ff5e1c]/20 px-4 py-2 rounded-full text-xs font-black text-[#ff5e1c] uppercase tracking-wider select-none animate-pulse">
+                    <i data-lucide="sparkles" class="w-4 h-4 text-[#ff5e1c]"></i>
+                    Premium Pet-Tech Platform
+                </div>
 
-            <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="/choose-category"
-                    class="bg-indigo-600 text-white font-bold py-4 px-8 rounded-full shadow-lg hover:bg-indigo-700 hover:shadow-xl transition transform hover:-translate-y-1 text-lg">
-                    Adopt a Pet
-                </a>
-                <a href="{% if current_user.is_authenticated %}/add-pet{% else %}/login{% endif %}"
-                    class="bg-white text-indigo-600 font-bold py-4 px-8 rounded-full shadow-lg border border-indigo-100 hover:bg-indigo-50 hover:shadow-xl transition transform hover:-translate-y-1 text-lg">
-                    Put Up for Adoption
-                </a>
+                <h1 class="text-5xl sm:text-6xl lg:text-7xl font-black text-[#2A2A2A] leading-[1.08] tracking-tight">
+                    Connecting Hearts,<br>
+                    <span class="text-[#007d8e] relative">
+                        One Paw at a Time.
+                        <span class="absolute bottom-1.5 left-0 w-full h-2.5 bg-[#ff5e1c]/30 rounded-full -z-10"></span>
+                    </span>
+                </h1>
+
+                <p class="text-lg sm:text-xl text-slate-500 font-medium leading-relaxed max-w-2xl mx-auto lg:mx-0">
+                    Experience a secure, digital, and premium pet adoption space. We unite certified rehomers with loving families to foster lifetime companionships.
+                </p>
+
+                <!-- Single Premium Anchor Action Button -->
+                <div class="flex justify-center lg:justify-start pt-2">
+                    <a href="#onboarding"
+                       class="inline-flex items-center gap-2.5 bg-[#007d8e] hover:bg-[#006674] text-white font-extrabold px-10 py-5 rounded-2xl shadow-xl hover:shadow-2xl hover:shadow-[#007d8e]/25 hover:-translate-y-0.5 transition-all duration-300 group text-lg">
+                        <span>Get Started</span>
+                        <i data-lucide="arrow-down" class="w-5 h-5 group-hover:translate-y-1.5 transition-transform duration-300"></i>
+                    </a>
+                </div>
+
+                <!-- Trust Badges -->
+                <div class="pt-8 grid grid-cols-3 gap-6 border-t border-slate-200/60 max-w-lg mx-auto lg:mx-0">
+                    <div class="flex flex-col items-center lg:items-start space-y-1">
+                        <span class="text-3xl sm:text-4xl font-black text-[#007d8e]">100%</span>
+                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider text-center lg:text-left leading-tight">Verified Health</span>
+                    </div>
+                    <div class="flex flex-col items-center lg:items-start space-y-1">
+                        <span class="text-3xl sm:text-4xl font-black text-[#ff5e1c]">10k+</span>
+                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider text-center lg:text-left leading-tight">Happy Homes</span>
+                    </div>
+                    <div class="flex flex-col items-center lg:items-start space-y-1">
+                        <span class="text-3xl sm:text-4xl font-black text-[#2A2A2A]">24/7</span>
+                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider text-center lg:text-left leading-tight">Owner Care</span>
+                    </div>
+                </div>
+
             </div>
+
+            <!-- Hero Right: Custom SVG Illustration & Overlapping Card -->
+            <div class="lg:col-span-5 relative flex justify-center items-center">
+                <!-- Glowing Backdrop Blob -->
+                <div class="absolute w-72 sm:w-96 h-72 sm:h-96 bg-gradient-to-tr from-[#007d8e]/10 to-[#ff5e1c]/10 rounded-full blur-3xl opacity-60 z-0"></div>
+                
+                <div class="relative z-10 bg-white border border-slate-100/80 p-8 rounded-[3rem] shadow-2xl hover:shadow-3xl transition-all duration-300 max-w-md w-full transform hover:scale-[1.01] group/card">
+                    
+                    <!-- Floating Star Badge -->
+                    <div class="absolute -top-5 -right-5 w-14 h-14 bg-[#ff5e1c] rounded-2xl shadow-lg flex items-center justify-center text-white transform rotate-12 group-hover/card:rotate-0 transition-transform duration-300">
+                        <i data-lucide="star" class="w-6 h-6 fill-current"></i>
+                    </div>
+
+                    <!-- Modern Stylized Dog & Cat Portait SVG -->
+                    <div class="bg-gradient-to-b from-[#F2F5F7] to-white rounded-[2rem] overflow-hidden p-6 border border-slate-100 flex items-center justify-center">
+                        <svg viewBox="0 0 400 300" class="w-full h-auto text-[#007d8e]" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Back Blobs -->
+                            <circle cx="200" cy="150" r="110" fill="url(#bg-gradient)" />
+                            
+                            <!-- Stylized Dog (Left) -->
+                            <g class="transition-transform duration-500 group-hover/card:-translate-y-2">
+                                <!-- Dog Ears -->
+                                <path d="M100 110 C80 60, 110 50, 120 70 C130 90, 120 110, 100 110 Z" fill="#2A2A2A" />
+                                <path d="M180 110 C200 60, 170 50, 160 70 C150 90, 160 110, 180 110 Z" fill="#2A2A2A" />
+                                <!-- Dog Head -->
+                                <path d="M110 100 C110 80, 170 80, 170 100 C170 130, 110 130, 110 100 Z" fill="#E2E8F0" />
+                                <!-- Dog Muzzle -->
+                                <path d="M125 115 C125 105, 155 105, 155 115 C155 130, 125 130, 125 115 Z" fill="#F8FAFB" />
+                                <path d="M137 113 L143 113 C145 113, 146 115, 144 117 L141 120 C140 121, 139 121, 138 120 L135 117 C133 115, 134 113, 137 113 Z" fill="#2A2A2A" />
+                                <!-- Dog Eyes -->
+                                <circle cx="130" cy="98" r="3.5" fill="#2A2A2A" />
+                                <circle cx="150" cy="98" r="3.5" fill="#2A2A2A" />
+                                <!-- Blush -->
+                                <circle cx="122" cy="106" r="4.5" fill="#ff5e1c" opacity="0.3" />
+                                <circle cx="158" cy="106" r="4.5" fill="#ff5e1c" opacity="0.3" />
+                                <!-- Dog Collar -->
+                                <path d="M120 126 C120 126, 140 132, 160 126 L158 131 C158 131, 140 137, 122 131 Z" fill="#007d8e" />
+                                <circle cx="140" cy="133" r="3" fill="#ff5e1c" />
+                            </g>
+                            
+                            <!-- Stylized Cat (Right) -->
+                            <g class="transition-transform duration-500 group-hover/card:-translate-y-3">
+                                <!-- Cat Ears -->
+                                <path d="M220 120 L225 80 L245 100 Z" fill="#ff5e1c" />
+                                <path d="M290 120 L285 80 L265 100 Z" fill="#ff5e1c" />
+                                <!-- Cat Head -->
+                                <circle cx="255" cy="120" r="32" fill="#FFF7ED" stroke="#FFE4E6" stroke-width="1.5" />
+                                <!-- Inner Ears -->
+                                <path d="M224 114 L227 88 L240 102 Z" fill="#FECDD3" />
+                                <path d="M286 114 L283 88 L270 102 Z" fill="#FECDD3" />
+                                <!-- Cat Eyes -->
+                                <ellipse cx="242" cy="115" rx="3.5" ry="5" fill="#007d8e" />
+                                <ellipse cx="268" cy="115" rx="3.5" ry="5" fill="#007d8e" />
+                                <circle cx="243.5" cy="113.5" r="1.5" fill="white" />
+                                <circle cx="269.5" cy="113.5" r="1.5" fill="white" />
+                                <!-- Cat Nose & Whiskers -->
+                                <polygon points="253,122 257,122 255,124" fill="#2A2A2A" />
+                                <path d="M252 127 Q255 129 258 127" stroke="#2A2A2A" stroke-width="1.5" fill="none" />
+                                <!-- Whiskers -->
+                                <line x1="228" y1="122" x2="218" y2="120" stroke="#CBD5E1" stroke-width="1.5" />
+                                <line x1="228" y1="126" x2="216" y2="128" stroke="#CBD5E1" stroke-width="1.5" />
+                                <line x1="282" y1="122" x2="292" y2="120" stroke="#CBD5E1" stroke-width="1.5" />
+                                <line x1="282" y1="126" x2="294" y2="128" stroke="#CBD5E1" stroke-width="1.5" />
+                            </g>
+
+                            <defs>
+                                <radialGradient id="bg-gradient" cx="50%" cy="50%" r="50%">
+                                    <stop offset="0%" stop-color="#F2F5F7" />
+                                    <stop offset="100%" stop-color="#E2E8F0" stop-opacity="0.4" />
+                                </radialGradient>
+                            </defs>
+                        </svg>
+                    </div>
+
+                    <!-- Overlay Description -->
+                    <div class="mt-6 border-t border-slate-100 pt-6 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-[#007d8e]/10 rounded-full flex items-center justify-center text-[#007d8e]">
+                                <i data-lucide="shield-check" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-slate-800 text-sm">Bella & Luna</h4>
+                                <p class="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider">Verified Health Record</p>
+                            </div>
+                        </div>
+                        <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] px-2.5 py-1 rounded-full uppercase font-black tracking-wider shadow-sm">
+                            Ready to Adopt
+                        </span>
+                    </div>
+
+                </div>
+            </div>
+
         </div>
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-white border-t py-8 text-center text-gray-500 mt-auto">
-        <p>&copy; 2026 Adopt Me Platform. All rights reserved.</p>
+    <!-- SECTION 2: VIEWPORT-TRIGGERED ONBOARDING SPLIT SELECTOR -->
+    <section id="onboarding" class="py-24 px-6 sm:px-[55px] bg-[#F8FAFB] relative overflow-hidden border-t border-slate-100">
+        
+        <!-- Decorative subtle grid background -->
+        <div class="absolute inset-0 opacity-[0.015] pointer-events-none bg-[radial-gradient(#007d8e_1px,transparent_1px)] [background-size:24px_24px]"></div>
+
+        <div class="max-w-6xl mx-auto relative z-10 space-y-16">
+            
+            <!-- Heading -->
+            <div class="text-center space-y-4 max-w-2xl mx-auto">
+                <span class="inline-flex items-center gap-2 bg-[#007d8e]/10 border border-[#007d8e]/20 text-[#007d8e] px-4 py-1.5 rounded-full font-bold text-xs uppercase tracking-wider animate-bounce" style="animation-duration: 3s;">
+                    <i data-lucide="mouse-pointer" class="w-3.5 h-3.5"></i> Pick Your Path
+                </span>
+                <h2 class="text-4xl sm:text-5xl font-black text-[#2A2A2A] tracking-tight">
+                    What is Your Goal Today?
+                </h2>
+                <p class="text-slate-500 font-semibold text-base sm:text-lg">
+                    Select one of our secure channels below to initiate your customized pet-tech journey.
+                </p>
+            </div>
+
+            <!-- Onboarding Split Columns Grid with Reveal Animations -->
+            <div class="flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-4 relative max-w-5xl mx-auto">
+                
+                <!-- COLUMN 1: ADOPT CARD -->
+                <div class="scroll-reveal-card opacity-0 translate-y-12 scale-95 transition-all duration-1000 w-full lg:w-1/2 bg-white border-2 border-slate-200/60 rounded-[2.5rem] p-8 sm:p-10 shadow-md hover:shadow-2xl hover:shadow-[#007d8e]/10 transition-all duration-300 flex flex-col justify-between group min-h-[380px] relative overflow-hidden transform hover:-translate-y-1.5">
+                    <!-- Top subtle pattern -->
+                    <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-[#007d8e]/5 to-transparent rounded-bl-[100px] pointer-events-none"></div>
+                    
+                    <div class="space-y-6 relative z-10">
+                        <div class="w-14 h-14 bg-[#007d8e]/10 text-[#007d8e] rounded-2xl flex items-center justify-center shadow-inner group-hover:scale-110 group-hover:bg-[#007d8e] group-hover:text-white transition duration-300">
+                            <i data-lucide="search" class="w-6 h-6"></i>
+                        </div>
+                        <div class="space-y-2">
+                            <h3 class="text-2xl sm:text-3xl font-black text-[#2A2A2A] tracking-tight group-hover:text-[#007d8e] transition duration-200">ADOPT A COMPANION</h3>
+                            <p class="text-slate-500 font-semibold text-sm leading-relaxed">
+                                Find your new best friend. Browse available dogs and cats, filter by breed, vaccination status, and send instant adoption requests to pet parents.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="pt-8 relative z-10">
+                        <a href="/choose-category"
+                           class="w-full inline-flex items-center justify-center gap-2 bg-[#007d8e] hover:bg-[#006674] text-white px-6 py-4 rounded-xl font-bold shadow-lg shadow-[#007d8e]/10 hover:shadow-xl hover:shadow-[#007d8e]/20 transition-all duration-200 text-base">
+                            <span>Adopt a Pet</span>
+                            <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1.5 transition-transform duration-200"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- OR DIVIDER -->
+                <div class="flex items-center justify-center w-14 h-14 rounded-full bg-white border-2 border-slate-200 text-slate-500 font-black text-sm shadow-lg z-20 shrink-0 select-none my-2 lg:my-0 transform hover:scale-110 hover:border-[#ff5e1c] hover:text-[#ff5e1c] transition-all duration-300">
+                    OR
+                </div>
+
+                <!-- COLUMN 2: POST A PET CARD -->
+                <div class="scroll-reveal-card opacity-0 translate-y-12 scale-95 transition-all duration-1000 w-full lg:w-1/2 bg-white border-2 border-slate-200/60 rounded-[2.5rem] p-8 sm:p-10 shadow-md hover:shadow-2xl hover:shadow-[#ff5e1c]/10 transition-all duration-300 flex flex-col justify-between group min-h-[380px] relative overflow-hidden transform hover:-translate-y-1.5">
+                    <!-- Top subtle pattern -->
+                    <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-[#ff5e1c]/5 to-transparent rounded-bl-[100px] pointer-events-none"></div>
+
+                    <div class="space-y-6 relative z-10">
+                        <div class="w-14 h-14 bg-[#ff5e1c]/10 text-[#ff5e1c] rounded-2xl flex items-center justify-center shadow-inner group-hover:scale-110 group-hover:bg-[#ff5e1c] group-hover:text-white transition duration-300">
+                            <i data-lucide="home" class="w-6 h-6"></i>
+                        </div>
+                        <div class="space-y-2">
+                            <h3 class="text-2xl sm:text-3xl font-black text-[#2A2A2A] tracking-tight group-hover:text-[#ff5e1c] transition duration-200">PUT UP FOR ADOPTION</h3>
+                            <p class="text-slate-500 font-semibold text-sm leading-relaxed">
+                                Help pets find loving homes. List a pet for rehoming, upload vaccination certificates, manage profiles, and connect with screened potential adopters.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="pt-8 relative z-10">
+                        <a href="{% if current_user.is_authenticated %}/add-pet{% else %}/login{% endif %}"
+                           class="w-full inline-flex items-center justify-center gap-2 bg-[#ff5e1c] hover:bg-[#e04f14] text-white px-6 py-4 rounded-xl font-bold shadow-lg shadow-[#ff5e1c]/10 hover:shadow-xl hover:shadow-[#ff5e1c]/20 transition-all duration-200 text-base">
+                            <span>Post a Pet</span>
+                            <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1.5 transition-transform duration-200"></i>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+
+    <!-- CORE HOW IT WORKS STEPS -->
+    <section class="py-24 px-6 sm:px-[55px] bg-white border-t border-slate-100">
+        <div class="max-w-7xl mx-auto space-y-16">
+            
+            <div class="text-center space-y-4 max-w-2xl mx-auto">
+                <span class="inline-flex items-center gap-2 bg-[#ff5e1c]/10 border border-[#ff5e1c]/20 text-[#ff5e1c] px-4 py-1.5 rounded-full font-bold text-xs uppercase tracking-wider">
+                    <i data-lucide="workflow" class="w-3.5 h-3.5"></i> Streamlined Process
+                </span>
+                <h2 class="text-4xl font-black text-[#2A2A2A] tracking-tight">Adopt in Three Premium Steps</h2>
+                <p class="text-slate-500 font-semibold text-base sm:text-lg">Simple, transparent, and fully digital procedures from search to completion.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-12">
+                
+                <!-- Step 1 -->
+                <div class="bg-white border border-slate-100 rounded-[2.5rem] p-8 shadow-sm hover:shadow-xl hover:shadow-[#007d8e]/5 transition-all duration-300 group transform hover:-translate-y-1.5 text-center">
+                    <div class="w-16 h-16 bg-[#007d8e]/10 text-[#007d8e] rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-115 transition duration-300 shadow-sm">
+                        <i data-lucide="search" class="w-7 h-7"></i>
+                    </div>
+                    <h3 class="text-2xl font-black text-[#2A2A2A] mb-3">1. Smart Filtering</h3>
+                    <p class="text-slate-500 text-sm font-semibold leading-relaxed">
+                        Find the perfect dog or cat using optimized filters for age, category, vaccinations, and breed.
+                    </p>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="bg-white border border-slate-100 rounded-[2.5rem] p-8 shadow-sm hover:shadow-xl hover:shadow-[#ff5e1c]/5 transition-all duration-300 group transform hover:-translate-y-1.5 text-center" style="animation-delay: 0.1s;">
+                    <div class="w-16 h-16 bg-[#ff5e1c]/10 text-[#ff5e1c] rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-115 transition duration-300 shadow-sm">
+                        <i data-lucide="shield-check" class="w-7 h-7"></i>
+                    </div>
+                    <h3 class="text-2xl font-black text-[#2A2A2A] mb-3">2. Screened Adopters</h3>
+                    <p class="text-slate-500 text-sm font-semibold leading-relaxed">
+                        Connect with verified identities. Review authentic pet health papers and chat directly with peace of mind.
+                    </p>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="bg-white border border-slate-100 rounded-[2.5rem] p-8 shadow-sm hover:shadow-xl hover:shadow-[#007d8e]/5 transition-all duration-300 group transform hover:-translate-y-1.5 text-center" style="animation-delay: 0.2s;">
+                    <div class="w-16 h-16 bg-[#007d8e]/10 text-[#007d8e] rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-115 transition duration-300 shadow-sm">
+                        <i data-lucide="smile" class="w-7 h-7"></i>
+                    </div>
+                    <h3 class="text-2xl font-black text-[#2A2A2A] mb-3">3. Welcome Companion</h3>
+                    <p class="text-slate-500 text-sm font-semibold leading-relaxed">
+                        Authorize standard adoption handovers, coordinate secure handoffs, and invite your companion home!
+                    </p>
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="bg-white border-t border-slate-100 py-12 text-center text-slate-400 mt-auto px-6">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-6">
+            <span class="text-xs font-black text-[#007d8e] tracking-wider uppercase">ADOPT ME PLATFORM</span>
+            <p class="text-sm font-semibold text-slate-400">&copy; 2026 Adopt Me Platform. All rights reserved.</p>
+            <div class="flex gap-4">
+                <a href="#" class="text-slate-400 hover:text-[#007d8e] transition-colors"><i data-lucide="instagram" class="w-4 h-4"></i></a>
+                <a href="#" class="text-slate-400 hover:text-[#007d8e] transition-colors"><i data-lucide="twitter" class="w-4 h-4"></i></a>
+                <a href="#" class="text-slate-400 hover:text-[#007d8e] transition-colors"><i data-lucide="facebook" class="w-4 h-4"></i></a>
+            </div>
+        </div>
     </footer>
+{% endblock %}
 
-</body>
+{% block extra_js %}
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Viewport-triggered scroll reveal logic
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.remove('opacity-0', 'translate-y-12', 'scale-95');
+                        entry.target.classList.add('opacity-100', 'translate-y-0', 'scale-100');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { 
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            });
 
-</html>
+            const cards = document.querySelectorAll('.scroll-reveal-card');
+            cards.forEach(card => observer.observe(card));
+        });
+    </script>
+{% endblock %}
