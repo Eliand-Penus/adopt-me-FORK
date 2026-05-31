@@ -102,6 +102,34 @@
     <!-- Extra Page Specific JS -->
     {% block extra_js %}{% endblock %}
     
+    <!-- AI Voice Assistant UI -->
+    <div id="ai-voice-assistant-container" class="fixed bottom-6 right-6 z-50 flex flex-col items-end pointer-events-none">
+        
+        <!-- Status Popup -->
+        <div id="ai-voice-status" class="mb-4 transform translate-y-4 opacity-0 transition-all duration-300 pointer-events-none max-w-xs">
+            <div class="bg-white/80 backdrop-blur-md border border-brand-border shadow-lg rounded-2xl p-4 flex items-start gap-3">
+                <div id="ai-voice-icon-container" class="mt-0.5 text-brand-primary">
+                    <i data-lucide="bot" class="w-5 h-5"></i>
+                </div>
+                <div class="flex-1">
+                    <p id="ai-voice-title" class="text-xs font-bold text-brand-text mb-1 uppercase tracking-wider">AI Assistant</p>
+                    <p id="ai-voice-text" class="text-sm text-gray-600 leading-tight">Ready to help.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Floating Button -->
+        <button id="ai-voice-btn" aria-label="Toggle Voice Assistant" class="pointer-events-auto relative group flex items-center justify-center w-14 h-14 bg-brand-primary text-white rounded-full shadow-lg hover:bg-[#006a78] hover:shadow-xl hover:-translate-y-1 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-brand-primary/30">
+            <!-- Ripple/Pulse effect layers -->
+            <div id="ai-voice-pulse" class="absolute inset-0 rounded-full bg-brand-primary opacity-0 group-hover:opacity-20 transition-opacity"></div>
+            
+            <!-- Icon -->
+            <div id="ai-voice-btn-icon" class="relative z-10">
+                <i data-lucide="mic" class="w-6 h-6"></i>
+            </div>
+        </button>
+    </div>
+
     <!-- Initialize Lucide Icons Globally -->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
@@ -110,5 +138,8 @@
             }
         });
     </script>
+
+    <!-- AI Voice Assistant Logic -->
+    <script src="{{ url_for('static', filename='js/voice-assistant.js') }}" defer></script>
 </body>
 </html>

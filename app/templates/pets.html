@@ -146,7 +146,8 @@
                     class="w-full px-4 py-3.5 border border-slate-200 rounded-xl bg-slate-50 focus:ring-2 focus:ring-[#007d8e] focus:border-[#007d8e] focus:bg-white outline-none transition-all text-sm font-semibold text-slate-600 cursor-pointer">
                     <option value="">Any Gender</option>
                     <option value="Male" {% if request.args.get('gender')=='Male' %}selected{% endif %}>Male</option>
-                    <option value="Female" {% if request.args.get('gender')=='Female' %}selected{% endif %}>Female</option>
+                    <option value="Female" {% if request.args.get('gender')=='Female' %}selected{% endif %}>Female
+                    </option>
                 </select>
             </div>
 
@@ -238,7 +239,8 @@
                 {% endfor %}
 
                 <div class="p-3 pb-0">
-                    <div class="relative w-full h-60 group-carousel overflow-hidden bg-slate-50 rounded-[2rem] border border-slate-100">
+                    <div
+                        class="relative w-full h-60 group-carousel overflow-hidden bg-slate-50 rounded-[2rem] border border-slate-100">
                         <img src="{{ images_list[0] }}" alt="{{ pet.pet_name }}"
                             class="w-full h-60 object-cover pet-carousel-img transition-all duration-300 group-hover:scale-105"
                             data-images="{{ images_list|join(',') }}" data-current="0">
@@ -266,14 +268,16 @@
                 {% set img_url = pet.pet_image if pet.pet_image.startswith('http') else url_for('static',
                 filename=pet.pet_image) %}
                 <div class="p-3 pb-0">
-                    <div class="relative w-full h-60 overflow-hidden bg-slate-50 rounded-[2rem] border border-slate-100">
+                    <div
+                        class="relative w-full h-60 overflow-hidden bg-slate-50 rounded-[2rem] border border-slate-100">
                         <img src="{{ img_url }}" alt="{{ pet.pet_name }}"
                             class="w-full h-60 object-cover group-hover:scale-105 transition-transform duration-300">
                     </div>
                 </div>
                 {% else %}
                 <div class="p-3 pb-0">
-                    <div class="w-full h-60 bg-slate-50 rounded-[2rem] border border-slate-100 flex flex-col items-center justify-center text-slate-400">
+                    <div
+                        class="w-full h-60 bg-slate-50 rounded-[2rem] border border-slate-100 flex flex-col items-center justify-center text-slate-400">
                         <i data-lucide="image-off" class="w-10 h-10 mb-2 text-slate-300"></i>
                         <span class="text-xs font-semibold">No Image Available</span>
                     </div>
