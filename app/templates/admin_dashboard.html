@@ -126,7 +126,7 @@
                             <div class="flex flex-wrap gap-1.5 text-xs text-slate-500 font-bold capitalize">
                                 <span class="bg-brand-secondary px-2.5 py-1 rounded-lg">{{ pet.animal_type }}</span>
                                 <span class="bg-brand-secondary px-2.5 py-1 rounded-lg">{{ pet.breed or 'Unknown' }}</span>
-                                <span class="bg-brand-secondary px-2.5 py-1 rounded-lg">{{ pet.age or '?' }} yrs</span>
+                                <span class="bg-brand-secondary px-2.5 py-1 rounded-lg">{{ pet.formatted_age }}</span>
                             </div>
                         </div>
 
@@ -207,7 +207,7 @@
                                     <div class="bg-brand-secondary/60 rounded-2xl p-4 border border-brand-border text-sm font-semibold space-y-2 text-slate-600">
                                         <div class="flex justify-between"><span class="text-slate-400">Type:</span> <span class="capitalize text-brand-text font-bold">{{ pet.animal_type }}</span></div>
                                         <div class="flex justify-between"><span class="text-slate-400">Breed:</span> <span class="text-brand-text font-bold">{{ pet.breed or 'Unknown' }}</span></div>
-                                        <div class="flex justify-between"><span class="text-slate-400">Age:</span> <span class="text-brand-text font-bold">{{ pet.age or '?' }} yrs</span></div>
+                                        <div class="flex justify-between"><span class="text-slate-400">Age:</span> <span class="text-brand-text font-bold">{{ pet.formatted_age }}</span></div>
                                         <div class="flex justify-between"><span class="text-slate-400">Gender:</span> <span class="text-brand-text font-bold">{{ pet.gender or 'N/A' }}</span></div>
                                         <div class="flex justify-between"><span class="text-slate-400">Color:</span> <span class="text-brand-text font-bold">{{ pet.color or 'N/A' }}</span></div>
                                     </div>

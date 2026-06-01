@@ -228,7 +228,41 @@ def edit_pet(pet_id):
 
         pet.pet_name = request.form.get("pet_name")
         pet.breed = request.form.get("breed")
-        pet.age = request.form.get("age")
+        
+        # Parse and validate years and months
+        age_years_str = request.form.get("age", "")
+        age_months_str = request.form.get("age_months", "")
+
+        age_years = None
+        age_months = None
+
+        if age_years_str:
+            try:
+                age_years = int(age_years_str)
+                if age_years < 0:
+                    flash("Age in years must be a non-negative number.", "error")
+                    return redirect(f"/admin/edit-pet/{pet.pet_id}")
+            except ValueError:
+                flash("Invalid age in years.", "error")
+                return redirect(f"/admin/edit-pet/{pet.pet_id}")
+
+        if age_months_str:
+            try:
+                age_months = int(age_months_str)
+                if age_months < 0 or age_months > 11:
+                    flash("Age in months must be between 0 and 11.", "error")
+                    return redirect(f"/admin/edit-pet/{pet.pet_id}")
+            except ValueError:
+                flash("Invalid age in months.", "error")
+                return redirect(f"/admin/edit-pet/{pet.pet_id}")
+
+        if age_years is None and age_months is None:
+            flash("Please enter age in years and/or months.", "error")
+            return redirect(f"/admin/edit-pet/{pet.pet_id}")
+
+        pet.age = age_years if age_years is not None else 0
+        pet.age_months = age_months if age_months is not None else 0
+
 
         gender_val = request.form.get("gender")
 
