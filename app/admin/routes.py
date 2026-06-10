@@ -228,7 +228,39 @@ def edit_pet(pet_id):
 
         pet.pet_name = request.form.get("pet_name")
         pet.breed = request.form.get("breed")
-        pet.age = request.form.get("age")
+        # Parse and validate years and months
+        age_years_str = request.form.get("age", "")
+        age_months_str = request.form.get("age_months", "")
+
+        age_years = None
+        age_months = None
+
+        if age_years_str:
+            try:
+                age_years = int(age_years_str)
+                if age_years < 0:
+                    flash("Age in years must be a non-negative number.", "error")
+                    return redirect(f"/admin/edit-pet/{pet.pet_id}")
+            except ValueError:
+                flash("Invalid age in years.", "error")
+                return redirect(f"/admin/edit-pet/{pet.pet_id}")
+
+        if age_months_str:
+            try:
+                age_months = int(age_months_str)
+                if age_months < 0 or age_months > 11:
+                    flash("Age in months must be between 0 and 11.", "error")
+                    return redirect(f"/admin/edit-pet/{pet.pet_id}")
+            except ValueError:
+                flash("Invalid age in months.", "error")
+                return redirect(f"/admin/edit-pet/{pet.pet_id}")
+
+        if age_years is None and age_months is None:
+            flash("Please enter age in years and/or months.", "error")
+            return redirect(f"/admin/edit-pet/{pet.pet_id}")
+
+        pet.age = age_years if age_years is not None else 0
+        pet.age_months = age_months if age_months is not None else 0
 
         gender_val = request.form.get("gender")
 
@@ -475,4 +507,57 @@ def admin_users():
         users=users,
         total_users=total_users,
         search=search
+    )
+
+# =========================
+# XML EXPORT
+# =========================
+
+@admin.route("/export/xml")
+@login_required
+@admin_required
+def export_xml():
+    import xml.etree.ElementTree as ET
+    from flask import Response
+    from app.models.user import User
+    from app.models.adoption_request import AdoptionRequest
+    
+    root = ET.Element("AdoptMeData")
+    
+    # Pets
+    pets_elem = ET.SubElement(root, "Pets")
+    for pet in Pet.query.all():
+        pet_elem = ET.SubElement(pets_elem, "Pet")
+        ET.SubElement(pet_elem, "ID").text = str(pet.pet_id)
+        ET.SubElement(pet_elem, "Name").text = pet.pet_name
+        ET.SubElement(pet_elem, "Type").text = pet.animal_type
+        ET.SubElement(pet_elem, "Status").text = pet.status
+        ET.SubElement(pet_elem, "Age").text = pet.formatted_age
+        ET.SubElement(pet_elem, "SpayedNeutered").text = pet.spayed_neutered
+        ET.SubElement(pet_elem, "Vaccinated").text = pet.vaccinated
+        
+    # Users
+    users_elem = ET.SubElement(root, "Users")
+    for user in User.query.all():
+        u_elem = ET.SubElement(users_elem, "User")
+        ET.SubElement(u_elem, "ID").text = str(user.user_id)
+        ET.SubElement(u_elem, "Username").text = user.username
+        ET.SubElement(u_elem, "Email").text = user.email
+        ET.SubElement(u_elem, "Active").text = str(user.is_active)
+        
+    # Requests
+    requests_elem = ET.SubElement(root, "AdoptionRequests")
+    for req in AdoptionRequest.query.all():
+        r_elem = ET.SubElement(requests_elem, "Request")
+        ET.SubElement(r_elem, "ID").text = str(req.request_id)
+        ET.SubElement(r_elem, "PetID").text = str(req.pet_id)
+        ET.SubElement(r_elem, "RequesterID").text = str(req.requester_id)
+        ET.SubElement(r_elem, "Status").text = req.status
+        
+    xml_str = ET.tostring(root, encoding="utf-8", method="xml").decode('utf-8')
+    
+    return Response(
+        xml_str,
+        mimetype="application/xml",
+        headers={"Content-Disposition": "attachment;filename=adopt_me_export.xml"}
     )

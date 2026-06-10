@@ -46,6 +46,10 @@ def create_app():
 
     login_manager.login_view = "auth.login"
 
+    with app.app_context():
+        from app.admin.create_admin import create_default_admin
+        create_default_admin()
+
     # GOOGLE OAUTH
     oauth.init_app(app)
 

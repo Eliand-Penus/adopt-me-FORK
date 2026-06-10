@@ -54,7 +54,7 @@
                                 <div class="flex flex-wrap justify-center sm:justify-start gap-1.5 text-xs text-slate-500 font-bold capitalize">
                                     <span class="bg-brand-secondary px-2.5 py-1 rounded-lg">{{ pet.animal_type }}</span>
                                     <span class="bg-brand-secondary px-2.5 py-1 rounded-lg">{{ pet.breed or 'Unknown' }}</span>
-                                    <span class="bg-brand-secondary px-2.5 py-1 rounded-lg">{{ pet.age or '?' }} yrs</span>
+                                    <span class="bg-brand-secondary px-2.5 py-1 rounded-lg">{{ pet.formatted_age }}</span>
                                 </div>
                                 
                                 <div class="flex items-center justify-center sm:justify-start gap-2 pt-1">
