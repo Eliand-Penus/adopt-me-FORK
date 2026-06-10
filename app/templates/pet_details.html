@@ -243,7 +243,7 @@
                         <span class="text-[10px] text-slate-400 uppercase tracking-widest block font-black">Age</span>
                         <div class="flex items-center gap-1.5 text-slate-700">
                             <i data-lucide="calendar" class="w-4 h-4 text-[#007d8e]"></i>
-                            <span>{{ pet.age or '?' }} years old</span>
+                            <span>{{ pet.formatted_age }}</span>
                         </div>
                     </div>
 
@@ -441,54 +441,7 @@
             </div>
             {% endif %}
 
-            <!-- Valid ID Section -->
-            <div class="space-y-3">
-                <h5 class="text-base font-black text-slate-800 flex items-center gap-1.5">
-                    <i data-lucide="file-check" class="w-4 h-4 text-[#007d8e]"></i> Verified Rehomer ID
-                </h5>
-                {% set owner_id_img = pet.owner_valid_id %}
-                {% if not owner_id_img and pet.valid_ids and pet.valid_ids|length > 0 %}
-                {% set owner_id_img = pet.valid_ids[0].image_path %}
-                {% endif %}
-
-                {% if owner_id_img %}
-                {% set id_url = owner_id_img if owner_id_img.startswith('http') else url_for('static',
-                filename=owner_id_img) %}
-                <div class="group relative rounded-[2rem] overflow-hidden cursor-pointer shadow-sm border border-gray-200 hover:shadow-xl transition-all duration-300 bg-slate-50"
-                    onclick="openIdModal('{{ id_url }}')">
-                    <img src="{{ id_url }}" alt="Owner Valid ID"
-                        class="w-full h-44 object-cover group-hover:scale-103 transition duration-500">
-                    <div
-                        class="absolute inset-0 bg-black/0 group-hover:bg-black/25 transition duration-300 flex items-center justify-center">
-                        <span
-                            class="bg-white/95 backdrop-blur shadow-lg text-slate-800 font-bold px-5 py-2.5 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 flex items-center gap-2 text-xs">
-                            <i data-lucide="zoom-in" class="w-4 h-4 text-[#007d8e]"></i> Click to Enlarge
-                        </span>
-                    </div>
-                </div>
-                {% else %}
-                <div
-                    class="border border-dashed border-gray-200 rounded-[2rem] py-10 flex flex-col items-center justify-center text-slate-400 bg-slate-50/50">
-                    <i data-lucide="user-x" class="w-10 h-10 mb-2 opacity-60"></i>
-                    <span class="font-bold text-xs uppercase tracking-wider">No Verified ID File</span>
-                </div>
-                {% endif %}
-            </div>
-
         </div>
-    </div>
-</div>
-
-<!-- ID MODAL (For enlarging the Valid ID) -->
-<div id="idModal"
-    class="hidden fixed inset-0 z-[120] bg-black/90 backdrop-blur-md flex items-center justify-center p-4 transition-opacity duration-300 opacity-0">
-    <div class="relative max-w-5xl w-full scale-95 transition-transform duration-300" id="idModalContent">
-        <button onclick="closeIdModal()"
-            class="absolute -top-14 right-0 bg-white/10 hover:bg-white/20 text-white rounded-full p-3 transition backdrop-blur-sm border border-white/20 cursor-pointer flex items-center justify-center">
-            <i data-lucide="x" class="w-6 h-6"></i>
-        </button>
-        <img id="idModalImage" src="" alt="Valid ID Enlarged"
-            class="w-full max-h-[85vh] object-contain rounded-[2rem] shadow-2xl border border-white/10">
     </div>
 </div>
 {% endblock %}
@@ -557,32 +510,6 @@
         }, 300);
     }
 
-    // VALID ID MODAL CONTROL
-    function openIdModal(url) {
-        const idModal = document.getElementById('idModal');
-        const idModalContent = document.getElementById('idModalContent');
-        document.getElementById('idModalImage').src = url;
-        idModal.classList.remove('hidden');
-
-        setTimeout(() => {
-            idModal.classList.remove('opacity-0');
-            idModalContent.classList.remove('scale-95');
-            idModalContent.classList.add('scale-100');
-        }, 10);
-    }
-
-    function closeIdModal() {
-        const idModal = document.getElementById('idModal');
-        const idModalContent = document.getElementById('idModalContent');
-        idModal.classList.add('opacity-0');
-        idModalContent.classList.remove('scale-100');
-        idModalContent.classList.add('scale-95');
-
-        setTimeout(() => {
-            idModal.classList.add('hidden');
-        }, 300);
-    }
-
     // MEDICAL CERTIFICATE MODAL CONTROL
     function openMedModal(url) {
         document.getElementById('medModalImage').src = url;
@@ -612,9 +539,6 @@
         if (e.target === ownerModal) {
             closeOwnerModal();
         }
-        if (e.target === idModal) {
-            closeIdModal();
-        }
         if (e.target === medModal) {
             closeMedModal();
         }
@@ -629,9 +553,6 @@
 
             if (ownerModal && !ownerModal.classList.contains('hidden')) {
                 closeOwnerModal();
-            }
-            if (idModal && !idModal.classList.contains('hidden')) {
-                closeIdModal();
             }
             if (medModal && !medModal.classList.contains('hidden')) {
                 closeMedModal();

@@ -26,6 +26,9 @@ class Pet(db.Model):
 
     age = db.Column(db.Integer)
 
+    age_months = db.Column(db.Integer, default=0, nullable=True)
+
+
     gender = db.Column(db.String(20))
 
     color = db.Column(db.String(50))
@@ -90,3 +93,25 @@ class Pet(db.Model):
             except:
                 return []
         return []
+
+    @property
+    def formatted_age(self):
+        parts = []
+        years = self.age
+        months = self.age_months
+
+        if years and years > 0:
+            if years == 1:
+                parts.append("1 year")
+            else:
+                parts.append(f"{years} years")
+
+        if months and months > 0:
+            if months == 1:
+                parts.append("1 month")
+            else:
+                parts.append(f"{months} months")
+
+        if not parts:
+            return "0 months"
+        return " ".join(parts)
