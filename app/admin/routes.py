@@ -476,3 +476,53 @@ def admin_users():
         total_users=total_users,
         search=search
     )
+
+# =========================
+# XML EXPORT
+# =========================
+
+@admin.route("/export/xml")
+@login_required
+@admin_required
+def export_xml():
+    import xml.etree.ElementTree as ET
+    from flask import Response
+    from app.models.user import User
+    from app.models.adoption_request import AdoptionRequest
+    
+    root = ET.Element("AdoptMeData")
+    
+    # Pets
+    pets_elem = ET.SubElement(root, "Pets")
+    for pet in Pet.query.all():
+        pet_elem = ET.SubElement(pets_elem, "Pet")
+        ET.SubElement(pet_elem, "ID").text = str(pet.pet_id)
+        ET.SubElement(pet_elem, "Name").text = pet.pet_name
+        ET.SubElement(pet_elem, "Type").text = pet.animal_type
+        ET.SubElement(pet_elem, "Status").text = pet.status
+        
+    # Users
+    users_elem = ET.SubElement(root, "Users")
+    for user in User.query.all():
+        u_elem = ET.SubElement(users_elem, "User")
+        ET.SubElement(u_elem, "ID").text = str(user.user_id)
+        ET.SubElement(u_elem, "Username").text = user.username
+        ET.SubElement(u_elem, "Email").text = user.email
+        ET.SubElement(u_elem, "Active").text = str(user.is_active)
+        
+    # Requests
+    requests_elem = ET.SubElement(root, "AdoptionRequests")
+    for req in AdoptionRequest.query.all():
+        r_elem = ET.SubElement(requests_elem, "Request")
+        ET.SubElement(r_elem, "ID").text = str(req.request_id)
+        ET.SubElement(r_elem, "PetID").text = str(req.pet_id)
+        ET.SubElement(r_elem, "RequesterID").text = str(req.requester_id)
+        ET.SubElement(r_elem, "Status").text = req.status
+        
+    xml_str = ET.tostring(root, encoding="utf-8", method="xml").decode('utf-8')
+    
+    return Response(
+        xml_str,
+        mimetype="application/xml",
+        headers={"Content-Disposition": "attachment;filename=adopt_me_export.xml"}
+    )
